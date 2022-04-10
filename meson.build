@@ -4,7 +4,7 @@ project('domains', 'cpp',
 
 # Dependencies
 fmt_dep = dependency('fmt')
-cairo_dep = dependency('cairo')
+cairo_dep = dependency('cairo') # TODO: make it optional
 
 # Libraries
 domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',
@@ -20,7 +20,7 @@ executable('domains', interpreter_sources,
 
 # Tests + test dependencies.
 gtest_dep = dependency('gtest')
-unittest_sources = ['test/main.cpp']
+unittest_sources = ['test/main.cpp', 'test/lexer.cpp']
 tests = executable('unittest', unittest_sources,
                    d_unittest: true,
                    install: false,

@@ -69,7 +69,19 @@ std::optional<Token> Lexer::lex() noexcept
         case '\t':
             break;
 
-        
+        // Comments
+        case '/':
+            if (match('/'))
+            {
+                // Skip to end of line for comment.
+                while (peek() != '\n' && !isAtEnd())
+                    advance();
+                break;
+            }
+            diag.error(line, fmt::format("Unexpected token: '{}'.", source.substr(start, current - start)));
+            hasError = true;
+            return std::nullopt;
+
         default:
             if (isdigit(c))
                 return lexNumber();
