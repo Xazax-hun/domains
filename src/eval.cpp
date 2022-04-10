@@ -1,6 +1,7 @@
 #include "include/eval.h"
 #include "include/lexer.h"
 #include "include/parser.h"
+#include "include/analysis.h"
 
 #include <fstream>
 #include <iostream>
@@ -23,4 +24,7 @@ bool runFile(std::string_view filePath, bool dumpAst)
     Parser parser(tokens, emitter);
     auto root = parser.parse();
     print(*root);
+    std::cout << "\n";
+    CFG cfg = createCfg(*root);
+    print(cfg);
 }

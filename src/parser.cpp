@@ -108,7 +108,7 @@ std::optional<Node> Parser::loop()
 {
     Token kw = previous();
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
-    BIND(body, command());
+    BIND(body, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
     return context.make<Loop>(kw, body);
