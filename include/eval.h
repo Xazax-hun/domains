@@ -3,7 +3,7 @@
 
 #include <string_view>
 
-bool runFile(std::string_view file, bool dumpAst);
+bool runFile(std::string_view file, bool dumpCfg, bool svg);
 
 
 #endif // EVAL_H

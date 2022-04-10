@@ -19,4 +19,12 @@ private:
     std::ostream& err;
 };
 
+template<typename T>
+struct Finally {
+    T t;
+    ~Finally() { t(); }
+};
+
+struct Vec2 { double x, y; };
+
 #endif // UTILS_H

@@ -12,20 +12,27 @@ int main(int argc, const char* argv[])
     {
         fmt::print("Usage: {} script [options]\n", argv[0]);
         fmt::print("options:\n");
-        fmt::print("  --ast-dump\n");
+        fmt::print("  --cfg-dump\n");
+        fmt::print("  --svg\n");
         fmt::print("  --help\n");
     };
 
     const char *file = nullptr;
-    bool dumpAst = false;
+    bool dumpCfg = false;
+    bool svg = false;
     for (int i = 1; i < argc; ++i)
     {
         if (argv[i][0] == '-')
         {
             // Process flags.
-            if (argv[i] == "--ast-dump"sv)
+            if (argv[i] == "--cfg-dump"sv)
             {
-                dumpAst = true;
+                dumpCfg = true;
+                continue;
+            }
+            if (argv[i] == "--svg"sv)
+            {
+                svg = true;
                 continue;
             }
             if (argv[i] == "--help"sv)
@@ -54,5 +61,5 @@ int main(int argc, const char* argv[])
     }
 
 
-    return runFile(file, dumpAst) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return runFile(file, dumpCfg, svg) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
