@@ -24,7 +24,8 @@ Running `./domains example.tr --svg` will output the SVG to the standard output.
 Rendering the SVG will produce a visualization of a possible execution of the input program.
 An execution is defined as a random walk of the control flow graph.
 
-Example output:
+## Example output:
+
 ![Example output](examples/example.png "Example output")
 
 # Dependencies
