@@ -1,5 +1,6 @@
 #include "include/eval.h"
 #include "include/lexer.h"
+#include "include/parser.h"
 
 #include <fstream>
 #include <iostream>
@@ -19,4 +20,7 @@ bool runFile(std::string_view filePath, bool dumpAst)
     {
         fmt::print("{}\n", print(t));
     }
+    Parser parser(tokens, emitter);
+    auto root = parser.parse();
+    print(*root);
 }
