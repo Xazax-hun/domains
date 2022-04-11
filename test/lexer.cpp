@@ -54,10 +54,10 @@ TEST(Lexer, TestNumbers)
     TokenType tokenTypes[] = {NUMBER, NUMBER, NUMBER, NUMBER, END_OF_FILE};
     EXPECT_TRUE(std::equal(tokenList.begin(), tokenList.end(), std::begin(tokenTypes), std::end(tokenTypes),
                 [](const Token& t, TokenType type) { return t.type == type; }));
-    EXPECT_TRUE(*tokenList[0].value == 0);
-    EXPECT_TRUE(*tokenList[1].value == 50);
-    EXPECT_TRUE(*tokenList[2].value == 50.5);
-    EXPECT_TRUE(*tokenList[3].value == 0.5);
+    EXPECT_EQ(*tokenList[0].value, 0);
+    EXPECT_EQ(*tokenList[1].value, 50);
+    EXPECT_EQ(*tokenList[2].value, 50.5);
+    EXPECT_EQ(*tokenList[3].value, 0.5);
     EXPECT_TRUE(output.str().empty());
 }
 
@@ -68,7 +68,7 @@ TEST(Lexer, TestComments)
     TokenType tokenTypes[] = {NUMBER, END_OF_FILE};
     EXPECT_TRUE(std::equal(tokenList.begin(), tokenList.end(), std::begin(tokenTypes), std::end(tokenTypes),
                 [](const Token& t, TokenType type) { return t.type == type; }));
-    EXPECT_TRUE(*tokenList[0].value == 0);
+    EXPECT_EQ(*tokenList[0].value, 0);
     EXPECT_TRUE(output.str().empty());
 }
 

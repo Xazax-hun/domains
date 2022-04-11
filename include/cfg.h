@@ -18,6 +18,6 @@ struct CFG
 
 CFG createCfg(Node node) noexcept;
 
-void print(const CFG& cfg);
+std::string print(const CFG& cfg);
 
 #endif // ANALYSIS_H

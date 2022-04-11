@@ -1,7 +1,7 @@
 #include "include/eval.h"
 #include "include/lexer.h"
 #include "include/parser.h"
-#include "include/analysis.h"
+#include "include/cfg.h"
 
 #include <fstream>
 #include <iostream>
@@ -173,7 +173,7 @@ bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
         return false;
     CFG cfg = createCfg(*root);
     if (dumpCfg)
-        print(cfg);
+        std::cout << print(cfg);
     Walk w = createRandomWalk(cfg);
     if (w.empty())
         return false;

@@ -1,6 +1,6 @@
-#include "include/analysis.h"
+#include "include/cfg.h"
 
-#include <iostream>
+#include <sstream>
 
 Node toNode(Operation op)
 {
@@ -57,6 +57,7 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             int rhsAfter = addAstNode(cfg, rhsBlock, b->rhs);
             cfg.blocks[branchPred].nexts.push_back(lhsBlock);
             cfg.blocks[branchPred].nexts.push_back(rhsBlock);
+            // TODO: can we do something smarter to avoid empty nodes with e.g., nested ors?
             int afterBranch = newBlock();
             cfg.blocks[lhsAfter].nexts.push_back(afterBranch);
             cfg.blocks[rhsAfter].nexts.push_back(afterBranch);
@@ -88,29 +89,32 @@ CFG createCfg(Node node) noexcept
     return cfg;
 }
 
-void print(const CFG& cfg)
+std::string print(const CFG& cfg)
 {
-    std::cout << "digraph CFG {\n";
+    std::stringstream out;
+    out << "digraph CFG {\n";
     int counter = 0;
     for (const auto& block : cfg.blocks)
     {
-        std::cout << "Node_" << counter << R"([label=")";
+        out << "  Node_" << counter << R"([label=")";
         for (auto op : block.operations)
         {
-            print(toNode(op));
-            std::cout << R"(\n)";
+            out << print(toNode(op));
+            out << R"(\n)";
         }
-        std::cout << R"("])" << "\n";
+        out << R"("])" << "\n";
         ++counter;
     }
+    out << "\n";
     counter = 0;
     for (const auto& block : cfg.blocks)
     {
         for (auto next : block.nexts)
         {
-            std::cout << "Node_" << counter << " -> " << "Node_" << next << "\n";
+            out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
         }
         ++counter;
     }
-    std::cout << "}\n";
+    out << "}\n";
+    return std::move(out).str();
 }
