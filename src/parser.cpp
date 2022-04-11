@@ -19,7 +19,7 @@
 
 std::optional<Node> Parser::parse()
 {
-    auto result = sequence();
+    auto result = sequence(true);
     if (!isAtEnd())
     {
         error(peek(), "end of file expected");
@@ -28,9 +28,14 @@ std::optional<Node> Parser::parse()
     return result;
 }
 
-std::optional<Node> Parser::sequence()
+std::optional<Node> Parser::sequence(bool root)
 {
     std::vector<Node> commands;
+    if (root && peek().type != TokenType::INIT)
+    {
+        error(peek(), "'init' expected at the beginning of the program");
+        return {};
+    }
     while (auto com = command())
     {
         commands.push_back(*com);

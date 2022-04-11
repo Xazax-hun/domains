@@ -27,7 +27,7 @@ public:
     const ASTContext& getContext() const { return context; }
 
 private:
-    std::optional<Node> sequence();
+    std::optional<Node> sequence(bool root = false);
     std::optional<Node> branch();
     std::optional<Node> loop();
     std::optional<Node> command();

@@ -175,6 +175,9 @@ bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
     if (dumpCfg)
         print(cfg);
     Walk w = createRandomWalk(cfg);
+    if (w.empty())
+        return false;
+
     if (svg)
         std::cout << renderRandomWalkSVG(w) << "\n";
     else

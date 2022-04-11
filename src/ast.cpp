@@ -1,9 +1,9 @@
 #include "include/ast.h"
 
-#include <iostream>
+#include <sstream>
 #include <fmt/format.h>
 
-void print(int indent, Node n) noexcept;
+void print(int indent, Node n, std::ostream& output) noexcept;
 
 namespace
 {
@@ -34,7 +34,7 @@ namespace
             const int size = s->nodes.size();
             for (auto n : s->nodes)
             {
-                print(indent, n);
+                print(indent, n, out);
                 if (i++ < size - 1)
                     out << ";\n";
             }
@@ -43,15 +43,15 @@ namespace
         {
 
             out << indentString(indent) << "{\n";
-            print(indent + 2, b->lhs);
+            print(indent + 2, b->lhs, out);
             out << "\n" << indentString(indent) << "} or {\n";
-            print(indent + 2, b->rhs);
+            print(indent + 2, b->rhs, out);
             out << "\n" << indentString(indent) << "}";
         }
         void operator()(Loop* l) noexcept
         {
             out << indentString(indent) << "iter {\n";
-            print(indent + 2, l->body);
+            print(indent + 2, l->body, out);
             out << indentString(indent) << "\n}";
         }
 
@@ -60,15 +60,17 @@ namespace
     };
 } // anonymous namespace
 
-void print(Node n) noexcept
+std::string print(Node n) noexcept
 {
-    print(0, n);
+    std::stringstream output;
+    print(0, n, output);
+    return std::move(output).str();
 }
 
 
-void print(int indent, Node n) noexcept
+void print(int indent, Node n, std::ostream& output) noexcept
 {
-    NodePrinter nodePrinter{indent, std::cout};
+    NodePrinter nodePrinter{indent, output};
     std::visit(nodePrinter, n);
 }
 

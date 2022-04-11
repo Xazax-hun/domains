@@ -51,11 +51,17 @@ struct Loop
     Node body;
 };
 
-void print(Node n) noexcept;
+std::string print(Node n) noexcept;
 
 class ASTContext
 {
 public:
+    ASTContext() = default;
+    ASTContext(ASTContext&&) = default;
+    ASTContext& operator=(ASTContext&&) = default;
+    ASTContext(const ASTContext&) = delete;
+    ASTContext& operator=(const ASTContext&) = delete;
+
     template<typename T, typename... Args>
     Node make(Args&&... args)
     {
