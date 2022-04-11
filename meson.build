@@ -4,7 +4,12 @@ project('domains', 'cpp',
 
 # Dependencies
 fmt_dep = dependency('fmt')
-cairo_dep = dependency('cairo') # TODO: make it optional
+cairo_dep = dependency('cairo', required: false)
+
+# Compiler arguments
+if cairo_dep.found()
+  add_project_arguments('-DHAVE_CAIRO', language : 'cpp')
+endif
 
 # Libraries
 domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',

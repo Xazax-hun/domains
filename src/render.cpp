@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cmath>
 
+#ifdef HAVE_CAIRO
 #include <cairo.h>
 #include <cairo-svg.h> 
 
@@ -75,3 +76,12 @@ std::string renderRandomWalkSVG(Walk w)
 
     return std::move(svgContent).str();
 }
+
+#else
+
+std::string renderRandomWalkSVG(Walk w)
+{
+    return "ERROR: compiled without cairo.";
+}
+
+#endif

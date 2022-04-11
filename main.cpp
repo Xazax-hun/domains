@@ -38,7 +38,7 @@ bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
     else
     {
         for (auto step : w)
-            std::cout << step.nextPos.x << " " << step.nextPos.y << "\n";
+            std::cout << step.pos.x << " " << step.pos.y << "\n";
     }
     return true;
 }
