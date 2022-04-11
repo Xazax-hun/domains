@@ -20,8 +20,8 @@ iter{
 }
 ```
 
-Running `./domains example.tr --svg` will output the SVG to the standard output.
-Rendering the SVG will produce a visualization of a possible execution of the input program.
+Running `./domains example.tr --svg` will output the SVG to the standard output
+that visualizes an execution trace of the program.
 An execution is defined as a random walk of the control flow graph.
 
 ## Example output:
@@ -33,4 +33,4 @@ An execution is defined as a random walk of the control flow graph.
 * Meson
 * C++20 compatible compiler
 * fmt
-* cairo
+* cairo (optional for svg)
