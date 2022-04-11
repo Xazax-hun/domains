@@ -21,13 +21,13 @@ struct StepEval {
 
     Step operator()(Translation* t) noexcept
     {
-        return Step{ Vec2 { in->nextPos.x + *t->x.value, in->nextPos.y + *t->y.value}, {}, {}, false };
+        return Step{ Vec2 { in->pos.x + *t->x.value, in->pos.y + *t->y.value}, {}, {}, false };
     }
 
     Step operator()(Rotation* r) noexcept
     {
         Vec2 origin{*r->x.value, *r->y.value};
-        Vec2 transformed { in->nextPos.x - origin.x, in->nextPos.y - origin.y };
+        Vec2 transformed { in->pos.x - origin.x, in->pos.y - origin.y };
         double rotRad = toRad(*r->deg.value);
         Vec2 rotated;
         rotated.x = transformed.x * cos(rotRad) - transformed.y * sin(rotRad);

@@ -8,7 +8,7 @@
 #include "include/utils.h"
 
 struct Step {
-    Vec2 nextPos;
+    Vec2 pos;
     std::optional<Vec2> origin;
     std::optional<double> deg;
     bool init = false;

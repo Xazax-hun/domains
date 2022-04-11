@@ -47,18 +47,18 @@ std::string renderRandomWalkSVG(Walk w)
             cairo_new_path(cr);
             if (w[i].origin)
             {
-                double xdiff = w[i].origin->x - w[i].nextPos.x;
-                double ydiff = w[i].origin->y - w[i].nextPos.y;
+                double xdiff = w[i].origin->x - w[i].pos.x;
+                double ydiff = w[i].origin->y - w[i].pos.y;
                 double dist = sqrt(xdiff * xdiff + ydiff * ydiff);
-                double degPrev = atan2(-w[i-1].nextPos.y, w[i-1].nextPos.x);
-                double degCur = atan2(-w[i].nextPos.y, w[i].nextPos.x);
+                double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
+                double degCur = atan2(-w[i].pos.y, w[i].pos.x);
                 cairo_arc(cr, w[i].origin->x, -w[i].origin->y, dist, degCur, degPrev);
                 cairo_stroke(cr);
             }
             else
             {
-                cairo_move_to(cr, w[i - 1].nextPos.x, -w[i - 1].nextPos.y);
-                cairo_line_to(cr, w[i].nextPos.x, -w[i].nextPos.y);
+                cairo_move_to(cr, w[i - 1].pos.x, -w[i - 1].pos.y);
+                cairo_line_to(cr, w[i].pos.x, -w[i].pos.y);
                 cairo_stroke(cr);
             }
         }
@@ -67,7 +67,7 @@ std::string renderRandomWalkSVG(Walk w)
         {
             cairo_new_path(cr);
             cairo_set_source_rgb(cr, 0, w[i].init ? 1 : 0, 0);
-            cairo_arc(cr, w[i].nextPos.x, -w[i].nextPos.y, radius, 0, 2 * M_PI);
+            cairo_arc(cr, w[i].pos.x, -w[i].pos.y, radius, 0, 2 * M_PI);
             cairo_fill(cr);
         }
         // Surface needs to be destroyed here.

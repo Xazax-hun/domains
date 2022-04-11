@@ -61,9 +61,9 @@ rotation(0, 0, 90))";
     EXPECT_TRUE(result);
     EXPECT_EQ(result->w.size(), 3);
     Vec2 expected[] = { Vec2{50, 0}, Vec2{60, 0}, Vec2{0, 60}};
-    EXPECT_TRUE(veryClose(result->w[0].nextPos, expected[0]));
-    EXPECT_TRUE(veryClose(result->w[1].nextPos, expected[1]));
-    EXPECT_TRUE(veryClose(result->w[2].nextPos, expected[2]));
+    EXPECT_TRUE(veryClose(result->w[0].pos, expected[0]));
+    EXPECT_TRUE(veryClose(result->w[1].pos, expected[1]));
+    EXPECT_TRUE(veryClose(result->w[2].pos, expected[2]));
     EXPECT_TRUE(result->w[0].init);
     EXPECT_FALSE(result->w[1].origin);
     EXPECT_FALSE(result->w[1].deg);
@@ -87,7 +87,7 @@ iter { translation(10, 0) })";
     {
         EXPECT_FALSE(result->w[i].origin);
         EXPECT_FALSE(result->w[i].deg);
-        EXPECT_TRUE(veryClose(result->w[i - 1].nextPos.x + 10, result->w[i].nextPos.x));
+        EXPECT_TRUE(veryClose(result->w[i - 1].pos.x + 10, result->w[i].pos.x));
     }
 }
 
@@ -105,7 +105,7 @@ R"(init(50, 0, 0, 0);
     EXPECT_TRUE(result->w[0].init);
     EXPECT_FALSE(result->w[1].origin);
     EXPECT_FALSE(result->w[1].deg);
-    EXPECT_TRUE(veryClose(distSquared(result->w[0].nextPos, result->w[1].nextPos), 10*10));
+    EXPECT_TRUE(veryClose(distSquared(result->w[0].pos, result->w[1].pos), 10*10));
 }
 
 } // namespace
