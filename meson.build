@@ -8,7 +8,8 @@ cairo_dep = dependency('cairo') # TODO: make it optional
 
 # Libraries
 domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',
-                          'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp', 'src/cfg.cpp']
+                          'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp',
+                          'src/cfg.cpp', 'src/render.cpp']
 domains_static_lib = static_library('libslox', domains_static_sources,
                                      dependencies: [fmt_dep, cairo_dep])
 
