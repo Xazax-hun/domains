@@ -1,6 +1,9 @@
 #include "include/cfg.h"
 
+#include <algorithm>
 #include <sstream>
+#include <stack>
+#include <cassert>
 
 Node toNode(Operation op)
 {
@@ -117,4 +120,66 @@ std::string print(const CFG& cfg)
     }
     out << "}\n";
     return std::move(out).str();
+}
+
+
+RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
+{
+    std::vector<int> visitOrder;
+    visitOrder.reserve(cfg.blocks.size());
+    std::stack<int, std::vector<int>> stack;
+    std::vector<bool> visited(cfg.blocks.size());
+    std::stack<int, std::vector<int>> pending;
+    stack.push(0);
+    while(!stack.empty())
+    {
+        int current = stack.top();
+        visited[current] = true;
+        pending.push(-1);
+        for(auto succ : cfg.blocks[current].nexts)
+        {
+            if (!visited[succ])
+                pending.push(succ);
+        }
+        int next = pending.top();
+        pending.pop();
+        if (next == -1)
+        {
+            stack.pop();
+            visitOrder.push_back(current);
+            continue;
+        }
+        stack.push(next);
+    }
+    std::reverse(visitOrder.begin(), visitOrder.end());
+    int counter = 0;
+    for (int node : visitOrder)
+        rpoOrder[node] = counter++;
+}
+
+RPOWorklist::RPOWorklist(CFG& cfg)
+  : cfg(cfg), comparator(cfg), worklist(comparator), queued(cfg.blocks.size(), false) {}
+
+void RPOWorklist::enqueue(int node) noexcept
+{
+    if (queued[node])
+        return;
+
+    queued[node] = true;
+    worklist.push(node);
+}
+
+void RPOWorklist::enqueueSuccessors(int node) noexcept
+{
+    for (int succ : cfg.blocks[node].nexts)
+        enqueue(succ);
+}
+
+int RPOWorklist::dequeue() noexcept
+{
+    assert(!worklist.empty());
+    int node = worklist.top();
+    worklist.pop();
+    queued[node] = false;
+    return node;
 }

@@ -66,6 +66,107 @@ R"(digraph CFG {
     EXPECT_EQ(prettyPrintedCfg, expected);
 }
 
+TEST(Cfg, RpoOrder)
+{
+    //     0
+    //    / \  no multiline comment 
+    //   1   2
+    //   |   |
+    //   |   3
+    //    \ / 
+    //     4
+    CFG cfg;
+    cfg.blocks.resize(5);
+    cfg.blocks[0].nexts.push_back(1);
+    cfg.blocks[0].nexts.push_back(2);
+    cfg.blocks[1].nexts.push_back(4);
+    cfg.blocks[2].nexts.push_back(3);
+    cfg.blocks[3].nexts.push_back(4);
+
+    RPOCompare compare(cfg);
+    EXPECT_EQ(compare.getRpoPosition(0), 0);
+    EXPECT_EQ(compare.getRpoPosition(1), 1);
+    EXPECT_EQ(compare.getRpoPosition(2), 2);
+    EXPECT_EQ(compare.getRpoPosition(3), 3);
+    EXPECT_EQ(compare.getRpoPosition(4), 4);
+}
+
+TEST(Cfg, RpoOrder_DifferentEdgeOrder)
+{
+    // Same as before but with different edge order for the first node.
+    CFG cfg;
+    cfg.blocks.resize(5);
+    cfg.blocks[0].nexts.push_back(2);
+    cfg.blocks[0].nexts.push_back(1);
+    cfg.blocks[1].nexts.push_back(4);
+    cfg.blocks[2].nexts.push_back(3);
+    cfg.blocks[3].nexts.push_back(4);
+
+    RPOCompare compare(cfg);
+    EXPECT_EQ(compare.getRpoPosition(0), 0);
+    EXPECT_EQ(compare.getRpoPosition(2), 1);
+    EXPECT_EQ(compare.getRpoPosition(3), 2);
+    EXPECT_EQ(compare.getRpoPosition(1), 3);
+    EXPECT_EQ(compare.getRpoPosition(4), 4);
+}
+
+TEST(Cfg, RpoOrder_WithBackEdges)
+{
+    //      0  <----
+    //     / \   | |
+    //    1   2--| |
+    //    |   |    |
+    //    |   3----|
+    //     \ / 
+    //      4
+    CFG cfg;
+    cfg.blocks.resize(5);
+    cfg.blocks[0].nexts.push_back(1);
+    cfg.blocks[0].nexts.push_back(2);
+    cfg.blocks[1].nexts.push_back(4);
+    cfg.blocks[2].nexts.push_back(3);
+    cfg.blocks[2].nexts.push_back(0);
+    cfg.blocks[3].nexts.push_back(4);
+    cfg.blocks[3].nexts.push_back(0);
+
+    RPOCompare compare(cfg);
+    EXPECT_EQ(compare.getRpoPosition(0), 0);
+    EXPECT_EQ(compare.getRpoPosition(1), 1);
+    EXPECT_EQ(compare.getRpoPosition(2), 2);
+    EXPECT_EQ(compare.getRpoPosition(3), 3);
+    EXPECT_EQ(compare.getRpoPosition(4), 4);
+}
+
+TEST(Cfg, RpoOrder_WithBackEdges_2)
+{
+    //      0  <----
+    //     / \   | |
+    // -->1   2--| |
+    // |  |   |    |
+    // |  |   3----|
+    // |   \ / 
+    // |----4
+    CFG cfg;
+    cfg.blocks.resize(5);
+    cfg.blocks[0].nexts.push_back(1);
+    cfg.blocks[0].nexts.push_back(2);
+    cfg.blocks[1].nexts.push_back(4);
+    cfg.blocks[2].nexts.push_back(3);
+    cfg.blocks[2].nexts.push_back(0);
+    cfg.blocks[3].nexts.push_back(4);
+    cfg.blocks[3].nexts.push_back(0);
+    cfg.blocks[4].nexts.push_back(1);
+
+    // TODO: is this actually the order we want?
+    //       would we want to visit 1 earlier?
+    RPOCompare compare(cfg);
+    EXPECT_EQ(compare.getRpoPosition(0), 0);
+    EXPECT_EQ(compare.getRpoPosition(2), 1);
+    EXPECT_EQ(compare.getRpoPosition(3), 2);
+    EXPECT_EQ(compare.getRpoPosition(4), 3);
+    EXPECT_EQ(compare.getRpoPosition(1), 4);
+}
+
 // TODO: add property based tests,
 //  * No unreachable nodes
 //  * All next indices are valid
