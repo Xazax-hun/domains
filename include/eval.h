@@ -7,8 +7,6 @@
 
 #include "include/utils.h"
 
-bool runFile(std::string_view file, bool dumpCfg, bool svg);
-
 struct Step {
     Vec2 nextPos;
     std::optional<Vec2> origin;

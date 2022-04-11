@@ -4,13 +4,8 @@
 #include "include/cfg.h"
 #include "include/render.h"
 
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <random>
 #include <cmath>
-
-#include <fmt/format.h>
 
 double toRad(double deg) { return deg / 180 * M_PI; }
 
@@ -76,35 +71,4 @@ Walk createRandomWalk(const CFG& cfg)
         current = cfg.blocks[current].nexts[genNext(gen)];
     } while (true);
     return w;
-}
-
-bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
-{
-    DiagnosticEmitter emitter(std::cout, std::cerr);
-    std::ifstream file(filePath.data());
-    std::stringstream fileContent;
-    fileContent << file.rdbuf();
-    Lexer lexer(std::move(fileContent).str(), emitter);
-    auto tokens = lexer.lexAll();
-    if (tokens.empty())
-        return false;
-    Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
-        return false;
-    CFG cfg = createCfg(*root);
-    if (dumpCfg)
-        std::cout << print(cfg);
-    Walk w = createRandomWalk(cfg);
-    if (w.empty())
-        return false;
-
-    if (svg)
-        std::cout << renderRandomWalkSVG(w) << "\n";
-    else
-    {
-        for (auto step : w)
-            std::cout << step.nextPos.x << " " << step.nextPos.y << "\n";
-    }
-    return true;
 }
