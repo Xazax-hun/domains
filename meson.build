@@ -21,7 +21,8 @@ executable('domains', interpreter_sources,
 
 # Tests + test dependencies.
 gtest_dep = dependency('gtest')
-unittest_sources = ['test/main.cpp', 'test/lexer.cpp', 'test/parser.cpp', 'test/cfg.cpp']
+unittest_sources = ['test/main.cpp', 'test/lexer.cpp', 'test/parser.cpp',
+                    'test/cfg.cpp', 'test/eval.cpp']
 tests = executable('unittest', unittest_sources,
                    d_unittest: true,
                    install: false,

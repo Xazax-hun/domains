@@ -28,7 +28,7 @@ std::optional<ParseResult> parseToCFG(std::string_view str, std::ostream& output
 }
 
 
-TEST(Parser, BasicCfg)
+TEST(Cfg, BasicCfg)
 {
     std::stringstream output;
     std::string_view source =
