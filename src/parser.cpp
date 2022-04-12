@@ -99,11 +99,11 @@ std::optional<Node> Parser::command()
 std::optional<Node> Parser::branch()
 {
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
-    BIND(lhs, command());
+    BIND(lhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
     BIND(kw, consume(TokenType::OR, "number expected"));
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
-    BIND(rhs, command());
+    BIND(rhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
     return context.make<Branch>(kw, lhs, rhs);

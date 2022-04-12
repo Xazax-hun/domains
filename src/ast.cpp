@@ -52,7 +52,7 @@ namespace
         {
             out << indentString(indent) << "iter {\n";
             print(indent + 2, l->body, out);
-            out << indentString(indent) << "\n}";
+            out << "\n" << indentString(indent) << "}";
         }
 
         int indent;

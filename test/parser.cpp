@@ -29,7 +29,10 @@ R"(init(50, 50, 50, 50);
 translation(10, 0);
 iter {
   {
-    translation(10, 0)
+    translation(10, 0);
+    iter {
+      translation(10, 0)
+    }
   } or {
     rotation(0, 0, 90)
   }
