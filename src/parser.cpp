@@ -109,6 +109,13 @@ std::optional<Node> Parser::branch()
     BIND(rhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
+    if (std::get<Sequence*>(lhs)->nodes.empty() &&
+        std::get<Sequence*>(rhs)->nodes.empty())
+    {
+        error(kw, "at most one alternative can be empty");
+        return {};
+    }
+
     return context.make<Branch>(kw, lhs, rhs);
 }
 
@@ -118,6 +125,12 @@ std::optional<Node> Parser::loop()
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
     BIND(body, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
+
+    if (std::get<Sequence*>(body)->nodes.empty())
+    {
+        error(kw, "the body of 'iter' must not be empty");
+        return {};
+    }
 
     return context.make<Loop>(kw, body);
 }

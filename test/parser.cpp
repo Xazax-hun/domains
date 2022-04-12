@@ -71,4 +71,20 @@ TEST(Parser, EmptyInput)
     EXPECT_EQ(output.str(), "[line 1] Error at end of file: 'init' expected at the beginning of the program\n");
 }
 
+TEST(Parser, EmptyOr)
+{
+    std::stringstream output;
+    std::string_view source = "init(50, 50, 50, 50); {} or {}";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at 'or': at most one alternative can be empty\n");
+}
+
+TEST(Parser, EmptyLoop)
+{
+    std::stringstream output;
+    std::string_view source = "init(50, 50, 50, 50); iter {}";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at 'iter': the body of 'iter' must not be empty\n");
+}
+
 } // anonymous
