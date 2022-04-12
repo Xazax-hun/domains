@@ -66,6 +66,70 @@ R"(digraph CFG {
     EXPECT_EQ(prettyPrintedCfg, expected);
 }
 
+TEST(Cfg, CfgWithMoreNesting)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+translation(10, 0);
+iter {
+  iter {
+    translation(10, 0);
+  };
+  {
+    translation(10, 0)
+  } or {
+    {
+      translation(10, 0)
+    } or {
+      iter {
+        rotation(0, 0, 90)
+      }
+    }
+  }
+})";
+    std::string_view expected =
+R"(digraph CFG {
+  Node_0[label="init(50, 50, 50, 50)\ntranslation(10, 0)\n"]
+  Node_1[label=""]
+  Node_2[label="translation(10, 0)\n"]
+  Node_3[label=""]
+  Node_4[label="translation(10, 0)\n"]
+  Node_5[label=""]
+  Node_6[label="translation(10, 0)\n"]
+  Node_7[label=""]
+  Node_8[label="rotation(0, 0, 90)\n"]
+  Node_9[label=""]
+  Node_10[label=""]
+  Node_11[label=""]
+  Node_12[label=""]
+
+  Node_0 -> Node_1
+  Node_1 -> Node_2
+  Node_2 -> Node_2
+  Node_2 -> Node_3
+  Node_3 -> Node_4
+  Node_3 -> Node_5
+  Node_4 -> Node_11
+  Node_5 -> Node_6
+  Node_5 -> Node_7
+  Node_6 -> Node_10
+  Node_7 -> Node_8
+  Node_8 -> Node_8
+  Node_8 -> Node_9
+  Node_9 -> Node_10
+  Node_10 -> Node_11
+  Node_11 -> Node_1
+  Node_11 -> Node_12
+}
+)";
+    auto result = parseToCFG(source, output);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result.has_value());
+    auto prettyPrintedCfg = print(result->root);
+    EXPECT_EQ(prettyPrintedCfg, expected);
+}
+
 TEST(Cfg, RpoOrder)
 {
     //     0
@@ -91,9 +155,15 @@ TEST(Cfg, RpoOrder)
     EXPECT_EQ(compare.getRpoPosition(4), 4);
 }
 
-TEST(Cfg, RpoOrder_DifferentEdgeOrder)
+TEST(Cfg, RpoOrder_Mirrored)
 {
-    // Same as before but with different edge order for the first node.
+    //     0
+    //    / \  no multiline comment 
+    //   2   1
+    //   |   |
+    //   3   |
+    //    \ / 
+    //     4
     CFG cfg;
     cfg.blocks.resize(5);
     cfg.blocks[0].nexts.push_back(2);
