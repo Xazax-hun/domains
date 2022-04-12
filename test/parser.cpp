@@ -45,6 +45,24 @@ iter {
     EXPECT_EQ(prettyPrinted, source);
 }
 
+TEST(Parser, EmptyAlternativeInOr)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+{
+  translation(10, 0)
+} or {
+
+})";
+    auto result = parseString(source, output);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(result->root.has_value());
+    auto prettyPrinted = print(*result->root);
+    EXPECT_EQ(prettyPrinted, source);
+}
+
 TEST(Parser, EmptyInput)
 {
     std::stringstream output;

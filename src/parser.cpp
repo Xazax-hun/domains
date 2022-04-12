@@ -92,13 +92,16 @@ std::optional<Node> Parser::command()
     {
         return loop();
     }
+    else if (match(TokenType::LEFT_BRACE))
+    {
+        return branch();
+    }
 
-    return branch();
+    return {};
 }
 
 std::optional<Node> Parser::branch()
 {
-    MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
     BIND(lhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
     BIND(kw, consume(TokenType::OR, "number expected"));
