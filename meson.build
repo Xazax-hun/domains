@@ -14,7 +14,7 @@ endif
 # Libraries
 domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',
                           'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp',
-                          'src/cfg.cpp', 'src/render.cpp', 'src/dataflow/solver.cpp']
+                          'src/cfg.cpp', 'src/render.cpp']
 domains_static_lib = static_library('libslox', domains_static_sources,
                                      dependencies: [fmt_dep, cairo_dep])
 

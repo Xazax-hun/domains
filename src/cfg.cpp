@@ -58,22 +58,22 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             int branchPred = currentBlock;
             int lhsAfter = addAstNode(cfg, lhsBlock, b->lhs);
             int rhsAfter = addAstNode(cfg, rhsBlock, b->rhs);
-            cfg.blocks[branchPred].nexts.push_back(lhsBlock);
-            cfg.blocks[branchPred].nexts.push_back(rhsBlock);
+            cfg.blocks[branchPred].succs.push_back(lhsBlock);
+            cfg.blocks[branchPred].succs.push_back(rhsBlock);
             // TODO: can we do something smarter to avoid empty nodes with e.g., nested ors?
             int afterBranch = newBlock();
-            cfg.blocks[lhsAfter].nexts.push_back(afterBranch);
-            cfg.blocks[rhsAfter].nexts.push_back(afterBranch);
+            cfg.blocks[lhsAfter].succs.push_back(afterBranch);
+            cfg.blocks[rhsAfter].succs.push_back(afterBranch);
             return afterBranch;
         }
         int operator()(Loop* l) noexcept
         {
             int bodyBegin = newBlock();
-            cfg.blocks[currentBlock].nexts.push_back(bodyBegin);
+            cfg.blocks[currentBlock].succs.push_back(bodyBegin);
             int bodyEnd = addAstNode(cfg, bodyBegin, l->body);
             int afterBody = newBlock();
-            cfg.blocks[bodyEnd].nexts.push_back(bodyBegin);
-            cfg.blocks[bodyEnd].nexts.push_back(afterBody);
+            cfg.blocks[bodyEnd].succs.push_back(bodyBegin);
+            cfg.blocks[bodyEnd].succs.push_back(afterBody);
             return afterBody;
         }
 
@@ -112,7 +112,7 @@ std::string print(const CFG& cfg)
     counter = 0;
     for (const auto& block : cfg.blocks)
     {
-        for (auto next : block.nexts)
+        for (auto next : block.succs)
         {
             out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
         }
@@ -136,7 +136,7 @@ RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
         int current = stack.top();
         visited[current] = true;
         pending.push(-1);
-        for(auto succ : cfg.blocks[current].nexts)
+        for(auto succ : cfg.blocks[current].succs)
         {
             if (!visited[succ])
                 pending.push(succ);
@@ -171,7 +171,7 @@ void RPOWorklist::enqueue(int node) noexcept
 
 void RPOWorklist::enqueueSuccessors(int node) noexcept
 {
-    for (int succ : cfg.blocks[node].nexts)
+    for (int succ : cfg.blocks[node].succs)
         enqueue(succ);
 }
 

@@ -141,11 +141,11 @@ TEST(Cfg, RpoOrder)
     //     4
     CFG cfg;
     cfg.blocks.resize(5);
-    cfg.blocks[0].nexts.push_back(1);
-    cfg.blocks[0].nexts.push_back(2);
-    cfg.blocks[1].nexts.push_back(4);
-    cfg.blocks[2].nexts.push_back(3);
-    cfg.blocks[3].nexts.push_back(4);
+    cfg.blocks[0].succs.push_back(1);
+    cfg.blocks[0].succs.push_back(2);
+    cfg.blocks[1].succs.push_back(4);
+    cfg.blocks[2].succs.push_back(3);
+    cfg.blocks[3].succs.push_back(4);
 
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
@@ -166,11 +166,11 @@ TEST(Cfg, RpoOrder_Mirrored)
     //     4
     CFG cfg;
     cfg.blocks.resize(5);
-    cfg.blocks[0].nexts.push_back(2);
-    cfg.blocks[0].nexts.push_back(1);
-    cfg.blocks[1].nexts.push_back(4);
-    cfg.blocks[2].nexts.push_back(3);
-    cfg.blocks[3].nexts.push_back(4);
+    cfg.blocks[0].succs.push_back(2);
+    cfg.blocks[0].succs.push_back(1);
+    cfg.blocks[1].succs.push_back(4);
+    cfg.blocks[2].succs.push_back(3);
+    cfg.blocks[3].succs.push_back(4);
 
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
@@ -191,13 +191,13 @@ TEST(Cfg, RpoOrder_WithBackEdges)
     //      4
     CFG cfg;
     cfg.blocks.resize(5);
-    cfg.blocks[0].nexts.push_back(1);
-    cfg.blocks[0].nexts.push_back(2);
-    cfg.blocks[1].nexts.push_back(4);
-    cfg.blocks[2].nexts.push_back(3);
-    cfg.blocks[2].nexts.push_back(0);
-    cfg.blocks[3].nexts.push_back(4);
-    cfg.blocks[3].nexts.push_back(0);
+    cfg.blocks[0].succs.push_back(1);
+    cfg.blocks[0].succs.push_back(2);
+    cfg.blocks[1].succs.push_back(4);
+    cfg.blocks[2].succs.push_back(3);
+    cfg.blocks[2].succs.push_back(0);
+    cfg.blocks[3].succs.push_back(4);
+    cfg.blocks[3].succs.push_back(0);
 
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
@@ -218,14 +218,14 @@ TEST(Cfg, RpoOrder_WithBackEdges_2)
     // |----4
     CFG cfg;
     cfg.blocks.resize(5);
-    cfg.blocks[0].nexts.push_back(1);
-    cfg.blocks[0].nexts.push_back(2);
-    cfg.blocks[1].nexts.push_back(4);
-    cfg.blocks[2].nexts.push_back(3);
-    cfg.blocks[2].nexts.push_back(0);
-    cfg.blocks[3].nexts.push_back(4);
-    cfg.blocks[3].nexts.push_back(0);
-    cfg.blocks[4].nexts.push_back(1);
+    cfg.blocks[0].succs.push_back(1);
+    cfg.blocks[0].succs.push_back(2);
+    cfg.blocks[1].succs.push_back(4);
+    cfg.blocks[2].succs.push_back(3);
+    cfg.blocks[2].succs.push_back(0);
+    cfg.blocks[3].succs.push_back(4);
+    cfg.blocks[3].succs.push_back(0);
+    cfg.blocks[4].succs.push_back(1);
 
     // TODO: is this actually the order we want?
     //       would we want to visit 1 earlier?

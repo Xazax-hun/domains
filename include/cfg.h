@@ -9,7 +9,8 @@ using Operation = std::variant<Init*, Translation*, Rotation*>;
 struct BasicBlock
 {
     std::vector<Operation> operations;
-    std::vector<int> nexts;
+    std::vector<int> succs;
+    std::vector<int> preds;
 };
 
 struct CFG

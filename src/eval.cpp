@@ -65,10 +65,10 @@ Walk createRandomWalk(const CFG& cfg)
                next = std::visit(StepEval{&w.back(), gen}, o);
             w.push_back(next);
         }
-        if (cfg.blocks[current].nexts.empty())
+        if (cfg.blocks[current].succs.empty())
             break;
-        std::uniform_int_distribution<int> genNext(0, cfg.blocks[current].nexts.size() - 1);
-        current = cfg.blocks[current].nexts[genNext(gen)];
+        std::uniform_int_distribution<int> genNext(0, cfg.blocks[current].succs.size() - 1);
+        current = cfg.blocks[current].succs[genNext(gen)];
     } while (true);
     return w;
 }
