@@ -57,7 +57,7 @@ struct Token
     //       column number and file path.
     unsigned line; 
 
-    // The value of number literals.
+    // The value of number literals. TODO: move to integer values.
     std::optional<double> value;
 
     Token(TokenType type, int line, std::optional<double> value = {}) noexcept :
