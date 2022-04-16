@@ -78,6 +78,33 @@ std::optional<Token> Lexer::lex() noexcept
                     advance();
                 break;
             }
+            if (match('*'))
+            {
+                bool closed = false;
+                // Skip to end of comment. TODO: make this nestable?
+                do
+                {
+                    while (peek() != '*' && !isAtEnd())
+                        advance();
+
+                    if (isAtEnd())
+                    {
+                        diag.error(line, fmt::format("Multiline comment not closed."));
+                        hasError = true;
+                        return std::nullopt;
+                    }
+
+                    advance();
+                    if (peek() == '/')
+                    {
+                        advance();
+                        closed = true;
+                        break;
+                    }
+                } while (true);
+                if (closed)
+                    break;
+            }
             diag.error(line, fmt::format("Unexpected token: '{}'.", source.substr(start, current - start)));
             hasError = true;
             return std::nullopt;
