@@ -25,6 +25,6 @@ struct Finally {
     ~Finally() { t(); }
 };
 
-struct Vec2 { double x, y; };
+struct Vec2 { int x, y; };
 
 #endif // UTILS_H

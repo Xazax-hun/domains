@@ -48,8 +48,8 @@ std::string renderRandomWalkSVG(Walk w)
             cairo_new_path(cr);
             if (w[i].origin)
             {
-                double xdiff = w[i].origin->x - w[i].pos.x;
-                double ydiff = w[i].origin->y - w[i].pos.y;
+                int xdiff = w[i].origin->x - w[i].pos.x;
+                int ydiff = w[i].origin->y - w[i].pos.y;
                 double dist = sqrt(xdiff * xdiff + ydiff * ydiff);
                 double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
                 double degCur = atan2(-w[i].pos.y, w[i].pos.x);

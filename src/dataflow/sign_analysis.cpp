@@ -7,7 +7,7 @@
 namespace
 {
 
-SignDomain toAbstract(double value)
+SignDomain toAbstract(int value)
 {
     if (value < 0)
         return SignDomain{ SignValue::Negative };
@@ -24,8 +24,8 @@ struct TransferOperation
     Vec2Sign operator()(Init* init) const
     {
         SignDomain xSign{SignValue::Top};
-        double topX = *init->topX.value;
-        double width = *init->width.value;
+        int topX = *init->topX.value;
+        int width = *init->width.value;
         if (topX > 0)
             xSign = SignDomain{SignValue::Positive};
         else if (topX + width < 0)
@@ -34,8 +34,8 @@ struct TransferOperation
             xSign = SignDomain{SignValue::Zero};
 
         SignDomain ySign{SignValue::Top};
-        double topY = *init->topY.value;
-        double height = *init->height.value;
+        int topY = *init->topY.value;
+        int height = *init->height.value;
         if (topY > 0)
             ySign = SignDomain{SignValue::Positive};
         else if (topY + height < 0)
@@ -56,19 +56,16 @@ struct TransferOperation
 
     Vec2Sign operator()(Rotation* r) const
     {
-        double deg = *r->deg.value;
-        double intpart;
-        modf(deg, &intpart);
-        if (intpart == 0.0 && *r->x.value == 0 && *r->y.value == 0)
+        if (*r->x.value == 0 && *r->y.value == 0)
         {
-            int intDeg = deg;
-            if (intDeg % 360 == 0)
+            int deg = *r->deg.value;
+            if (deg % 360 == 0)
                 return preState;
-            if (intDeg % 270 == 0)
+            if (deg % 270 == 0)
                 return Vec2Sign{preState.y, negate(preState.x)};
-            if (intDeg % 180 == 0)
+            if (deg % 180 == 0)
                 return Vec2Sign{negate(preState.x), negate(preState.y)};
-            if (intDeg % 90 == 0)
+            if (deg % 90 == 0)
                 return Vec2Sign{negate(preState.y), preState.x};
         }
         return Vec2Sign{SignDomain{SignValue::Top}, SignDomain{SignValue::Top}};

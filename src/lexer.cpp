@@ -112,17 +112,7 @@ std::optional<Token> Lexer::lexNumber() noexcept
     while (isdigit(peek()))
         advance();
 
-    // Look for a fractional part.
-    if (peek() == '.' && isdigit(peekNext()))
-    {
-        // Consume the "."
-        advance();
-
-        while (isdigit(peek()))
-            advance();
-    }
-
-    double value = strtod(source.substr(start, current - start).c_str(), nullptr);
+    int value = atoi(source.substr(start, current - start).c_str());
 
     return Token(NUMBER, line, value);
 }

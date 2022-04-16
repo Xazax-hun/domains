@@ -30,8 +30,8 @@ struct StepEval {
         Vec2 transformed { in->pos.x - origin.x, in->pos.y - origin.y };
         double rotRad = toRad(*r->deg.value);
         Vec2 rotated;
-        rotated.x = transformed.x * cos(rotRad) - transformed.y * sin(rotRad);
-        rotated.y = transformed.y * cos(rotRad) + transformed.x * sin(rotRad);
+        rotated.x = round(transformed.x * cos(rotRad) - transformed.y * sin(rotRad));
+        rotated.y = round(transformed.y * cos(rotRad) + transformed.x * sin(rotRad));
         rotated.x += origin.x;
         rotated.y += origin.y;
         return Step {

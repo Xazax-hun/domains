@@ -10,7 +10,7 @@
 struct Step {
     Vec2 pos;
     std::optional<Vec2> origin;
-    std::optional<double> deg;
+    std::optional<int> deg;
     bool init = false;
 };
 
