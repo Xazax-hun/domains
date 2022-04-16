@@ -59,7 +59,7 @@ struct TransferOperation
         double deg = *r->deg.value;
         double intpart;
         modf(deg, &intpart);
-        if (intpart == 0.0)
+        if (intpart == 0.0 && *r->x.value == 0 && *r->y.value == 0)
         {
             int intDeg = deg;
             if (intDeg % 360 == 0)
