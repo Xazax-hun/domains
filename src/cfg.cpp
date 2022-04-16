@@ -165,7 +165,7 @@ RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
         rpoOrder[node] = counter++;
 }
 
-RPOWorklist::RPOWorklist(CFG& cfg)
+RPOWorklist::RPOWorklist(const CFG& cfg)
   : cfg(cfg), comparator(cfg), worklist(comparator), queued(cfg.blocks.size(), false) {}
 
 void RPOWorklist::enqueue(int node) noexcept

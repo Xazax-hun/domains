@@ -14,7 +14,7 @@ endif
 # Libraries
 domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',
                           'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp',
-                          'src/cfg.cpp', 'src/render.cpp']
+                          'src/cfg.cpp', 'src/render.cpp', 'src/dataflow/sign_analysis.cpp']
 domains_static_lib = static_library('libslox', domains_static_sources,
                                      dependencies: [fmt_dep, cairo_dep])
 
@@ -27,7 +27,8 @@ executable('domains', interpreter_sources,
 # Tests + test dependencies.
 gtest_dep = dependency('gtest')
 unittest_sources = ['test/main.cpp', 'test/lexer.cpp', 'test/parser.cpp',
-                    'test/cfg.cpp', 'test/eval.cpp', 'test/dataflow/domains.cpp']
+                    'test/cfg.cpp', 'test/eval.cpp', 'test/dataflow/domains.cpp',
+                    'test/dataflow/sign_analysis.cpp']
 tests = executable('unittest', unittest_sources,
                    d_unittest: true,
                    install: false,

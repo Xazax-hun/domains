@@ -39,14 +39,14 @@ private:
 class RPOWorklist
 {
 public:
-    RPOWorklist(CFG&);
+    RPOWorklist(const CFG&);
     void enqueue(int node) noexcept;
     void enqueueSuccessors(int node) noexcept;
     int dequeue() noexcept;
     bool empty() const noexcept { return worklist.empty(); }
 private:
     using Worklist = std::priority_queue<int, std::vector<int>, RPOCompare>;
-    CFG& cfg;
+    const CFG& cfg;
     RPOCompare comparator; // Must be declared before the worklist.
     Worklist worklist;
     std::vector<bool> queued;
