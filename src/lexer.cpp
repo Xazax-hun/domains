@@ -82,6 +82,14 @@ std::optional<Token> Lexer::lex() noexcept
             hasError = true;
             return std::nullopt;
 
+        // Negative numbers.
+        case '-':
+            if (auto num = lexNumber())
+                return num;
+            diag.error(line, fmt::format("Expected number after '-'."));
+            hasError = true;
+            return std::nullopt;
+
         default:
             if (isdigit(c))
                 return lexNumber();
