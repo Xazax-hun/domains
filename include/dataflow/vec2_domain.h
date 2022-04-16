@@ -3,6 +3,8 @@
 
 #include "include/dataflow/domain.h"
 
+#include <fmt/format.h>
+
 // Product of two domain values, used to represent a point in 2d space.
 template<Domain D>
 struct Vec2Domain
@@ -29,6 +31,11 @@ struct Vec2Domain
     Vec2Domain merge(const Vec2Domain& other) const
     {
         return Vec2Domain{x.merge(other.x), y.merge(other.y)};
+    }
+
+    std::string toString() const
+    {
+        return fmt::format("{{ x: {}, y: {} }}", x.toString(), y.toString());
     }
 
     // TODO: This is failing. Is this a gcc bug?

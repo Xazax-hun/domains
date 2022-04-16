@@ -5,6 +5,7 @@
 #include <queue>
 
 using Operation = std::variant<Init*, Translation*, Rotation*>;
+Node toNode(Operation op);
 
 struct BasicBlock
 {

@@ -49,4 +49,21 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
     return postStates;
 }
 
+
+template<Domain D>
+Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const CFG& cfg)
+{
+    Annotations anns;
+    int i = 0;
+    for (auto& block : cfg.blocks)
+    {
+        if (!block.operations.empty())
+        {
+            anns.postAnnotations[toNode(block.operations.back())].push_back(result[i].toString());
+        }
+        ++i;
+    }
+    return anns;
+}
+
 #endif // SOLVER_H

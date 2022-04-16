@@ -3,6 +3,7 @@
 
 #include <variant>
 #include <vector>
+#include <unordered_map>
 
 #include "include/lexer.h"
 
@@ -51,8 +52,6 @@ struct Loop
     Node body;
 };
 
-std::string print(Node n) noexcept;
-
 class ASTContext
 {
 public:
@@ -90,5 +89,16 @@ private:
 };
 
 
+// Utility to attach information before and after AST nodes that
+// can be rendered by pretty-printing the AST. This can be useful
+// to visualize dataflow analysis results.
+struct Annotations
+{
+    using AnnotationMap = std::unordered_map<Node, std::vector<std::string>>;
+    AnnotationMap preAnnotations; // Rendered before the node.
+    AnnotationMap postAnnotations; // Rendered after the node.
+};
+
+std::string print(Node n, const Annotations& anns = {}) noexcept;
 
 #endif // AST_H

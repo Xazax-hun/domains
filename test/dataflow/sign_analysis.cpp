@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "include/dataflow/analyses/sign_analysis.h"
+#include "include/dataflow/solver.h"
 #include "include/parser.h"
 #include "include/cfg.h"
 
@@ -10,6 +11,7 @@ struct AnalysisResult
 {
     CFG cfg;
     std::vector<Vec2Sign> analysis;
+    Node root;
     Parser parser; // Owns the nodes.
 };
 
@@ -26,7 +28,7 @@ std::optional<AnalysisResult> analyze(std::string_view str, std::ostream& output
         return {};
     auto cfg = createCfg(*root);
     auto result = getSignAnalysis(cfg);
-    return AnalysisResult{std::move(cfg), std::move(result), std::move(parser)};
+    return AnalysisResult{std::move(cfg), std::move(result), *root, std::move(parser)};
 }
 
 using enum SignValue;
@@ -37,13 +39,17 @@ TEST(SignAnalysis, LinearProgram)
     std::string_view source =
 R"(init(50, 50, 50, 50);
 translation(10, 0);
-rotation(0, 0, 0)
-)";
-    auto posPos = Vec2Sign{SignDomain{Positive}, SignDomain{Positive}};
+rotation(0, 0, 0))";
+    std::string_view expected =
+R"(init(50, 50, 50, 50);
+translation(10, 0);
+rotation(0, 0, 0) /* { x: Positive, y: Positive } */)";
     auto result = analyze(source, output);
+    auto anns = annotationsFromAnalysisResults(result->analysis, result->cfg);
+    std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
-    EXPECT_EQ(result->analysis[0], posPos);
+    EXPECT_EQ(expected, annotatedSource);
 }
 
 
@@ -52,20 +58,24 @@ TEST(SignAnalysis, Alternative)
     std::stringstream output;
     std::string_view source =
 R"(init(50, 50, 50, 50);
-{ translation(10, 0) } or { translation(-10, 0) })";
-    auto posPos = Vec2Sign{SignDomain{Positive}, SignDomain{Positive}};
-    auto topPos = Vec2Sign{SignDomain{Top}, SignDomain{Positive}};
+{
+  translation(10, 0)
+} or {
+  translation(-10, 0)
+})";
+    std::string_view expected =
+R"(init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
+{
+  translation(10, 0) /* { x: Positive, y: Positive } */
+} or {
+  translation(-10, 0) /* { x: Top, y: Positive } */
+})";
     auto result = analyze(source, output);
+    auto anns = annotationsFromAnalysisResults(result->analysis, result->cfg);
+    std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
-    // Start.
-    EXPECT_EQ(result->analysis[0], posPos);
-    // Left branch.
-    EXPECT_EQ(result->analysis[1], posPos);
-    // Right branch.
-    EXPECT_EQ(result->analysis[2], topPos);
-    // Merge.
-    EXPECT_EQ(result->analysis[3], topPos);
+    EXPECT_EQ(expected, annotatedSource);
 }
 
 TEST(SignAnalysis, Loop)
@@ -73,7 +83,9 @@ TEST(SignAnalysis, Loop)
     std::stringstream output;
     std::string_view source =
 R"(init(50, 50, 50, 50);
-iter { translation(0, 0) })";
+iter {
+  translation(0, 0)
+})";
     auto posPos = Vec2Sign{SignDomain{Positive}, SignDomain{Positive}};
     auto result = analyze(source, output);
     EXPECT_TRUE(output.str().empty());

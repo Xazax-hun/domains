@@ -3,6 +3,8 @@
 
 #include "include/dataflow/domain.h"
 
+#include <cassert>
+
 // TODO:
 // Add more general building blocks for finite domains and
 // post SignDomain to those facilities.
@@ -33,6 +35,26 @@ struct SignDomain
         if (v == SignValue::Bottom)
             return other;
         return { SignValue::Top };
+    }
+
+    std::string toString() const
+    {
+        switch(v)
+        {
+            case SignValue::Top:
+                return "Top";
+            case SignValue::Bottom:
+                return "Bottom";
+            case SignValue::Negative:
+                return "Negative";
+            case SignValue::Zero:
+                return "Zero";
+            case SignValue::Positive:
+                return "Positive";
+            default:
+                assert(false);
+                return "";
+        }
     }
 };
 
