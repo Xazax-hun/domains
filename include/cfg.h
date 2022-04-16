@@ -16,6 +16,7 @@ struct BasicBlock
 struct CFG
 {
     std::vector<BasicBlock> blocks;
+    CFG& addEdge(int from, int to);
 };
 
 CFG createCfg(Node node) noexcept;

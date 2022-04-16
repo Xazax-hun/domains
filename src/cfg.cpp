@@ -58,22 +58,22 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             int branchPred = currentBlock;
             int lhsAfter = addAstNode(cfg, lhsBlock, b->lhs);
             int rhsAfter = addAstNode(cfg, rhsBlock, b->rhs);
-            cfg.blocks[branchPred].succs.push_back(lhsBlock);
-            cfg.blocks[branchPred].succs.push_back(rhsBlock);
+            cfg.addEdge(branchPred, lhsBlock);
+            cfg.addEdge(branchPred, rhsBlock);
             // TODO: can we do something smarter to avoid empty nodes with e.g., nested ors?
             int afterBranch = newBlock();
-            cfg.blocks[lhsAfter].succs.push_back(afterBranch);
-            cfg.blocks[rhsAfter].succs.push_back(afterBranch);
+            cfg.addEdge(lhsAfter, afterBranch);
+            cfg.addEdge(rhsAfter, afterBranch);
             return afterBranch;
         }
         int operator()(Loop* l) noexcept
         {
             int bodyBegin = newBlock();
-            cfg.blocks[currentBlock].succs.push_back(bodyBegin);
+            cfg.addEdge(currentBlock, bodyBegin);
             int bodyEnd = addAstNode(cfg, bodyBegin, l->body);
             int afterBody = newBlock();
-            cfg.blocks[bodyEnd].succs.push_back(bodyBegin);
-            cfg.blocks[bodyEnd].succs.push_back(afterBody);
+            cfg.addEdge(bodyEnd, bodyBegin);
+            cfg.addEdge(bodyEnd, afterBody);
             return afterBody;
         }
 
@@ -90,6 +90,14 @@ CFG createCfg(Node node) noexcept
 
     addAstNode(cfg, 0, node);
     return cfg;
+}
+
+CFG& CFG::addEdge(int from, int to)
+{
+    blocks[from].succs.push_back(to);
+    blocks[to].preds.push_back(from);
+    // TODO: add assertion that succs/preds has no duplicates.
+    return *this;
 }
 
 std::string print(const CFG& cfg)
