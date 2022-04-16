@@ -30,7 +30,7 @@ struct TransferOperation
             xSign = SignDomain{SignValue::Positive};
         else if (topX + width < 0)
             xSign = SignDomain{SignValue::Negative};
-        else if (topX == 0.0 && width == 0.0)
+        else if (topX == 0 && width == 0)
             xSign = SignDomain{SignValue::Zero};
 
         SignDomain ySign{SignValue::Top};
@@ -40,7 +40,7 @@ struct TransferOperation
             ySign = SignDomain{SignValue::Positive};
         else if (topY + height < 0)
             ySign = SignDomain{SignValue::Negative};
-        else if (topY == 0.0 && height == 0.0)
+        else if (topY == 0 && height == 0)
             ySign = SignDomain{SignValue::Zero};
 
         return Vec2Sign{ xSign, ySign };
