@@ -44,7 +44,7 @@ rotation(0, 0, 180)
 ```
 Running `./domains signDemo.tr --analyze sign` will print out the same program along with
 some annotations. The annotations will contain the facts that the analyzer was able to
-infer about the programs.
+infer about the program.
 
 
 ## Output:
