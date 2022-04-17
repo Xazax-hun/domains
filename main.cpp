@@ -9,10 +9,11 @@
 #include "include/cfg.h"
 #include "include/parser.h"
 #include "include/render.h"
+#include "include/analyze.h"
 
 using namespace std::literals;
 
-bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
+bool runFile(std::string_view filePath, const std::optional<std::string>& analysisName, bool dumpCfg, bool svg)
 {
     DiagnosticEmitter emitter(std::cout, std::cerr);
     std::ifstream file(filePath.data());
@@ -40,6 +41,14 @@ bool runFile(std::string_view filePath, bool dumpCfg, bool svg)
         for (auto step : w)
             std::cout << step.pos.x << " " << step.pos.y << "\n";
     }
+    if (analysisName)
+    {
+        auto annotations = getAnalysisResults(*analysisName, cfg);
+        if (!annotations)
+            return false;
+
+        std::cout << print(*root, *annotations) << "\n";
+    }
     return true;
 }
 
@@ -48,15 +57,22 @@ int main(int argc, const char* argv[])
     auto printHelp = [&]()
     {
         fmt::print("Usage: {} script [options]\n", argv[0]);
-        fmt::print("options:\n");
+        fmt::print("Options:\n");
         fmt::print("  --cfg-dump\n");
         fmt::print("  --svg\n");
+        fmt::print("  --analyze ANALYSIS_NAME\n");
         fmt::print("  --help\n");
+        fmt::print("Available analyses:\n");
+        for (const auto& analysis : getListOfAnalyses())
+        {
+            fmt::print("  {}\n", analysis);
+        }
     };
 
     const char *file = nullptr;
     bool dumpCfg = false;
     bool svg = false;
+    std::optional<std::string> analysisName;
     for (int i = 1; i < argc; ++i)
     {
         if (argv[i][0] == '-')
@@ -76,6 +92,17 @@ int main(int argc, const char* argv[])
             {
                 printHelp();
                 return EXIT_SUCCESS;
+            }
+            if (argv[i] == "--analyze"sv)
+            {
+                if (i == argc - 1 || argv[i+1][0] == '-')
+                {
+                    fmt::print("Analysis name was not provided.");
+                    return EXIT_FAILURE;
+                }
+                analysisName = argv[i+1];
+                ++i;
+                continue;
             }
 
             printHelp();
@@ -98,5 +125,5 @@ int main(int argc, const char* argv[])
     }
 
 
-    return runFile(file, dumpCfg, svg) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return runFile(file, analysisName, dumpCfg, svg) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
