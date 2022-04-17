@@ -34,11 +34,11 @@ Consider the following small program:
 ```
 init(50, 50, 50, 50);
 iter {
-    {
-        translation(10, 0)
-    } or {
-        translation(0, 10)
-    }
+  {
+    translation(10, 0)
+  } or {
+    translation(0, 10)
+  }
 };
 rotation(0, 0, 180)
 ```
