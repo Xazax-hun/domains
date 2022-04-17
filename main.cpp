@@ -30,17 +30,6 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
     CFG cfg = createCfg(*root);
     if (dumpCfg)
         std::cout << print(cfg);
-    Walk w = createRandomWalk(cfg);
-    if (w.empty())
-        return false;
-
-    if (svg)
-        std::cout << renderRandomWalkSVG(w) << "\n";
-    else
-    {
-        for (auto step : w)
-            std::cout << step.pos.x << " " << step.pos.y << "\n";
-    }
     if (analysisName)
     {
         auto annotations = getAnalysisResults(*analysisName, cfg);
@@ -48,6 +37,18 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
             return false;
 
         std::cout << print(*root, *annotations) << "\n";
+        return true;
+    }
+
+    Walk w = createRandomWalk(cfg);
+    if (w.empty())
+        return false;
+    if (svg)
+        std::cout << renderRandomWalkSVG(w) << "\n";
+    else
+    {
+        for (auto step : w)
+            std::cout << step.pos.x << " " << step.pos.y << "\n";
     }
     return true;
 }
