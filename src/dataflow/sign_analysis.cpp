@@ -61,11 +61,11 @@ struct TransferOperation
             int deg = *r->deg.value;
             if (deg % 360 == 0)
                 return preState;
-            if (deg % 270 == 0)
+            if (deg % 360 == 270)
                 return Vec2Sign{preState.y, negate(preState.x)};
             if (deg % 180 == 0)
                 return Vec2Sign{negate(preState.x), negate(preState.y)};
-            if (deg % 90 == 0)
+            if (deg % 360 == 90)
                 return Vec2Sign{negate(preState.y), preState.x};
         }
         return Vec2Sign{SignDomain{SignValue::Top}, SignDomain{SignValue::Top}};
