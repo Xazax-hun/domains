@@ -17,8 +17,8 @@
 class Parser
 {
 public:
-    Parser(const std::vector<Token>& tokens,
-           const DiagnosticEmitter& diag) noexcept : tokens(tokens), diag(diag) {}
+    Parser(std::vector<Token> tokens,
+           const DiagnosticEmitter& diag) noexcept : tokens(std::move(tokens)), diag(diag) {}
 
     // Reentrant. Invoking again will continue parsing with the tokens
     // added since the last invocation.

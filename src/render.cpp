@@ -64,11 +64,11 @@ std::string renderRandomWalkSVG(Walk w)
             }
         }
         // Draw the dots
-        for (unsigned i = 0; i < w.size(); ++i)
+        for (auto step : w)
         {
             cairo_new_path(cr);
-            cairo_set_source_rgb(cr, 0, w[i].init ? 1 : 0, 0);
-            cairo_arc(cr, w[i].pos.x, -w[i].pos.y, radius, 0, 2 * M_PI);
+            cairo_set_source_rgb(cr, 0, step.init ? 1 : 0, 0);
+            cairo_arc(cr, step.pos.x, -step.pos.y, radius, 0, 2 * M_PI);
             cairo_fill(cr);
         }
         // Surface needs to be destroyed here.

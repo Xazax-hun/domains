@@ -55,7 +55,7 @@ Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const C
 {
     Annotations anns;
     int i = 0;
-    for (auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks)
     {
         if (!block.operations.empty())
         {

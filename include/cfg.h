@@ -25,7 +25,7 @@ CFG createCfg(Node node) noexcept;
 class RPOCompare
 {
 public:
-    RPOCompare(const CFG& cfg);
+    explicit RPOCompare(const CFG& cfg);
 
     bool operator()(int lhsBlockId, int rhsBlockId) const
     {
@@ -40,7 +40,7 @@ private:
 class RPOWorklist
 {
 public:
-    RPOWorklist(const CFG&);
+    explicit RPOWorklist(const CFG&);
     void enqueue(int node) noexcept;
     void enqueueSuccessors(int node) noexcept;
     int dequeue() noexcept;

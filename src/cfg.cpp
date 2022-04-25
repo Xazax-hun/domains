@@ -22,7 +22,7 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
         int currentBlock;
         CFG& cfg;
 
-        int newBlock()
+        int newBlock() noexcept
         {
             cfg.blocks.emplace_back();
             return cfg.blocks.size() - 1;

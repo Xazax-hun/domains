@@ -13,28 +13,28 @@ namespace
     }
 
     struct NodePrinter {
-        void operator()(Init* i) noexcept
+        void operator()(Init* i) const noexcept
         {
             renderPreAnnotations(i);
             out << indentString(indent);
             out << fmt::format("init({}, {}, {}, {})", *i->topX.value, *i->topY.value, *i->width.value, *i->height.value);
             renderPostAnnotations(i);
         }
-        void operator()(Translation* t) noexcept
+        void operator()(Translation* t) const noexcept
         {
             renderPreAnnotations(t);
             out << indentString(indent);
             out << fmt::format("translation({}, {})", *t->x.value, *t->y.value);
             renderPostAnnotations(t);
         }
-        void operator()(Rotation* r) noexcept
+        void operator()(Rotation* r) const noexcept
         {
             renderPreAnnotations(r);
             out << indentString(indent);
             out << fmt::format("rotation({}, {}, {})", *r->x.value, *r->y.value, *r->deg.value);
             renderPostAnnotations(r);
         }
-        void operator()(Sequence* s) noexcept
+        void operator()(Sequence* s) const noexcept
         {
             renderPreAnnotations(s);
             int i = 0;
@@ -47,7 +47,7 @@ namespace
             }
             renderPostAnnotations(s);
         }
-        void operator()(Branch* b) noexcept
+        void operator()(Branch* b) const noexcept
         {
             renderPreAnnotations(b);
             out << indentString(indent) << "{\n";
@@ -57,7 +57,7 @@ namespace
             out << "\n" << indentString(indent) << "}";
             renderPostAnnotations(b);
         }
-        void operator()(Loop* l) noexcept
+        void operator()(Loop* l) const noexcept
         {
             renderPreAnnotations(l);
             out << indentString(indent) << "iter {\n";
@@ -65,15 +65,15 @@ namespace
             out << "\n" << indentString(indent) << "}";
             renderPostAnnotations(l);
         }
-        void renderPreAnnotations(Node n) const
+        void renderPreAnnotations(Node n) const noexcept
         {
             renderAnnotations(n, anns.preAnnotations);
         }
-        void renderPostAnnotations(Node n) const
+        void renderPostAnnotations(Node n) const noexcept
         {
             renderAnnotations(n, anns.postAnnotations);
         }
-        void renderAnnotations(Node n, const Annotations::AnnotationMap& map) const
+        void renderAnnotations(Node n, const Annotations::AnnotationMap& map) const noexcept
         {
             if (auto it = map.find(n); it != map.end())
             {

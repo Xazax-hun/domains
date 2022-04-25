@@ -64,7 +64,7 @@ std::optional<Node> Parser::command()
 
         return context.make<Init>(kw, topX, topY, width, height);
     }
-    else if (match(TokenType::TRANSLATION))
+    if (match(TokenType::TRANSLATION))
     {
         Token kw = previous();
         MUST_SUCCEED(consume(TokenType::LEFT_PAREN, "( expected"));
@@ -75,7 +75,7 @@ std::optional<Node> Parser::command()
 
         return context.make<Translation>(kw, x, y);
     }
-    else if (match(TokenType::ROTATION))
+    if (match(TokenType::ROTATION))
     {
         Token kw = previous();
         MUST_SUCCEED(consume(TokenType::LEFT_PAREN, "( expected"));
@@ -88,11 +88,11 @@ std::optional<Node> Parser::command()
 
         return context.make<Rotation>(kw, x, y, deg);
     }
-    else if (match(TokenType::ITER))
+    if (match(TokenType::ITER))
     {
         return loop();
     }
-    else if (match(TokenType::LEFT_BRACE))
+    if (match(TokenType::LEFT_BRACE))
     {
         return branch();
     }

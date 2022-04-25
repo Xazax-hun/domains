@@ -81,7 +81,7 @@ iter { translation(10, 0) })";
     auto result = getWalk(source, output);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
-    EXPECT_TRUE(result->w.size() >= 1);
+    EXPECT_TRUE(!result->w.empty());
     EXPECT_TRUE(result->w[0].init);
     for (unsigned i = 1; i < result->w.size(); ++i)
     {

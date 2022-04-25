@@ -20,13 +20,13 @@ Annotations getResults(const CFG& cfg)
 
 using AnalysisAnnotationsFunc = Annotations(*)(const CFG& cfg);
 
-std::unordered_map<std::string, AnalysisAnnotationsFunc> analyses = {
+std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
     {"sign", &getResults<Vec2Sign, getSignAnalysis> }
 };
 
 } // anonymous
 
-std::optional<Annotations> getAnalysisResults(std::string analysisName, const CFG& cfg)
+std::optional<Annotations> getAnalysisResults(std::string_view analysisName, const CFG& cfg)
 {
     if (auto it = analyses.find(analysisName); it != analyses.end())
     {
@@ -36,9 +36,9 @@ std::optional<Annotations> getAnalysisResults(std::string analysisName, const CF
     return {};
 }
 
-std::vector<std::string> getListOfAnalyses()
+std::vector<std::string_view> getListOfAnalyses()
 {
-    std::vector<std::string> results;
+    std::vector<std::string_view> results;
     for (const auto& [name, _] : analyses)
     {
         results.push_back(name);
