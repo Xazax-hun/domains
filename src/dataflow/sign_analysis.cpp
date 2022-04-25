@@ -76,7 +76,7 @@ struct TransferOperation
 
 struct SignTransfer
 {
-    Vec2Sign operator()(Vec2Sign preState, Operation o)
+    Vec2Sign operator()(Vec2Sign preState, Operation o) const
     {
         return std::visit(TransferOperation{preState}, o);
     }
