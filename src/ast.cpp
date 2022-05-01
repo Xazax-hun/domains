@@ -13,28 +13,28 @@ namespace
     }
 
     struct NodePrinter {
-        void operator()(Init* i) const noexcept
+        void operator()(const Init* i) const noexcept
         {
             renderPreAnnotations(i);
             out << indentString(indent);
             out << fmt::format("init({}, {}, {}, {})", *i->topX.value, *i->topY.value, *i->width.value, *i->height.value);
             renderPostAnnotations(i);
         }
-        void operator()(Translation* t) const noexcept
+        void operator()(const Translation* t) const noexcept
         {
             renderPreAnnotations(t);
             out << indentString(indent);
             out << fmt::format("translation({}, {})", *t->x.value, *t->y.value);
             renderPostAnnotations(t);
         }
-        void operator()(Rotation* r) const noexcept
+        void operator()(const Rotation* r) const noexcept
         {
             renderPreAnnotations(r);
             out << indentString(indent);
             out << fmt::format("rotation({}, {}, {})", *r->x.value, *r->y.value, *r->deg.value);
             renderPostAnnotations(r);
         }
-        void operator()(Sequence* s) const noexcept
+        void operator()(const Sequence* s) const noexcept
         {
             renderPreAnnotations(s);
             int i = 0;
@@ -47,7 +47,7 @@ namespace
             }
             renderPostAnnotations(s);
         }
-        void operator()(Branch* b) const noexcept
+        void operator()(const Branch* b) const noexcept
         {
             renderPreAnnotations(b);
             out << indentString(indent) << "{\n";
@@ -57,7 +57,7 @@ namespace
             out << "\n" << indentString(indent) << "}";
             renderPostAnnotations(b);
         }
-        void operator()(Loop* l) const noexcept
+        void operator()(const Loop* l) const noexcept
         {
             renderPreAnnotations(l);
             out << indentString(indent) << "iter {\n";

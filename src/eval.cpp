@@ -12,19 +12,19 @@ double toRad(double deg) { return deg / 180 * M_PI; }
 struct StepEval {
     const Step* in;
     std::mt19937& gen;
-    Step operator()(Init* i) const noexcept
+    Step operator()(const Init* i) const noexcept
     {
         std::uniform_int_distribution<int> genX(*i->topX.value, *i->topX.value + *i->width.value);
         std::uniform_int_distribution<int> genY(*i->topY.value, *i->topY.value + *i->height.value);
         return Step{ Vec2 (genX(gen), genY(gen)), {}, {}, true};
     }
 
-    Step operator()(Translation* t) const noexcept
+    Step operator()(const Translation* t) const noexcept
     {
         return Step{ Vec2 { in->pos.x + *t->x.value, in->pos.y + *t->y.value}, {}, {}, false };
     }
 
-    Step operator()(Rotation* r) const noexcept
+    Step operator()(const Rotation* r) const noexcept
     {
         Vec2 origin{*r->x.value, *r->y.value};
         Vec2 transformed { in->pos.x - origin.x, in->pos.y - origin.y };
@@ -46,7 +46,7 @@ struct StepEval {
 Walk createRandomWalk(const CFG& cfg)
 {
     Walk w;
-    if (!std::holds_alternative<Init*>(cfg.blocks.at(0).operations.at(0)))
+    if (!std::holds_alternative<const Init*>(cfg.blocks.at(0).operations.at(0)))
     {
         // TOOD: add error message.
         return w;

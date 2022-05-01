@@ -14,7 +14,8 @@ struct Sequence;
 struct Branch;
 struct Loop;
 
-using Node = std::variant<Init*, Translation*, Rotation*, Sequence*, Branch*, Loop*>;
+using Node = std::variant<const Init*, const Translation*, const Rotation*,
+                          const Sequence*, const Branch*, const Loop*>;
 
 struct Init
 {
@@ -79,12 +80,12 @@ private:
     std::vector<Node> nodes;
 
     struct {
-        void operator()(Init* i) const noexcept { delete i; }
-        void operator()(Translation* t) const noexcept { delete t; }
-        void operator()(Rotation* r) const noexcept { delete r; }
-        void operator()(Sequence* s) const noexcept { delete s; }
-        void operator()(Branch* b) const noexcept { delete b; }
-        void operator()(Loop* l) const noexcept { delete l; }
+        void operator()(const Init* i) const noexcept { delete i; }
+        void operator()(const Translation* t) const noexcept { delete t; }
+        void operator()(const Rotation* r) const noexcept { delete r; }
+        void operator()(const Sequence* s) const noexcept { delete s; }
+        void operator()(const Branch* b) const noexcept { delete b; }
+        void operator()(const Loop* l) const noexcept { delete l; }
     } nodeDeleter;
 };
 

@@ -4,7 +4,7 @@
 #include "include/ast.h"
 #include <queue>
 
-using Operation = std::variant<Init*, Translation*, Rotation*>;
+using Operation = std::variant<const Init*, const Translation*, const Rotation*>;
 Node toNode(Operation op);
 
 struct BasicBlock

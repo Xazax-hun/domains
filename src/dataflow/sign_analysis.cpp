@@ -6,47 +6,48 @@
 
 namespace
 {
+using enum SignValue;
 
 SignDomain toAbstract(int value)
 {
     if (value < 0)
-        return SignDomain{ SignValue::Negative };
+        return SignDomain{ Negative };
     if (value > 0)
-        return SignDomain{ SignValue::Positive };
+        return SignDomain{ Positive };
     if (std::isnan(value))
-        return SignDomain{ SignValue::Top };
-    return SignDomain{ SignValue::Zero };
+        return SignDomain{ Top };
+    return SignDomain{ Zero };
 }
 
 struct TransferOperation
 {
     // TODO: topX and topY are misleading, we should rename them.
-    Vec2Sign operator()(Init* init) const
+    Vec2Sign operator()(const Init* init) const
     {
-        SignDomain xSign{SignValue::Top};
+        SignDomain xSign{Top};
         int topX = *init->topX.value;
         int width = *init->width.value;
         if (topX > 0)
-            xSign = SignDomain{SignValue::Positive};
+            xSign = SignDomain{Positive};
         else if (topX + width < 0)
-            xSign = SignDomain{SignValue::Negative};
+            xSign = SignDomain{Negative};
         else if (topX == 0 && width == 0)
-            xSign = SignDomain{SignValue::Zero};
+            xSign = SignDomain{Zero};
 
-        SignDomain ySign{SignValue::Top};
+        SignDomain ySign{Top};
         int topY = *init->topY.value;
         int height = *init->height.value;
         if (topY > 0)
-            ySign = SignDomain{SignValue::Positive};
+            ySign = SignDomain{Positive};
         else if (topY + height < 0)
-            ySign = SignDomain{SignValue::Negative};
+            ySign = SignDomain{Negative};
         else if (topY == 0 && height == 0)
-            ySign = SignDomain{SignValue::Zero};
+            ySign = SignDomain{Zero};
 
         return Vec2Sign{ xSign, ySign };
     }
 
-    Vec2Sign operator()(Translation* t) const
+    Vec2Sign operator()(const Translation* t) const
     {
         SignDomain xTranslate = toAbstract(*t->x.value);
         SignDomain yTranslate = toAbstract(*t->y.value);
@@ -54,7 +55,7 @@ struct TransferOperation
                         add(preState.y, yTranslate)};
     }
 
-    Vec2Sign operator()(Rotation* r) const
+    Vec2Sign operator()(const Rotation* r) const
     {
         if (*r->x.value == 0 && *r->y.value == 0)
         {
@@ -68,7 +69,7 @@ struct TransferOperation
             if (deg % 360 == 90)
                 return Vec2Sign{negate(preState.y), preState.x};
         }
-        return Vec2Sign{SignDomain{SignValue::Top}, SignDomain{SignValue::Top}};
+        return Vec2Sign{SignDomain{Top}, SignDomain{Top}};
     }
     
     Vec2Sign preState;

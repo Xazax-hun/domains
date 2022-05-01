@@ -6,8 +6,12 @@
 #include "include/dataflow/domain.h"
 #include "include/cfg.h"
 
+#include <type_traits>
+
 template<typename T, typename Dom>
-concept TransferFunction = Domain<Dom> && requires(T f, Dom d, Operation o)
+concept TransferFunction = Domain<Dom> && 
+    std::is_default_constructible_v<T> &&
+    requires(T f, Dom d, Operation o)
 {
     { f(d, o) } -> std::same_as<Dom>;
 };
@@ -22,17 +26,17 @@ template<Domain D, TransferFunction<D> F>
 std::vector<D> solveMonotoneFramework(const CFG& cfg)
 {
     std::vector<D> postStates(cfg.blocks.size(), D::bottom());
-    RPOWorklist w(cfg);
+    RPOWorklist w{ cfg };
     w.enqueue(0);
     while(!w.empty())
     {
         int currentBlock = w.dequeue();
-        D preState = D::bottom();
+        D preState{ D::bottom() };
         for (auto pred : cfg.blocks[currentBlock].preds)
         {
             preState = preState.merge(postStates[pred]);
         }
-        D postState = preState;
+        D postState{ preState };
         for (Operation o : cfg.blocks[currentBlock].operations)
         {
             postState = F{}(postState, o);

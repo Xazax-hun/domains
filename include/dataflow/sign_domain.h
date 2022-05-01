@@ -25,31 +25,32 @@ enum class SignValue
 
 struct SignDomain
 {
+    using enum SignValue;
     SignValue v;
 
-    static SignDomain bottom() { return { SignValue::Bottom }; }
+    static SignDomain bottom() { return { Bottom }; }
     SignDomain merge(SignDomain other) const
     {
-        if (v == other.v || other.v == SignValue::Bottom)
+        if (v == other.v || other.v == Bottom)
             return *this;
-        if (v == SignValue::Bottom)
+        if (v == Bottom)
             return other;
-        return { SignValue::Top };
+        return { Top };
     }
 
     std::string_view toString() const
     {
         switch(v)
         {
-            case SignValue::Top:
+            case Top:
                 return "Top";
-            case SignValue::Bottom:
+            case Bottom:
                 return "Bottom";
-            case SignValue::Negative:
+            case Negative:
                 return "Negative";
-            case SignValue::Zero:
+            case Zero:
                 return "Zero";
-            case SignValue::Positive:
+            case Positive:
                 return "Positive";
             default:
                 assert(false);

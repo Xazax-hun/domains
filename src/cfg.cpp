@@ -8,9 +8,9 @@
 Node toNode(Operation op)
 {
     struct {
-        Node operator()(Init* i) const noexcept { return i; }
-        Node operator()(Translation* t) const noexcept { return t; }
-        Node operator()(Rotation* r) const noexcept { return r; }
+        Node operator()(const Init* i) const noexcept { return i; }
+        Node operator()(const Translation* t) const noexcept { return t; }
+        Node operator()(const Rotation* r) const noexcept { return r; }
     } converter;
     return std::visit(converter, op);
 }
@@ -28,22 +28,22 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             return cfg.blocks.size() - 1;
         }
 
-        int operator()(Init* i) noexcept
+        int operator()(const Init* i) noexcept
         {
             cfg.blocks[currentBlock].operations.push_back(i);
             return currentBlock;
         }
-        int operator()(Translation* t) noexcept
+        int operator()(const Translation* t) noexcept
         {
             cfg.blocks[currentBlock].operations.push_back(t);
             return currentBlock;
         }
-        int operator()(Rotation* r) noexcept
+        int operator()(const Rotation* r) noexcept
         {
             cfg.blocks[currentBlock].operations.push_back(r);
             return currentBlock;
         }
-        int operator()(Sequence* s) noexcept
+        int operator()(const Sequence* s) noexcept
         {
             for (auto node : s->nodes)
             {
@@ -51,7 +51,7 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             }
             return currentBlock;
         }
-        int operator()(Branch* b) noexcept
+        int operator()(const Branch* b) noexcept
         {
             int lhsBlock = newBlock();
             int rhsBlock = newBlock();
@@ -66,7 +66,7 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
             cfg.addEdge(rhsAfter, afterBranch);
             return afterBranch;
         }
-        int operator()(Loop* l) noexcept
+        int operator()(const Loop* l) noexcept
         {
             int bodyBegin = newBlock();
             cfg.addEdge(currentBlock, bodyBegin);
