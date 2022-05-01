@@ -87,7 +87,7 @@ inline SignDomain negate(SignDomain d)
     return d;
 }
 
-inline SignDomain add(SignDomain lhs, SignDomain rhs)
+inline SignDomain operator+(SignDomain lhs, SignDomain rhs)
 {
     using enum SignValue;
     static constexpr SignValue AdditionTable[][5] = 

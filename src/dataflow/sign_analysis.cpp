@@ -57,8 +57,8 @@ struct TransferOperation
     {
         SignDomain xTranslate = toAbstract(*t->x.value);
         SignDomain yTranslate = toAbstract(*t->y.value);
-        return Vec2Sign{add(preState.x, xTranslate),
-                        add(preState.y, yTranslate)};
+        return Vec2Sign{preState.x + xTranslate,
+                        preState.y + yTranslate};
     }
 
     Vec2Sign operator()(const Rotation* r) const
