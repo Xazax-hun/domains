@@ -27,17 +27,17 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
 
         int operator()(const Init* i) noexcept
         {
-            cfg.blocks[currentBlock].operations.push_back(i);
+            cfg.blocks[currentBlock].operations.emplace_back(i);
             return currentBlock;
         }
         int operator()(const Translation* t) noexcept
         {
-            cfg.blocks[currentBlock].operations.push_back(t);
+            cfg.blocks[currentBlock].operations.emplace_back(t);
             return currentBlock;
         }
         int operator()(const Rotation* r) noexcept
         {
-            cfg.blocks[currentBlock].operations.push_back(r);
+            cfg.blocks[currentBlock].operations.emplace_back(r);
             return currentBlock;
         }
         int operator()(const Sequence* s) noexcept
