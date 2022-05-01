@@ -45,16 +45,12 @@ std::optional<Token> Lexer::lex() noexcept
         {
         //  Unambiguous single characters tokens.
         case '(':
-            ++bracketBalance;
             return Token(LEFT_PAREN, line);
         case ')':
-            --bracketBalance;
             return Token(RIGHT_PAREN, line);
         case '{':
-            ++bracketBalance;
             return Token(LEFT_BRACE, line);
         case '}':
-            --bracketBalance;
             return Token(RIGHT_BRACE, line);
 
         case ',': return Token(COMMA, line);

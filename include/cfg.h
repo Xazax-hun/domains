@@ -20,7 +20,7 @@ struct CFG
     CFG& addEdge(int from, int to);
 };
 
-CFG createCfg(Node node) noexcept;
+CFG createCfg(Node root) noexcept;
 
 class RPOCompare
 {

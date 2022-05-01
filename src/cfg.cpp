@@ -77,13 +77,13 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
     return std::visit(processNode, currentNode);
 }
 
-CFG createCfg(Node node) noexcept
+CFG createCfg(Node root) noexcept
 {
     CFG cfg;
     // Add start block.
     cfg.blocks.emplace_back();
 
-    addAstNode(cfg, 0, node);
+    addAstNode(cfg, 0, root);
     return cfg;
 }
 

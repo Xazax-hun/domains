@@ -74,8 +74,6 @@ public:
 
     std::vector<Token> lexAll() noexcept;
 
-    int getBracketBalance() const noexcept { return bracketBalance; }
-
 private:
     std::optional<Token> lex() noexcept;
     std::optional<Token> lexNumber() noexcept;
@@ -91,7 +89,6 @@ private:
     int start = 0;
     int current = 0;
     int line = 1;
-    int bracketBalance = 0;
     bool hasError = false; // TODO: get rid of this.
 };
 
