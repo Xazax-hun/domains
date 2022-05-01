@@ -81,7 +81,6 @@ private:
     bool isAtEnd() const noexcept { return static_cast<unsigned>(current) >= source.length(); }
     char advance() noexcept { return source[current++]; }
     char peek() const noexcept;
-    char peekNext() const noexcept;
     bool match(char expected) noexcept;
 
     std::string source;

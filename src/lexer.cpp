@@ -179,10 +179,3 @@ char Lexer::peek() const noexcept
         return '\0';
     return source[current];
 }
-
-char Lexer::peekNext() const noexcept
-{
-    if (static_cast<unsigned>(current + 1) >= source.length())
-        return '\0';
-    return source[current + 1];
-}

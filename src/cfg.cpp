@@ -10,6 +10,8 @@ Node toNode(Operation op) noexcept
     return std::visit([](const auto* node) noexcept -> Node { return node; }, op);
 }
 
+namespace
+{
 int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
 {
     struct
@@ -76,6 +78,7 @@ int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
     
     return std::visit(processNode, currentNode);
 }
+} // anonymous namespace
 
 CFG createCfg(Node root) noexcept
 {

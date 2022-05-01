@@ -7,7 +7,9 @@
 #include <random>
 #include <cmath>
 
-double toRad(double deg) { return deg / 180 * M_PI; }
+namespace
+{
+double toRad(double deg) noexcept { return deg / 180 * M_PI; }
 
 struct StepEval {
     const Step* in;
@@ -42,6 +44,7 @@ struct StepEval {
         };
     }
 };
+} // namespace anonymous
 
 Walk createRandomWalk(const CFG& cfg)
 {
@@ -58,17 +61,15 @@ Walk createRandomWalk(const CFG& cfg)
     {
         for (Operation o : cfg.blocks[current].operations)
         {
-            Step next;
             if (w.empty())
-               next = std::visit(StepEval{nullptr, gen}, o);
+               w.push_back(std::visit(StepEval{nullptr, gen}, o));
             else
-               next = std::visit(StepEval{&w.back(), gen}, o);
-            w.push_back(next);
+               w.push_back(std::visit(StepEval{&w.back(), gen}, o));
         }
         if (cfg.blocks[current].succs.empty())
             break;
-        std::uniform_int_distribution<int> genNext(0, cfg.blocks[current].succs.size() - 1);
-        current = cfg.blocks[current].succs[genNext(gen)];
+        std::uniform_int_distribution<int> randomSuccessor(0, cfg.blocks[current].succs.size() - 1);
+        current = cfg.blocks[current].succs[randomSuccessor(gen)];
     } while (true);
     return w;
 }
