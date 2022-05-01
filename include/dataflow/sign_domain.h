@@ -37,7 +37,7 @@ struct SignDomain
         return { SignValue::Top };
     }
 
-    std::string toString() const
+    std::string_view toString() const
     {
         switch(v)
         {

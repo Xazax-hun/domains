@@ -11,7 +11,7 @@ concept Domain = requires(T a)
     { a <= a } -> std::convertible_to<bool>;
     { T::bottom() } -> std::same_as<T>;
     { a.merge(a) } -> std::same_as<T>;
-    { a.toString() } -> std::convertible_to<std::string>;
+    { a.toString() } -> std::convertible_to<std::string_view>;
 };
 
 #endif // SOLVER_H
