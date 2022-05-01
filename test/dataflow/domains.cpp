@@ -5,14 +5,15 @@
 
 namespace
 {
+using enum SignValue;
 
 TEST(Domains, SignDomain)
 {
     SignDomain bottom = SignDomain::bottom();
-    SignDomain positive{SignValue::Positive};
-    SignDomain negative{SignValue::Negative};
-    SignDomain zero{SignValue::Zero};
-    SignDomain top{SignValue::Top};
+    SignDomain positive{Positive};
+    SignDomain negative{Negative};
+    SignDomain zero{Zero};
+    SignDomain top{Top};
 
     EXPECT_EQ(positive, positive);
     EXPECT_TRUE(bottom <= negative);
@@ -26,18 +27,18 @@ TEST(Domains, SignDomain)
     EXPECT_EQ(negative.merge(bottom), negative);
 }
 
-TEST(Domains, Vec2Domain)
+TEST(Domains, Vec2SignsDomain)
 {
     using Vec2Signs = Vec2Domain<SignDomain>;
     static_assert(Domain<Vec2Signs>);
 
     Vec2Signs bottom = Vec2Signs::bottom();
-    Vec2Signs posNeg{SignDomain{SignValue::Positive}, SignDomain{SignValue::Negative}};
-    Vec2Signs posPos{SignDomain{SignValue::Positive}, SignDomain{SignValue::Positive}};
-    Vec2Signs negPos{SignDomain{SignValue::Negative}, SignDomain{SignValue::Positive}};
-    Vec2Signs posTop{SignDomain{SignValue::Positive}, SignDomain{SignValue::Top}};
-    Vec2Signs topPos{SignDomain{SignValue::Top}, SignDomain{SignValue::Positive}};
-    Vec2Signs topTop{SignDomain{SignValue::Top}, SignDomain{SignValue::Top}};
+    Vec2Signs posNeg{SignDomain{Positive}, SignDomain{Negative}};
+    Vec2Signs posPos{SignDomain{Positive}, SignDomain{Positive}};
+    Vec2Signs negPos{SignDomain{Negative}, SignDomain{Positive}};
+    Vec2Signs posTop{SignDomain{Positive}, SignDomain{Top}};
+    Vec2Signs topPos{SignDomain{Top}, SignDomain{Positive}};
+    Vec2Signs topTop{SignDomain{Top}, SignDomain{Top}};
 
     EXPECT_EQ(bottom, bottom);
     EXPECT_TRUE(posPos <= posTop);

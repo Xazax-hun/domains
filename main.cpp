@@ -13,6 +13,8 @@
 
 using namespace std::literals;
 
+namespace
+{
 bool runFile(std::string_view filePath, const std::optional<std::string>& analysisName, bool dumpCfg, bool svg)
 {
     DiagnosticEmitter emitter(std::cout, std::cerr);
@@ -52,6 +54,7 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
     }
     return true;
 }
+} // anonymous
 
 int main(int argc, const char* argv[])
 {
@@ -70,7 +73,7 @@ int main(int argc, const char* argv[])
         }
     };
 
-    const char *file = nullptr;
+    std::string_view file;
     bool dumpCfg = false;
     bool svg = false;
     std::optional<std::string> analysisName;
@@ -109,7 +112,7 @@ int main(int argc, const char* argv[])
             printHelp();
             return EXIT_FAILURE;
         }
-        if (!file)
+        if (file.empty())
         {
             file = argv[i];
             continue;
@@ -119,12 +122,11 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (!file)
+    if (file.empty())
     {
         fmt::print("error: input file not specified.\n");
         return EXIT_FAILURE;
     }
-
 
     return runFile(file, analysisName, dumpCfg, svg) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

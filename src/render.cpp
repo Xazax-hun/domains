@@ -8,11 +8,14 @@
 #include <cairo-svg.h> 
 
 
+namespace
+{
 cairo_status_t stringstream_writer(void *closure, const unsigned char *data, unsigned int length)
 {
     static_cast<std::stringstream*>(closure)->write((const char*)data, length);
     return CAIRO_STATUS_SUCCESS;
 }
+} // anonymous
 
 std::string renderRandomWalkSVG(Walk w)
 {
