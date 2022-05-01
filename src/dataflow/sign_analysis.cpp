@@ -24,25 +24,31 @@ struct TransferOperation
     // TODO: topX and topY are misleading, we should rename them.
     Vec2Sign operator()(const Init* init) const
     {
-        SignDomain xSign{Top};
-        int topX = *init->topX.value;
-        int width = *init->width.value;
-        if (topX > 0)
-            xSign = SignDomain{Positive};
-        else if (topX + width < 0)
-            xSign = SignDomain{Negative};
-        else if (topX == 0 && width == 0)
-            xSign = SignDomain{Zero};
+        SignDomain xSign{
+            [topX = *init->topX.value, width = *init->width.value]() {
+                if (topX > 0)
+                    return Positive;
+                if (topX + width < 0)
+                    return Negative;
+                if (topX == 0 && width == 0)
+                    return Zero;
 
-        SignDomain ySign{Top};
-        int topY = *init->topY.value;
-        int height = *init->height.value;
-        if (topY > 0)
-            ySign = SignDomain{Positive};
-        else if (topY + height < 0)
-            ySign = SignDomain{Negative};
-        else if (topY == 0 && height == 0)
-            ySign = SignDomain{Zero};
+                return Top;
+            }()
+        };
+
+        SignDomain ySign{
+            [topY = *init->topY.value, height = *init->height.value]() {
+                if (topY > 0)
+                    return Positive;
+                if (topY + height < 0)
+                    return Negative;
+                if (topY == 0 && height == 0)
+                    return Zero;
+                
+                return Top;
+            }()
+        };
 
         return Vec2Sign{ xSign, ySign };
     }
