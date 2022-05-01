@@ -69,11 +69,11 @@ struct TransferOperation
             if (deg % 360 == 0)
                 return preState;
             if (deg % 360 == 270)
-                return Vec2Sign{preState.y, negate(preState.x)};
+                return Vec2Sign{preState.y, -preState.x};
             if (deg % 180 == 0)
-                return Vec2Sign{negate(preState.x), negate(preState.y)};
+                return Vec2Sign{-preState.x, -preState.y};
             if (deg % 360 == 90)
-                return Vec2Sign{negate(preState.y), preState.x};
+                return Vec2Sign{-preState.y, preState.x};
         }
         return Vec2Sign{SignDomain{Top}, SignDomain{Top}};
     }

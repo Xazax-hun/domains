@@ -77,7 +77,7 @@ inline bool operator<=(SignDomain lhs, SignDomain rhs)
 
 static_assert(Domain<SignDomain>);
 
-inline SignDomain negate(SignDomain d)
+inline SignDomain operator-(SignDomain d)
 {
     if (d.v == SignValue::Negative)
         return SignDomain{ SignValue::Positive };
