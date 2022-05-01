@@ -28,7 +28,7 @@ std::optional<Node> Parser::parse()
     return result;
 }
 
-std::optional<Node> Parser::sequence(bool root)
+std::optional<const Sequence*> Parser::sequence(bool root)
 {
     std::vector<Node> commands;
     if (root && peek().type != TokenType::INIT)
@@ -100,7 +100,7 @@ std::optional<Node> Parser::command()
     return {};
 }
 
-std::optional<Node> Parser::branch()
+std::optional<const Branch*> Parser::branch()
 {
     BIND(lhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
@@ -109,8 +109,7 @@ std::optional<Node> Parser::branch()
     BIND(rhs, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
-    if (std::get<const Sequence*>(lhs)->nodes.empty() &&
-        std::get<const Sequence*>(rhs)->nodes.empty())
+    if (lhs->nodes.empty() && rhs->nodes.empty())
     {
         error(kw, "at most one alternative can be empty");
         return {};
@@ -119,14 +118,14 @@ std::optional<Node> Parser::branch()
     return context.make<Branch>(kw, lhs, rhs);
 }
 
-std::optional<Node> Parser::loop()
+std::optional<const Loop*> Parser::loop()
 {
     Token kw = previous();
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
     BIND(body, sequence());
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
-    if (std::get<const Sequence*>(body)->nodes.empty())
+    if (body->nodes.empty())
     {
         error(kw, "the body of 'iter' must not be empty");
         return {};

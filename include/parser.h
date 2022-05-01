@@ -20,16 +20,14 @@ public:
     Parser(std::vector<Token> tokens,
            const DiagnosticEmitter& diag) noexcept : tokens(std::move(tokens)), diag(diag) {}
 
-    // Reentrant. Invoking again will continue parsing with the tokens
-    // added since the last invocation.
     std::optional<Node> parse();
 
     const ASTContext& getContext() const { return context; }
 
 private:
-    std::optional<Node> sequence(bool root = false);
-    std::optional<Node> branch();
-    std::optional<Node> loop();
+    std::optional<const Sequence*> sequence(bool root = false);
+    std::optional<const Branch*> branch();
+    std::optional<const Loop*> loop();
     std::optional<Node> command();
 
     // Utilities.

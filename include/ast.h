@@ -44,13 +44,14 @@ struct Sequence
 struct Branch
 {
     Token kw;
-    Node lhs, rhs;
+    const Sequence* lhs;
+    const Sequence* rhs;
 };
 
 struct Loop
 {
     Token kw;
-    Node body;
+    const Sequence* body;
 };
 
 class ASTContext
