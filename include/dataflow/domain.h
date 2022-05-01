@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <string>
+#include <string_view>
 
 template<typename T>
 concept Domain = requires(T a)

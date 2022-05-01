@@ -63,9 +63,11 @@ public:
     ASTContext& operator=(const ASTContext&) = delete;
 
     template<typename T, typename... Args>
-    Node make(Args&&... args)
+    const T* make(Args&&... args)
     {
-        return nodes.emplace_back(new T(std::forward<Args&&>(args)...));
+        const T* ret = new T(std::forward<Args&&>(args)...);
+        nodes.push_back(ret);
+        return ret;
     }
 
     ~ASTContext()

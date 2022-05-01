@@ -41,7 +41,7 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
         {
             postState = F{}(postState, o);
         }
-        // If the state did not chage we do not need to
+        // If the state did not change we do not need to
         // propagate the changes.
         if (postStates[currentBlock] == postState)
             continue;
@@ -63,7 +63,7 @@ Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const C
     {
         if (!block.operations.empty())
         {
-            anns.postAnnotations[toNode(block.operations.back())].push_back(result[i].toString());
+            anns.postAnnotations[toNode(block.operations.back())].emplace_back(result[i].toString());
         }
         ++i;
     }
