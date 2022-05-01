@@ -17,7 +17,7 @@
   if (!y) return std::nullopt; 
 
 
-std::optional<Node> Parser::parse()
+std::optional<const Sequence*> Parser::parse()
 {
     auto result = sequence(true);
     if (!isAtEnd())

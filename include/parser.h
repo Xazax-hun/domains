@@ -20,7 +20,7 @@ public:
     Parser(std::vector<Token> tokens,
            const DiagnosticEmitter& diag) noexcept : tokens(std::move(tokens)), diag(diag) {}
 
-    std::optional<Node> parse();
+    std::optional<const Sequence*> parse();
 
     const ASTContext& getContext() const { return context; }
 
