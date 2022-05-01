@@ -5,14 +5,9 @@
 #include <stack>
 #include <cassert>
 
-Node toNode(Operation op)
+Node toNode(Operation op) noexcept
 {
-    struct {
-        Node operator()(const Init* i) const noexcept { return i; }
-        Node operator()(const Translation* t) const noexcept { return t; }
-        Node operator()(const Rotation* r) const noexcept { return r; }
-    } converter;
-    return std::visit(converter, op);
+    return std::visit([](const auto* node) noexcept -> Node { return node; }, op);
 }
 
 int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
@@ -100,7 +95,7 @@ CFG& CFG::addEdge(int from, int to)
     return *this;
 }
 
-std::string print(const CFG& cfg)
+std::string print(const CFG& cfg) noexcept
 {
     std::stringstream out;
     out << "digraph CFG {\n";

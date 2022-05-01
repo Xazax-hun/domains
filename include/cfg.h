@@ -5,7 +5,7 @@
 #include <queue>
 
 using Operation = std::variant<const Init*, const Translation*, const Rotation*>;
-Node toNode(Operation op);
+Node toNode(Operation op) noexcept;
 
 struct BasicBlock
 {
@@ -53,6 +53,6 @@ private:
     std::vector<bool> queued;
 };
 
-std::string print(const CFG& cfg);
+std::string print(const CFG& cfg) noexcept;
 
 #endif // ANALYSIS_H
