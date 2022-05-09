@@ -121,9 +121,8 @@ TEST(Domains, Vec2IntervalDomain)
 
     Vec2Interval singleton{IntervalDomain{5}, IntervalDomain{5}};
     Vec2Interval range{IntervalDomain{0, 10}, IntervalDomain{0, 10}};
-    Vec2Interval top{IntervalDomain::top(), IntervalDomain::top()};
 
-    EXPECT_EQ(singleton.widen(range), top);
+    EXPECT_EQ(singleton.widen(range), Vec2Interval::top());
 }
 
 } // anonymous

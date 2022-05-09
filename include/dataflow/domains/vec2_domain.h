@@ -28,6 +28,11 @@ struct Vec2Domain
         return Vec2Domain{D::bottom(), D::bottom()};
     }
 
+    static Vec2Domain top() requires requires { { D::top() } -> std::same_as<D>; }
+    {
+        return Vec2Domain{D::top(), D::top()};
+    }
+
     Vec2Domain merge(const Vec2Domain& other) const
     {
         return Vec2Domain{x.merge(other.x), y.merge(other.y)};
