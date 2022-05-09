@@ -2,6 +2,7 @@
 #include "include/dataflow/solver.h"
 #include "include/dataflow/domains/domain.h"
 #include "include/dataflow/analyses/sign_analysis.h"
+#include "include/dataflow/analyses/interval_analysis.h"
 
 #include <unordered_map>
 
@@ -21,7 +22,8 @@ Annotations getResults(const CFG& cfg)
 using AnalysisAnnotationsFunc = Annotations(*)(const CFG& cfg);
 
 std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
-    {"sign", &getResults<Vec2Sign, getSignAnalysis> }
+    {"sign", &getResults<Vec2Sign, getSignAnalysis> },
+    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis> }
 };
 
 } // anonymous

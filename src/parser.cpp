@@ -62,6 +62,7 @@ std::optional<Node> Parser::command()
         BIND(height, consume(TokenType::NUMBER, "number expected"));
         MUST_SUCCEED(consume(TokenType::RIGHT_PAREN, ") expected"));
 
+        // TODO: diagnose when width or height is negative.
         return context.make<Init>(kw, topX, topY, width, height);
     }
     if (match(TokenType::TRANSLATION))
