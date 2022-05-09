@@ -10,7 +10,7 @@ concept Domain = requires(T a)
 {
     // Required to be an equivalence relation.
     { a == a } -> std::convertible_to<bool>;
-    // Required to be partial order.
+    // Required to be a partial order.
     { a <= a } -> std::convertible_to<bool>;
     // Required to be the smallest element according to the order above.
     { T::bottom() } -> std::same_as<T>;
