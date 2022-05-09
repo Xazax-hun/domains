@@ -15,4 +15,11 @@ concept Domain = requires(T a)
     { a.toString() } -> std::convertible_to<std::string_view>;
 };
 
+template<typename T>
+concept WidenableDomain = Domain<T> &&
+    requires(T a)
+{
+    { a.widen(a) } -> std::same_as<T>; 
+};
+
 #endif // SOLVER_H

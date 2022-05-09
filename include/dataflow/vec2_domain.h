@@ -33,6 +33,11 @@ struct Vec2Domain
         return Vec2Domain{x.merge(other.x), y.merge(other.y)};
     }
 
+    Vec2Domain widen(const Vec2Domain transferredState) const requires WidenableDomain<D>
+    {
+        return {x.widen(transferredState.x), y.widen(transferredState.y)};
+    }
+
     std::string toString() const
     {
         return fmt::format("{{ x: {}, y: {} }}", x.toString(), y.toString());

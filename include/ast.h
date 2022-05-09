@@ -14,6 +14,8 @@ struct Sequence;
 struct Branch;
 struct Loop;
 
+// TODO: add language elements to express assertions about the state
+//       that can be checked statically and dynamically.
 using Node = std::variant<const Init*, const Translation*, const Rotation*,
                           const Sequence*, const Branch*, const Loop*>;
 

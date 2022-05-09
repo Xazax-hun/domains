@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "include/dataflow/sign_domain.h"
+#include "include/dataflow/interval_domain.h"
 #include "include/dataflow/vec2_domain.h"
 
 namespace
@@ -25,6 +26,65 @@ TEST(Domains, SignDomain)
     EXPECT_EQ(negative.merge(top), top);
     EXPECT_EQ(bottom.merge(negative), negative);
     EXPECT_EQ(negative.merge(bottom), negative);
+}
+
+TEST(Domains, IntervalDomain)
+{
+    IntervalDomain bottom = IntervalDomain::bottom();
+    IntervalDomain top = IntervalDomain::top();
+    IntervalDomain singleton = IntervalDomain{5};
+    IntervalDomain smallRangeA = IntervalDomain{0, 10};
+    IntervalDomain smallRangeB = IntervalDomain{11, 20};
+    IntervalDomain largeRange = IntervalDomain{-100, 100};
+
+    // Ordering
+    EXPECT_LE(bottom, top);
+    EXPECT_LE(bottom, singleton);
+    EXPECT_LE(bottom, smallRangeA);
+    EXPECT_LE(singleton, smallRangeA);
+    EXPECT_LE(smallRangeA, largeRange);
+    EXPECT_LE(smallRangeB, largeRange);
+    EXPECT_LE(largeRange, top);
+    EXPECT_FALSE(smallRangeA <= smallRangeB);
+    EXPECT_FALSE(smallRangeB <= smallRangeA);
+    EXPECT_FALSE(singleton <= smallRangeB);
+    EXPECT_FALSE(smallRangeB <= singleton);
+
+    // Merging
+    {
+        EXPECT_EQ(bottom.merge(singleton), singleton);
+        EXPECT_EQ(bottom.merge(smallRangeA), smallRangeA);
+        EXPECT_EQ(smallRangeA.merge(bottom), smallRangeA);
+        IntervalDomain mergedSmallsExpected{0, 20};
+        EXPECT_EQ(smallRangeA.merge(smallRangeB), mergedSmallsExpected);
+        EXPECT_EQ(largeRange.merge(top), top);
+        EXPECT_EQ(top.merge(largeRange), top);
+    }
+
+    // Widening
+    {
+        EXPECT_EQ(largeRange.widen(smallRangeA), largeRange);
+        EXPECT_EQ(smallRangeA.widen(largeRange), top);
+        IntervalDomain bumpMax{smallRangeA.min, smallRangeA.max + 1};
+        IntervalDomain wideningExpected{smallRangeA.min, IntervalDomain::INF}; 
+        EXPECT_EQ(smallRangeA.widen(bumpMax), wideningExpected);
+    }
+
+    // Arithmetic
+    {
+        EXPECT_EQ(singleton + singleton, IntervalDomain{10});
+        EXPECT_EQ(-singleton, IntervalDomain{-5});
+        EXPECT_EQ(singleton + top, top);
+        EXPECT_EQ(-top, top);
+        IntervalDomain negateExpected {-20, -11};
+        EXPECT_EQ(-smallRangeB, negateExpected);
+        IntervalDomain addExpected1 {5, 15};
+        EXPECT_EQ(smallRangeA + singleton, addExpected1);
+        EXPECT_EQ(singleton + smallRangeA, addExpected1);
+        IntervalDomain addExpected2 {11, 30};
+        EXPECT_EQ(smallRangeA + smallRangeB, addExpected2);
+        EXPECT_EQ(smallRangeB + smallRangeA, addExpected2);
+    }
 }
 
 TEST(Domains, Vec2SignsDomain)
@@ -52,6 +112,18 @@ TEST(Domains, Vec2SignsDomain)
     EXPECT_EQ(posNeg.merge(topTop), topTop);
     EXPECT_EQ(posNeg.merge(bottom), posNeg);
     EXPECT_EQ(bottom.merge(posNeg), posNeg);
+}
+
+TEST(Domains, Vec2IntervalDomain)
+{
+    using Vec2Interval = Vec2Domain<IntervalDomain>;
+    static_assert(WidenableDomain<Vec2Interval>);
+
+    Vec2Interval singleton{IntervalDomain{5}, IntervalDomain{5}};
+    Vec2Interval range{IntervalDomain{0, 10}, IntervalDomain{0, 10}};
+    Vec2Interval top{IntervalDomain::top(), IntervalDomain::top()};
+
+    EXPECT_EQ(singleton.widen(range), top);
 }
 
 } // anonymous
