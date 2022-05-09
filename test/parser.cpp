@@ -71,6 +71,22 @@ TEST(Parser, EmptyInput)
     EXPECT_EQ(output.str(), "[line 1] Error at end of file: 'init' expected at the beginning of the program\n");
 }
 
+TEST(Parser, IllegalInit)
+{
+    {
+        std::stringstream output;
+        std::string_view source = "init(50, 50, -1, 0)";
+        auto result = parseString(source, output);
+        EXPECT_EQ(output.str(), "[line 1] Error at 'init': the width of the initial area cannot be negative\n");
+    }
+    {
+        std::stringstream output;
+        std::string_view source = "init(50, 50, 0, -1)";
+        auto result = parseString(source, output);
+        EXPECT_EQ(output.str(), "[line 1] Error at 'init': the height of the initial area cannot be negative\n");
+    }
+}
+
 TEST(Parser, EmptyOr)
 {
     std::stringstream output;
