@@ -8,17 +8,6 @@ namespace
 {
 using enum SignValue;
 
-SignDomain toAbstract(int value)
-{
-    if (value < 0)
-        return SignDomain{ Negative };
-    if (value > 0)
-        return SignDomain{ Positive };
-    if (std::isnan(value))
-        return SignDomain{ Top };
-    return SignDomain{ Zero };
-}
-
 struct TransferOperation
 {
     // TODO: topX and topY are misleading, we should rename them.
@@ -55,10 +44,8 @@ struct TransferOperation
 
     Vec2Sign operator()(const Translation* t) const
     {
-        SignDomain xTranslate = toAbstract(*t->x.value);
-        SignDomain yTranslate = toAbstract(*t->y.value);
-        return Vec2Sign{preState.x + xTranslate,
-                        preState.y + yTranslate};
+        return Vec2Sign{preState.x + SignDomain{*t->x.value},
+                        preState.y + SignDomain{*t->y.value}};
     }
 
     Vec2Sign operator()(const Rotation* r) const

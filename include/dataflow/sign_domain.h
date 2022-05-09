@@ -23,10 +23,23 @@ enum class SignValue
     Positive
 };
 
+inline constexpr SignValue toAbstract(int value)
+{
+    using enum SignValue;
+    if (value < 0)
+        return Negative;
+    if (value > 0)
+        return Positive;
+    return Zero;
+}
+
 struct SignDomain
 {
     using enum SignValue;
     SignValue v;
+
+    constexpr SignDomain(SignValue v) : v(v) {}
+    explicit constexpr SignDomain(int v) : v(toAbstract(v)) {}
 
     static SignDomain bottom() { return { Bottom }; }
     SignDomain merge(SignDomain other) const
