@@ -1,7 +1,7 @@
 #ifndef SIGN_DOMAIN_H
 #define SIGN_DOMAIN_H
 
-#include "include/dataflow/domain.h"
+#include "include/dataflow/domains/domain.h"
 
 #include <cassert>
 

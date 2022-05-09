@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "include/dataflow/sign_domain.h"
-#include "include/dataflow/vec2_domain.h"
+#include "include/dataflow/domains/sign_domain.h"
+#include "include/dataflow/domains/vec2_domain.h"
 #include "include/cfg.h"
 
 using Vec2Sign = Vec2Domain<SignDomain>;

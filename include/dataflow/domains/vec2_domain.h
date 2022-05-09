@@ -1,7 +1,7 @@
 #ifndef PAIR_DOMAIN_H
 #define PAIR_DOMAIN_H
 
-#include "include/dataflow/domain.h"
+#include "include/dataflow/domains/domain.h"
 
 #include <fmt/format.h>
 

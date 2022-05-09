@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "include/dataflow/domain.h"
+#include "include/dataflow/domains/domain.h"
 #include "include/cfg.h"
 
 #include <type_traits>

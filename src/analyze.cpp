@@ -1,6 +1,6 @@
 #include "include/analyze.h"
-#include "include/dataflow/domain.h"
 #include "include/dataflow/solver.h"
+#include "include/dataflow/domains/domain.h"
 #include "include/dataflow/analyses/sign_analysis.h"
 
 #include <unordered_map>

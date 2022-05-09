@@ -7,7 +7,7 @@
 
 #include <fmt/format.h>
 
-#include "include/dataflow/domain.h"
+#include "include/dataflow/domains/domain.h"
 
 struct IntervalDomain
 {

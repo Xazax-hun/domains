@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "include/dataflow/sign_domain.h"
-#include "include/dataflow/interval_domain.h"
-#include "include/dataflow/vec2_domain.h"
+#include "include/dataflow/domains/sign_domain.h"
+#include "include/dataflow/domains/interval_domain.h"
+#include "include/dataflow/domains/vec2_domain.h"
 
 namespace
 {
