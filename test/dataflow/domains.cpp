@@ -68,6 +68,7 @@ TEST(Domains, IntervalDomain)
         IntervalDomain bumpMax{smallRangeA.min, smallRangeA.max + 1};
         IntervalDomain wideningExpected{smallRangeA.min, IntervalDomain::INF}; 
         EXPECT_EQ(smallRangeA.widen(bumpMax), wideningExpected);
+        EXPECT_EQ(bottom.widen(largeRange), largeRange);
     }
 
     // Arithmetic

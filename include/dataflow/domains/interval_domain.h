@@ -9,6 +9,9 @@
 
 #include "include/dataflow/domains/domain.h"
 
+struct IntervalDomain;
+bool operator==(IntervalDomain lhs, IntervalDomain rhs);
+
 struct IntervalDomain
 {
     static constexpr int NEG_INF = std::numeric_limits<int>::min();
@@ -29,6 +32,8 @@ struct IntervalDomain
 
     IntervalDomain widen(IntervalDomain transferredState) const
     {
+        if (*this == bottom())
+            return transferredState;
         int resultMin = [this, transferredState] {
             if (transferredState.min < min)
                 return NEG_INF;
