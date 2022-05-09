@@ -85,12 +85,7 @@ private:
     std::vector<Node> nodes;
 
     struct {
-        void operator()(const Init* i) const noexcept { delete i; }
-        void operator()(const Translation* t) const noexcept { delete t; }
-        void operator()(const Rotation* r) const noexcept { delete r; }
-        void operator()(const Sequence* s) const noexcept { delete s; }
-        void operator()(const Branch* b) const noexcept { delete b; }
-        void operator()(const Loop* l) const noexcept { delete l; }
+        void operator()(const auto* p) const noexcept { delete p; }
     } nodeDeleter;
 };
 
@@ -106,5 +101,7 @@ struct Annotations
 };
 
 std::string print(Node n, const Annotations& anns = {}) noexcept;
+
+// TODO: add recursive AST visitor.
 
 #endif // AST_H
