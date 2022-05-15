@@ -44,10 +44,7 @@ rotation(0, 0, 180)
 ```
 Running `./domains signDemo.tr --analyze sign` will print out the same program along with
 some annotations. The annotations will contain the facts that the analyzer was able to
-infer about the program.
-
-
-## Output:
+infer about the program. In this case, the output will be:
 ```
 init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
 iter {
@@ -58,6 +55,25 @@ iter {
   }
 };
 rotation(0, 0, 180) /* { x: Negative, y: Negative } */
+```
+
+## Another example:
+
+Running `./domains filename.tr --analyze interval` on:
+```
+init(50, 50, 50, 50);
+translation(10, 0);
+iter{
+  translation(10, 0)
+}
+```
+will output:
+```
+init(50, 50, 50, 50);
+translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
+iter {
+  translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
+}
 ```
 
 # Dependencies
