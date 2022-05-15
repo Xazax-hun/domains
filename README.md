@@ -21,8 +21,8 @@ iter{
 }
 ```
 
-Running `./domains example.tr --svg` will output the SVG to the standard output
-that visualizes an execution trace of the program.
+Running `./domains example.tr --svg --executions 3` will output the SVG to the standard output
+that visualizes some execution traces of the program.
 An execution is defined as a random walk of the control flow graph.
 
 ## Output:
