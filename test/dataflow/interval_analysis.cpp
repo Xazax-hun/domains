@@ -53,6 +53,54 @@ translation(10, 0) /* { x: [60, 110], y: [50, 100] } */)";
     EXPECT_EQ(expected, annotatedSource);
 }
 
+TEST(IntervalAnalysis, PrimitiveAnalysisRotation)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 90))";
+    std::string_view expected =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 90) /* { x: [-70, -20], y: [20, 70] } */)";
+    auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
+    std::string annotatedSource = print(result->root, result->anns);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_EQ(expected, annotatedSource);
+}
+
+TEST(IntervalAnalysis, PrimitiveAnalysisRotation2)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 180))";
+    std::string_view expected =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 180) /* { x: [-70, -20], y: [-70, -20] } */)";
+    auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
+    std::string annotatedSource = print(result->root, result->anns);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_EQ(expected, annotatedSource);
+}
+
+TEST(IntervalAnalysis, PrimitiveAnalysisRotation3)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 360))";
+    std::string_view expected =
+R"(init(20, 20, 50, 50);
+rotation(0, 0, 360) /* { x: [20, 70], y: [20, 70] } */)";
+    auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
+    std::string annotatedSource = print(result->root, result->anns);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_EQ(expected, annotatedSource);
+}
+
 TEST(IntervalAnalysis, WidenSimpleLoop)
 {
     std::stringstream output;
@@ -69,6 +117,31 @@ translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
 iter {
   translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
 })";
+    auto result = analyze<getIntervalAnalysis>(source, output);
+    std::string annotatedSource = print(result->root, result->anns);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_EQ(expected, annotatedSource);
+
+}
+
+TEST(IntervalAnalysis, WidenSimpleLoopAndRotate)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+translation(10, 0);
+iter{
+  translation(10, 0)
+};
+rotation(0, 0, 90))";
+    std::string_view expected =
+R"(init(50, 50, 50, 50);
+translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
+iter {
+  translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
+};
+rotation(0, 0, 90) /* { x: [-inf, inf], y: [-inf, inf] } */)";
     auto result = analyze<getIntervalAnalysis>(source, output);
     std::string annotatedSource = print(result->root, result->anns);
     EXPECT_TRUE(output.str().empty());

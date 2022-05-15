@@ -1,6 +1,9 @@
 #include "include/dataflow/analyses/interval_analysis.h"
 
+#include <algorithm>
+
 #include "include/dataflow/solver.h"
+#include "include/eval.h"
 
 namespace
 {
@@ -21,10 +24,50 @@ struct TransferOperation
                             preState.y + IntervalDomain{*t->y.value}};
     }
 
-    Vec2Interval operator()(const Rotation*) const
+    Vec2Interval operator()(const Rotation* r) const
     {
-        // TODO: do the actual calculation and give some bounds.
-        return Vec2Interval::top();
+        // TODO: In some cases we could give tighter bounds
+        //       for these.
+        if (preState.x.max == IntervalDomain::INF ||
+            preState.x.min == IntervalDomain::NEG_INF ||
+            preState.y.max == IntervalDomain::INF ||
+            preState.y.min == IntervalDomain::NEG_INF)
+            return Vec2Interval::top();
+
+        // The two intervals describe a rectangle aligned with the axes:
+        //    
+        //  ----------
+        //  |        |
+        //  |        |
+        //  ----------
+        //
+        // To get the rotated region, we rotate all the corners and calculate
+        // the bounding box of the result:
+        //
+        //  -----------
+        //  |   /---_ |
+        //  |  /    / |
+        //  | /    /  |
+        //  | ---_/   |
+        //  -----------
+        //
+        Vec2 corners[]{ Vec2{preState.x.min, preState.y.min},
+                        Vec2{preState.x.min, preState.y.max},
+                        Vec2{preState.x.max, preState.y.min},
+                        Vec2{preState.x.max, preState.y.max} };
+        Vec2 origin{*r->x.value, *r->y.value};
+        for (auto& toRotate : corners)
+        {
+            toRotate = rotate(toRotate, origin, *r->deg.value);
+        }
+        auto newX = std::minmax_element(std::begin(corners), std::end(corners), [](Vec2 lhs, Vec2 rhs) {
+            return lhs.x < rhs.x;
+        });
+        auto newY = std::minmax_element(std::begin(corners), std::end(corners), [](Vec2 lhs, Vec2 rhs) {
+            return lhs.y < rhs.y;
+        });
+        return Vec2Interval{ IntervalDomain{ newX.first->x, newX.second->x },
+                             IntervalDomain { newY.first->y, newY.second->y } };
     }
     
     Vec2Interval preState;
