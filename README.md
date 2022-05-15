@@ -8,6 +8,7 @@ Toy language to help experiment with numerical domains for abstract interpretati
 
 The goal is to build a framework that helps experimenting with numerical domains and static analysis methods to
 infer which regions in the 2D space are reachable by the programs written in the graphical language.
+To get basic syntax highlight for the language install `utils/ide/trlang/trlang.vsix` extension to VS code.
 
 # Running the interpreter
 
