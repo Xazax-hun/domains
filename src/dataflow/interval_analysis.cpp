@@ -36,20 +36,20 @@ struct TransferOperation
 
         // The two intervals describe a rectangle aligned with the axes:
         //    
-        //  ----------
+        //  +--------+
         //  |        |
         //  |        |
-        //  ----------
+        //  +--------+
         //
         // To get the rotated region, we rotate all the corners and calculate
         // the bounding box of the result:
         //
-        //  -----------
-        //  |   /---_ |
-        //  |  /    / |
-        //  | /    /  |
-        //  | ---_/   |
-        //  -----------
+        //  +---------+
+        //  |   /¯--__|
+        //  |  /     /|
+        //  | /     / |
+        //  |¯---__/  |
+        //  +---------+
         //
         Vec2 corners[]{ Vec2{preState.x.min, preState.y.min},
                         Vec2{preState.x.min, preState.y.max},
