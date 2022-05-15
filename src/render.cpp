@@ -1,12 +1,14 @@
 #include "include/render.h"
 
+#ifdef HAVE_CAIRO
+
 #include <sstream>
 #include <cmath>
 
-#ifdef HAVE_CAIRO
 #include <cairo.h>
 #include <cairo-svg.h> 
 
+#include <random>
 
 namespace
 {
@@ -21,10 +23,56 @@ cairo_status_t stringstream_writer(void *closure, const unsigned char *data, uns
     return CAIRO_STATUS_SUCCESS;
 }
 
-void renderRandomPath(cairo_t *cr, const Walk& w)
+// Pick easily distinguishable colors for the first 20,
+// random colors afterwards.
+struct RGB { double r, g, b; };
+class ColorPicker
+{
+public:
+    ColorPicker() : gen(rd()), genComp(0, 255) {}
+
+    RGB next()
+    {
+        if (current < sizeof(colors)/sizeof(colors[0]))
+            return colors[current++];
+
+        return RGB { genComp(gen) / 255., genComp(gen) / 255., genComp(gen) / 255.};
+    }
+private:
+    static constexpr RGB colors[] = {
+        {230 / 255., 25 / 255., 75 / 255.},
+        {60 / 255., 180 / 255., 75 / 255.},
+        {255 / 255., 225 / 255., 25 / 255.},
+        {0 / 255., 130 / 255., 200 / 255.},
+        {245 / 255., 130 / 255., 48 / 255.},
+        {145 / 255., 30 / 255., 180 / 255.},
+        {70 / 255., 240 / 255., 240 / 255.},
+        {240 / 255., 50 / 255., 230 / 255.},
+        {210 / 255., 245 / 255., 60 / 255.},
+        {250 / 255., 190 / 255., 212 / 255.},
+        {0 / 255., 128 / 255., 128 / 255.},
+        {220 / 255., 190 / 255., 255 / 255.},
+        {170 / 255., 110 / 255., 40 / 255.},
+        {255 / 255., 250 / 255., 200 / 255.},
+        {255 / 255., 250 / 255., 200 / 255.},
+        {128 / 255., 0 / 255., 0 / 255.},
+        {170 / 255., 255 / 255., 195 / 255.},
+        {128 / 255., 128 / 255., 0 / 255.},
+        {255 / 255., 215 / 255., 180 / 255.},
+        {0 / 255., 0 / 255., 128 / 255.},
+        {128 / 255., 128 / 255., 128 / 255.}
+    };
+
+    unsigned current = 0;
+    std::random_device rd;
+    std::mt19937 gen;
+    std::uniform_int_distribution<int> genComp;
+};
+
+void renderRandomPath(cairo_t *cr, const Walk& w, RGB color)
 {
     // Draw the lines
-    cairo_set_source_rgb(cr, 1, 0, 0);
+    cairo_set_source_rgb(cr, color.r, color.g, color.b);
     for (unsigned i = 1; i < w.size(); ++i)
     {
         cairo_new_path(cr);
@@ -83,9 +131,10 @@ std::string renderRandomWalkSVG(std::vector<Walk> walks)
         cairo_line_to(cr, WIDTH, 0);
         cairo_stroke(cr);
 
+        ColorPicker picker;
         for (const auto& walk : walks)
         {
-            renderRandomPath(cr, walk);
+            renderRandomPath(cr, walk, picker.next());
         }
         // Surface needs to be destroyed here.
     }
