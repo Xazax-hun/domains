@@ -19,6 +19,11 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
 {
     DiagnosticEmitter emitter(std::cout, std::cerr);
     std::ifstream file(filePath.data());
+    if (!file)
+    {
+        fmt::print("Unable to open file '{}'.\n", filePath);
+        return false;
+    }
     std::stringstream fileContent;
     fileContent << file.rdbuf();
     Lexer lexer(std::move(fileContent).str(), emitter);
@@ -38,7 +43,7 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
         if (!annotations)
             return false;
 
-        std::cout << print(*root, *annotations) << "\n";
+        fmt::print("{}\n", print(*root, *annotations));
         return true;
     }
 
@@ -57,7 +62,7 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
         }
     }
     if (svg)
-        std::cout << renderRandomWalkSVG(walks) << "\n";
+        fmt::print("{}\n", renderRandomWalkSVG(walks));
     return true;
 }
 } // anonymous
