@@ -43,3 +43,8 @@ std::vector<Vec2Interval> getPrimitiveIntervalAnalysis(const CFG& cfg)
 {
     return solveMonotoneFramework<Vec2Interval, IntervalTransfer>(cfg);
 }
+
+std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg)
+{
+    return solveMonotoneFrameworkWithWidening<Vec2Interval, IntervalTransfer>(cfg);
+}

@@ -8,6 +8,9 @@
 
 #include <type_traits>
 
+template<Domain D>
+using AnalysisFunc = std::vector<D>(*)(const CFG&);
+
 template<typename T, typename Dom>
 concept TransferFunction = Domain<Dom> && 
     std::is_default_constructible_v<T> &&
@@ -53,6 +56,40 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
     return postStates;
 }
 
+// Similar to solveMonotoneFramework, but always invoke the widen
+// operation.
+template<WidenableDomain D, TransferFunction<D> F>
+std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
+{
+    std::vector<D> preStates(cfg.blocks.size(), D::bottom());
+    std::vector<D> postStates(cfg.blocks.size(), D::bottom());
+    RPOWorklist w{ cfg };
+    w.enqueue(0);
+    while(!w.empty())
+    {
+        int currentBlock = w.dequeue();
+        D newPreState{ D::bottom() };
+        for (auto pred : cfg.blocks[currentBlock].preds)
+        {
+            newPreState = newPreState.merge(postStates[pred]);
+        }
+        preStates[currentBlock] = preStates[currentBlock].widen(newPreState);
+        D postState{ preStates[currentBlock] };
+        for (Operation o : cfg.blocks[currentBlock].operations)
+        {
+            postState = F{}(postState, o);
+        }
+        // If the state did not change we do not need to
+        // propagate the changes.
+        if (postStates[currentBlock] == postState)
+            continue;
+
+        postStates[currentBlock] = postState;
+        w.enqueueSuccessors(currentBlock);
+    }
+
+    return postStates;
+}
 
 template<Domain D>
 Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const CFG& cfg)

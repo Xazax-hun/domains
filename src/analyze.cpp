@@ -9,9 +9,6 @@
 namespace 
 {
 
-template<Domain D>
-using AnalysisFunc = std::vector<D>(*)(const CFG&);
-
 template<Domain D, AnalysisFunc<D> getAnalysis>
 Annotations getResults(const CFG& cfg)
 {
@@ -23,7 +20,8 @@ using AnalysisAnnotationsFunc = Annotations(*)(const CFG& cfg);
 
 std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
     {"sign", &getResults<Vec2Sign, getSignAnalysis> },
-    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis> }
+    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis> },
+    {"interval", &getResults<Vec2Interval, getIntervalAnalysis> }
 };
 
 } // anonymous

@@ -13,6 +13,9 @@ using Vec2Interval = Vec2Domain<IntervalDomain>;
 // dealing with loops and kept for exposition only.
 std::vector<Vec2Interval> getPrimitiveIntervalAnalysis(const CFG& cfg);
 
+// Always widen during the fixed-point iteration.
+std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg);
+
 
 // TODO: add variants of interval analysis:
 // - Widening
