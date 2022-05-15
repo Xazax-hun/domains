@@ -15,7 +15,7 @@ using namespace std::literals;
 
 namespace
 {
-bool runFile(std::string_view filePath, const std::optional<std::string>& analysisName, bool dumpCfg, bool svg)
+bool runFile(std::string_view filePath, const std::optional<std::string>& analysisName, bool dumpCfg, bool svg, int iter = 1)
 {
     DiagnosticEmitter emitter(std::cout, std::cerr);
     std::ifstream file(filePath.data());
@@ -42,16 +42,22 @@ bool runFile(std::string_view filePath, const std::optional<std::string>& analys
         return true;
     }
 
-    Walk w = createRandomWalk(cfg);
-    if (w.empty())
-        return false;
-    if (svg)
-        std::cout << renderRandomWalkSVG(w) << "\n";
-    else
+    std::vector<Walk> walks;
+    for (int i = 0; i < iter; ++i)
     {
-        for (auto step : w)
-            std::cout << step.pos.x << " " << step.pos.y << "\n";
+        if (iter > 1)
+            fmt::print("{}. execution:\n", i + 1);
+        walks.push_back(createRandomWalk(cfg));
+        if (walks.back().empty())
+            return false;
+        else
+        {
+            for (auto step : walks.back())
+                fmt::print("{{ x: {}, y: {} }}\n", step.pos.x, step.pos.y);
+        }
     }
+    if (svg)
+        std::cout << renderRandomWalkSVG(walks) << "\n";
     return true;
 }
 } // anonymous
@@ -64,6 +70,7 @@ int main(int argc, const char* argv[])
         fmt::print("Options:\n");
         fmt::print("  --cfg-dump\n");
         fmt::print("  --svg\n");
+        fmt::print("  --executions NUMBER\n");
         fmt::print("  --analyze ANALYSIS_NAME\n");
         fmt::print("  --help\n");
         fmt::print("Available analyses:\n");
@@ -76,6 +83,7 @@ int main(int argc, const char* argv[])
     std::string_view file;
     bool dumpCfg = false;
     bool svg = false;
+    int iterations = 1;
     std::optional<std::string> analysisName;
     for (int i = 1; i < argc; ++i)
     {
@@ -108,6 +116,31 @@ int main(int argc, const char* argv[])
                 ++i;
                 continue;
             }
+            if (argv[i] == "--executions"sv)
+            {
+                if (i == argc - 1 || argv[i+1][0] == '-')
+                {
+                    fmt::print("Execution count was not provided.");
+                    return EXIT_FAILURE;
+                }
+                bool fail = false;
+                std::size_t pos{};
+                try
+                {
+                    iterations = std::stoi(argv[i+1], &pos);
+                }
+                catch(...)
+                {
+                    fail = true;
+                }
+                if (fail || iterations < 1 || pos != strlen(argv[i+1]))
+                {
+                    fmt::print("Invalid execution count.");
+                    return EXIT_FAILURE;
+                }
+                ++i;
+                continue;
+            }
 
             printHelp();
             return EXIT_FAILURE;
@@ -128,5 +161,5 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
-    return runFile(file, analysisName, dumpCfg, svg) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return runFile(file, analysisName, dumpCfg, svg, iterations) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

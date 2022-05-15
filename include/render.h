@@ -3,6 +3,8 @@
 
 #include "include/eval.h"
 
-std::string renderRandomWalkSVG(Walk w);
+#include <vector>
+
+std::string renderRandomWalkSVG(std::vector<Walk> walks);
 
 #endif // RENDER_H
