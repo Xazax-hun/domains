@@ -23,19 +23,14 @@ struct StepEval {
 
     Step operator()(const Translation* t) const noexcept
     {
-        return Step{ Vec2 { in->pos.x + *t->x.value, in->pos.y + *t->y.value}, {}, {}, false };
+        return Step{ in->pos + Vec2{ *t->x.value, *t->y.value }, {}, {}, false };
     }
 
     Step operator()(const Rotation* r) const noexcept
     {
         Vec2 origin{*r->x.value, *r->y.value};
-        Vec2 transformed { in->pos.x - origin.x, in->pos.y - origin.y };
-        double rotRad = toRad(*r->deg.value);
-        Vec2 rotated;
-        rotated.x = round(transformed.x * cos(rotRad) - transformed.y * sin(rotRad));
-        rotated.y = round(transformed.y * cos(rotRad) + transformed.x * sin(rotRad));
-        rotated.x += origin.x;
-        rotated.y += origin.y;
+        Vec2 toRotate { in->pos.x, in->pos.y };
+        Vec2 rotated = rotate(toRotate, origin, *r->deg.value);
         return Step {
             rotated,
             origin,
@@ -45,6 +40,18 @@ struct StepEval {
     }
 };
 } // namespace anonymous
+
+Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree)
+{
+    toRotate -= origin;
+    double rotRad = toRad(degree);
+    Vec2 rotated{
+        static_cast<int>(round(toRotate.x * cos(rotRad) - toRotate.y * sin(rotRad))),
+        static_cast<int>(round(toRotate.y * cos(rotRad) + toRotate.x * sin(rotRad)))
+    };
+    rotated += origin;
+    return rotated;
+}
 
 Walk createRandomWalk(const CFG& cfg)
 {

@@ -19,4 +19,6 @@ using Walk = std::vector<Step>;
 class CFG;
 Walk createRandomWalk(const CFG& cfg);
 
+Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree);
+
 #endif // EVAL_H

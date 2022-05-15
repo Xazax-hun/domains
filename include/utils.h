@@ -20,11 +20,32 @@ private:
 };
 
 template<typename T>
-struct Finally {
+struct Finally
+{
     T t;
     ~Finally() { t(); }
 };
 
 struct Vec2 { int x, y; };
+
+inline Vec2 operator-=(Vec2 lhs, Vec2 rhs)
+{
+    return Vec2{ lhs.x - rhs.x, lhs.y - rhs.y };
+}
+
+inline Vec2 operator-(Vec2 lhs, Vec2 rhs)
+{
+    return lhs -= rhs;
+}
+
+inline Vec2 operator+=(Vec2 lhs, Vec2 rhs)
+{
+    return Vec2{ lhs.x + rhs.x, lhs.y + rhs.y };
+}
+
+inline Vec2 operator+(Vec2 lhs, Vec2 rhs)
+{
+    return lhs += rhs;
+}
 
 #endif // UTILS_H
