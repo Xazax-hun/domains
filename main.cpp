@@ -73,6 +73,22 @@ bool runFile(std::string_view filePath, Config config)
         fmt::print("{}\n", renderRandomWalkSVG(walks));
     return true;
 }
+
+std::optional<int> toInt(const std::string& str)
+{
+    try
+    {
+        std::size_t pos{};
+        int ret = std::stoi(str, &pos);
+        if (pos != str.size())
+            return {};
+        return ret;
+    }
+    catch(...)
+    {
+        return {};
+    }
+}
 } // anonymous
 
 int main(int argc, const char* argv[])
@@ -133,21 +149,13 @@ int main(int argc, const char* argv[])
                     fmt::print("Execution count was not provided.");
                     return EXIT_FAILURE;
                 }
-                bool fail = false;
-                std::size_t pos{};
-                try
-                {
-                    config.iterations = std::stoi(argv[i+1], &pos);
-                }
-                catch(...)
-                {
-                    fail = true;
-                }
-                if (fail || config.iterations < 1 || pos != strlen(argv[i+1]))
+                auto nextNum = toInt(argv[i+1]);
+                if (!nextNum || *nextNum < 1)
                 {
                     fmt::print("Invalid execution count.");
                     return EXIT_FAILURE;
                 }
+                config.iterations = *nextNum;
                 ++i;
                 continue;
             }
@@ -161,6 +169,7 @@ int main(int argc, const char* argv[])
             continue;
         }
 
+        fmt::print("error: multiple input files specified.\n");
         printHelp();
         return EXIT_FAILURE;
     }
