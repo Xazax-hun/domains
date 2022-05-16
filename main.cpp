@@ -168,6 +168,7 @@ int main(int argc, const char* argv[])
     if (file.empty())
     {
         fmt::print("error: input file not specified.\n");
+        printHelp();
         return EXIT_FAILURE;
     }
 
