@@ -2,10 +2,13 @@
 #include "include/lexer.h"
 #include "include/parser.h"
 #include "include/cfg.h"
-#include "include/render.h"
 
+#include <algorithm>
 #include <random>
 #include <cmath>
+#include <set>
+
+#include <fmt/format.h>
 
 namespace
 {
@@ -39,7 +42,7 @@ struct StepEval {
         };
     }
 };
-} // namespace anonymous
+} // anonymous namespace
 
 Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree)
 {
@@ -53,16 +56,69 @@ Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree)
     return rotated;
 }
 
-Walk createRandomWalk(const CFG& cfg)
+namespace
+{
+std::set<std::pair<int, int>> detectBackEdges(const CFG& cfg, int current, const std::set<int>& visited)
+{
+    // Only do back-edge detection when we first encounter a node.
+    if (visited.contains(current))
+        return {};
+
+    std::set<std::pair<int, int>> ret;
+    for(auto succ : cfg.blocks[current].succs)
+    {
+        // In every walk, in order to take the back edge of a loop,
+        // we first need to enter the loop. Thus, if the target of the
+        // edge is already visited, we see a back edge.
+        if (visited.contains(succ))
+            ret.insert(std::make_pair(current, succ));
+    }
+    return ret;
+}
+
+unsigned getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
+                      const std::set<std::pair<int, int>>& backEdges, int loopiness)
+{
+    std::vector<int> successors = cfg.blocks[current].succs;
+    auto it = std::partition(successors.begin(), successors.end(),
+        [&backEdges, current](int succ) {
+            return !backEdges.contains(std::make_pair(current, succ));
+        });
+
+    int regularEdgeNum = it - successors.begin();
+    int backEdgeNum = successors.end() - it;
+    std::uniform_int_distribution<int> shouldTakeBackEdge(1, regularEdgeNum + backEdgeNum * loopiness);
+    if (shouldTakeBackEdge(gen) <= regularEdgeNum)
+    {
+        unsigned next = std::uniform_int_distribution<int>(0, regularEdgeNum - 1)(gen);
+        assert(next < successors.size());
+        return successors[next];
+    }
+    else
+    {
+        unsigned next = std::uniform_int_distribution<int>(regularEdgeNum, regularEdgeNum + backEdgeNum - 1)(gen);
+        assert(next < successors.size());
+        return successors[next];
+    }
+}
+} // anonymous namespace
+
+Walk createRandomWalk(const CFG& cfg, int loopiness)
 {
     Walk w;
     if (!std::holds_alternative<const Init*>(cfg.blocks.at(0).operations.at(0)))
     {
-        // TOOD: add error message.
+        // TODO: add error message.
         return w;
     }
     std::random_device rd;
     std::mt19937 gen(rd());
+
+    // Discover what edges are back edges as we go to correctly 
+    // account for loopiness when choosing the next block.
+    std::set<int> visited;
+    std::set<std::pair<int, int>> backEdges;
+
     int current = 0;
     do 
     {
@@ -75,8 +131,10 @@ Walk createRandomWalk(const CFG& cfg)
         }
         if (cfg.blocks[current].succs.empty())
             break;
-        std::uniform_int_distribution<int> randomSuccessor(0, cfg.blocks[current].succs.size() - 1);
-        current = cfg.blocks[current].succs[randomSuccessor(gen)];
+        backEdges.merge(detectBackEdges(cfg, current, visited));
+        visited.insert(current);
+        current = getNextBlock(gen, cfg, current, backEdges, loopiness);
     } while (true);
+
     return w;
 }

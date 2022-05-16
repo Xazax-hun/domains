@@ -20,6 +20,7 @@ struct Config
     bool dumpCfg = false;
     bool svg = false;
     int iterations = 1;
+    int loopiness = 1;
     std::optional<std::string> analysisName;
 };
 
@@ -60,7 +61,7 @@ bool runFile(std::string_view filePath, Config config)
     {
         if (config.iterations > 1)
             fmt::print("{}. execution:\n", i + 1);
-        walks.push_back(createRandomWalk(cfg));
+        walks.push_back(createRandomWalk(cfg, config.loopiness));
         if (walks.back().empty())
             return false;
         else
@@ -100,6 +101,7 @@ int main(int argc, const char* argv[])
         fmt::print("  --cfg-dump\n");
         fmt::print("  --svg\n");
         fmt::print("  --executions NUMBER\n");
+        fmt::print("  --loopiness NUMBER\n");
         fmt::print("  --analyze ANALYSIS_NAME\n");
         fmt::print("  --help\n");
         fmt::print("Available analyses:\n");
@@ -156,6 +158,23 @@ int main(int argc, const char* argv[])
                     return EXIT_FAILURE;
                 }
                 config.iterations = *nextNum;
+                ++i;
+                continue;
+            }
+            if (argv[i] == "--loopiness"sv)
+            {
+                if (i == argc - 1 || argv[i+1][0] == '-')
+                {
+                    fmt::print("Loopiness was not provided.");
+                    return EXIT_FAILURE;
+                }
+                auto nextNum = toInt(argv[i+1]);
+                if (!nextNum || *nextNum < 1)
+                {
+                    fmt::print("Invalid loopiness.");
+                    return EXIT_FAILURE;
+                }
+                config.loopiness = *nextNum;
                 ++i;
                 continue;
             }

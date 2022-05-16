@@ -17,7 +17,12 @@ struct Step {
 using Walk = std::vector<Step>;
 
 class CFG;
-Walk createRandomWalk(const CFG& cfg);
+
+// Loopiness specifies the weight of choosing back edges.
+// Loopiness == 1 means that back edges are as likely to
+// be picked as any other edge. Loopiness == n means that
+// the back edges are n times as likely to be picked.
+Walk createRandomWalk(const CFG& cfg, int loopiness = 1);
 
 Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree);
 
