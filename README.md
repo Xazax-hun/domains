@@ -16,8 +16,8 @@ Consider the following example program from the book:
 ```
 init(50, 50, 50, 50);
 translation(10, 0);
-iter{
-    { translation(10, 0) } or { rotation(0, 0, 90) }
+iter {
+  { translation(10, 0) } or { rotation(0, 0, 90) }
 }
 ```
 
@@ -64,7 +64,7 @@ Running `./domains filename.tr --analyze interval` on:
 ```
 init(50, 50, 50, 50);
 translation(10, 0);
-iter{
+iter {
   translation(10, 0)
 }
 ```
