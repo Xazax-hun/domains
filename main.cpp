@@ -31,7 +31,7 @@ bool runFile(std::string_view filePath, Config config)
     std::ifstream file(filePath.data());
     if (!file)
     {
-        fmt::print("Unable to open file '{}'.\n", filePath);
+        fmt::print(stderr, "Unable to open file '{}'.\n", filePath);
         return false;
     }
     std::stringstream fileContent;
@@ -142,7 +142,7 @@ int main(int argc, const char* argv[])
             {
                 if (i == argc - 1 || argv[i+1][0] == '-')
                 {
-                    fmt::print("Analysis name was not provided.");
+                    fmt::print(stderr, "Analysis name was not provided.");
                     return EXIT_FAILURE;
                 }
                 config.analysisName = argv[i+1];
@@ -153,13 +153,13 @@ int main(int argc, const char* argv[])
             {
                 if (i == argc - 1 || argv[i+1][0] == '-')
                 {
-                    fmt::print("Execution count was not provided.");
+                    fmt::print(stderr, "Execution count was not provided.");
                     return EXIT_FAILURE;
                 }
                 auto nextNum = toInt(argv[i+1]);
                 if (!nextNum || *nextNum < 1)
                 {
-                    fmt::print("Invalid execution count.");
+                    fmt::print(stderr, "Invalid execution count.");
                     return EXIT_FAILURE;
                 }
                 config.iterations = *nextNum;
@@ -170,13 +170,13 @@ int main(int argc, const char* argv[])
             {
                 if (i == argc - 1 || argv[i+1][0] == '-')
                 {
-                    fmt::print("Loopiness was not provided.");
+                    fmt::print(stderr, "Loopiness was not provided.");
                     return EXIT_FAILURE;
                 }
                 auto nextNum = toInt(argv[i+1]);
                 if (!nextNum || *nextNum < 1)
                 {
-                    fmt::print("Invalid loopiness.");
+                    fmt::print(stderr, "Invalid loopiness.");
                     return EXIT_FAILURE;
                 }
                 config.loopiness = *nextNum;
@@ -193,17 +193,17 @@ int main(int argc, const char* argv[])
             continue;
         }
 
-        fmt::print("error: multiple input files specified.\n");
+        fmt::print(stderr, "error: multiple input files specified.\n");
         printHelp();
         return EXIT_FAILURE;
     }
 
     if (config.dotsOnly && !config.svg)
-        fmt::print("warning: --dots-only is redundant without --svg.\n");
+        fmt::print(stderr, "warning: --dots-only is redundant without --svg.\n");
 
     if (file.empty())
     {
-        fmt::print("error: input file not specified.\n");
+        fmt::print(stderr, "error: input file not specified.\n");
         printHelp();
         return EXIT_FAILURE;
     }
