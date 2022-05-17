@@ -19,6 +19,7 @@ struct Config
 {
     bool dumpCfg = false;
     bool svg = false;
+    bool dotsOnly = false;
     int iterations = 1;
     int loopiness = 1;
     std::optional<std::string> analysisName;
@@ -71,7 +72,7 @@ bool runFile(std::string_view filePath, Config config)
         }
     }
     if (config.svg)
-        fmt::print("{}\n", renderRandomWalkSVG(walks));
+        fmt::print("{}\n", renderRandomWalkSVG(walks, config.dotsOnly));
     return true;
 }
 
@@ -94,21 +95,20 @@ std::optional<int> toInt(const std::string& str)
 
 int main(int argc, const char* argv[])
 {
-    auto printHelp = [&]()
+    auto printHelp = [=]()
     {
         fmt::print("Usage: {} script [options]\n", argv[0]);
         fmt::print("Options:\n");
         fmt::print("  --cfg-dump\n");
         fmt::print("  --svg\n");
+        fmt::print("  --dots-only\n");
         fmt::print("  --executions NUMBER\n");
         fmt::print("  --loopiness NUMBER\n");
         fmt::print("  --analyze ANALYSIS_NAME\n");
         fmt::print("  --help\n");
         fmt::print("Available analyses:\n");
         for (const auto& analysis : getListOfAnalyses())
-        {
             fmt::print("  {}\n", analysis);
-        }
     };
 
     std::string_view file;
@@ -126,6 +126,11 @@ int main(int argc, const char* argv[])
             if (argv[i] == "--svg"sv)
             {
                 config.svg = true;
+                continue;
+            }
+            if (argv[i] == "--dots-only"sv)
+            {
+                config.dotsOnly = true;
                 continue;
             }
             if (argv[i] == "--help"sv)
@@ -192,6 +197,9 @@ int main(int argc, const char* argv[])
         printHelp();
         return EXIT_FAILURE;
     }
+
+    if (config.dotsOnly && !config.svg)
+        fmt::print("warning: --dots-only is redundant without --svg.\n");
 
     if (file.empty())
     {

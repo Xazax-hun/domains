@@ -69,28 +69,31 @@ private:
     std::uniform_int_distribution<int> genComp;
 };
 
-void renderRandomPath(cairo_t *cr, const Walk& w, RGB color)
+void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
 {
     // Draw the lines
-    cairo_set_source_rgb(cr, color.r, color.g, color.b);
-    for (unsigned i = 1; i < w.size(); ++i)
+    if (!dotsOnly)
     {
-        cairo_new_path(cr);
-        if (w[i].origin)
+        cairo_set_source_rgb(cr, color.r, color.g, color.b);
+        for (unsigned i = 1; i < w.size(); ++i)
         {
-            int xdiff = w[i].origin->x - w[i].pos.x;
-            int ydiff = w[i].origin->y - w[i].pos.y;
-            double dist = sqrt(xdiff * xdiff + ydiff * ydiff);
-            double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
-            double degCur = atan2(-w[i].pos.y, w[i].pos.x);
-            cairo_arc(cr, w[i].origin->x, -w[i].origin->y, dist, degCur, degPrev);
-            cairo_stroke(cr);
-        }
-        else
-        {
-            cairo_move_to(cr, w[i - 1].pos.x, -w[i - 1].pos.y);
-            cairo_line_to(cr, w[i].pos.x, -w[i].pos.y);
-            cairo_stroke(cr);
+            cairo_new_path(cr);
+            if (w[i].origin)
+            {
+                int xdiff = w[i].origin->x - w[i].pos.x;
+                int ydiff = w[i].origin->y - w[i].pos.y;
+                double dist = sqrt(xdiff * xdiff + ydiff * ydiff);
+                double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
+                double degCur = atan2(-w[i].pos.y, w[i].pos.x);
+                cairo_arc(cr, w[i].origin->x, -w[i].origin->y, dist, degCur, degPrev);
+                cairo_stroke(cr);
+            }
+            else
+            {
+                cairo_move_to(cr, w[i - 1].pos.x, -w[i - 1].pos.y);
+                cairo_line_to(cr, w[i].pos.x, -w[i].pos.y);
+                cairo_stroke(cr);
+            }
         }
     }
     // Draw the dots
@@ -106,7 +109,7 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color)
 
 } // anonymous
 
-std::string renderRandomWalkSVG(std::vector<Walk> walks)
+std::string renderRandomWalkSVG(std::vector<Walk> walks, bool dotsOnly)
 {
     std::stringstream svgContent;
     {
@@ -134,7 +137,7 @@ std::string renderRandomWalkSVG(std::vector<Walk> walks)
         ColorPicker picker;
         for (const auto& walk : walks)
         {
-            renderRandomPath(cr, walk, picker.next());
+            renderRandomPath(cr, walk, picker.next(), dotsOnly);
         }
         // Surface needs to be destroyed here.
     }

@@ -5,6 +5,6 @@
 
 #include <vector>
 
-std::string renderRandomWalkSVG(std::vector<Walk> walks);
+std::string renderRandomWalkSVG(std::vector<Walk> walks, bool dotsOnly = false);
 
 #endif // RENDER_H
