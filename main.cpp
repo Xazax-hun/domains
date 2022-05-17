@@ -60,13 +60,13 @@ bool runFile(std::string_view filePath, Config config)
     std::vector<Walk> walks;
     for (int i = 0; i < config.iterations; ++i)
     {
-        if (config.iterations > 1)
-            fmt::print("{}. execution:\n", i + 1);
         walks.push_back(createRandomWalk(cfg, config.loopiness));
         if (walks.back().empty())
             return false;
-        else
+        if (!config.svg)
         {
+            if (config.iterations > 1)
+                fmt::print("{}. execution:\n", i + 1);
             for (auto step : walks.back())
                 fmt::print("{{ x: {}, y: {} }}\n", step.pos.x, step.pos.y);
         }
