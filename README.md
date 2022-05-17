@@ -76,6 +76,11 @@ iter {
   translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
 }
 ```
+Alternatively, we can visualize the analysis result along with some executions
+running `./domains filename.tr --analyze interval --svg --executions 10 --loopiness 5`.
+The gray area represents the regions  of the 2D space that the analysis deduced as reachable.
+
+![Interval example output](examples/interval_example.png "Interval example output")
 
 # Dependencies
 
