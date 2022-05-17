@@ -28,10 +28,10 @@ struct TransferOperation
     {
         // TODO: In some cases we could give tighter bounds
         //       for these.
-        if (preState.x.max == IntervalDomain::INF ||
-            preState.x.min == IntervalDomain::NEG_INF ||
-            preState.y.max == IntervalDomain::INF ||
-            preState.y.min == IntervalDomain::NEG_INF)
+        if (preState.x.max == INF ||
+            preState.x.min == NEG_INF ||
+            preState.y.max == INF ||
+            preState.y.min == NEG_INF)
             return Vec2Interval::top();
 
         // The two intervals describe a rectangle aligned with the axes:

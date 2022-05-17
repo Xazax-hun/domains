@@ -66,7 +66,7 @@ TEST(Domains, IntervalDomain)
         EXPECT_EQ(largeRange.widen(smallRangeA), largeRange);
         EXPECT_EQ(smallRangeA.widen(largeRange), top);
         IntervalDomain bumpMax{smallRangeA.min, smallRangeA.max + 1};
-        IntervalDomain wideningExpected{smallRangeA.min, IntervalDomain::INF}; 
+        IntervalDomain wideningExpected{smallRangeA.min, INF}; 
         EXPECT_EQ(smallRangeA.widen(bumpMax), wideningExpected);
         EXPECT_EQ(bottom.widen(largeRange), largeRange);
     }

@@ -2,7 +2,6 @@
 #define INTERVAL_DOMAIN_H
 
 #include <algorithm>
-#include <limits>
 #include <cassert>
 
 #include <fmt/format.h>
@@ -14,9 +13,6 @@ bool operator==(IntervalDomain lhs, IntervalDomain rhs);
 
 struct IntervalDomain
 {
-    static constexpr int NEG_INF = std::numeric_limits<int>::min();
-    static constexpr int INF = std::numeric_limits<int>::max();
-
     int min, max;
 
     explicit IntervalDomain(int num) : min(num), max(num) {}
@@ -80,13 +76,13 @@ static_assert(WidenableDomain<IntervalDomain>);
 inline IntervalDomain operator-(IntervalDomain o)
 {
     int minResult = [o] {
-        if (o.max == IntervalDomain::INF)
-            return IntervalDomain::NEG_INF;
+        if (o.max == INF)
+            return NEG_INF;
         return -o.max;
     }();
     int maxResult = [o] {
-        if (o.min == IntervalDomain::NEG_INF)
-            return IntervalDomain::INF;
+        if (o.min == NEG_INF)
+            return INF;
         return -o.min;
     }();
     return {minResult, maxResult};
@@ -95,15 +91,15 @@ inline IntervalDomain operator-(IntervalDomain o)
 inline IntervalDomain operator+(IntervalDomain lhs, IntervalDomain rhs)
 {
     int resultMin = [lhs, rhs]{
-        assert(lhs.min != IntervalDomain::INF && rhs.min != IntervalDomain::INF);
-        if (lhs.min == IntervalDomain::NEG_INF || rhs.min == IntervalDomain::NEG_INF)
-            return IntervalDomain::NEG_INF;
+        assert(lhs.min != INF && rhs.min != INF);
+        if (lhs.min == NEG_INF || rhs.min == NEG_INF)
+            return NEG_INF;
         return lhs.min + rhs.min;
     }();
     int resultMax = [lhs, rhs]{
-        assert(lhs.max != IntervalDomain::NEG_INF && rhs.max != IntervalDomain::NEG_INF);
-        if (lhs.max == IntervalDomain::INF || rhs.max == IntervalDomain::INF)
-            return IntervalDomain::INF;
+        assert(lhs.max != NEG_INF && rhs.max != NEG_INF);
+        if (lhs.max == INF || rhs.max == INF)
+            return INF;
         return lhs.max + rhs.max;
     }();
     return {resultMin, resultMax};

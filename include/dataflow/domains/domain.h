@@ -4,6 +4,10 @@
 #include <concepts>
 #include <string>
 #include <string_view>
+#include <limits>
+
+constexpr int NEG_INF = std::numeric_limits<int>::min();
+constexpr int INF = std::numeric_limits<int>::max();
 
 template<typename T>
 concept Domain = requires(T a)
