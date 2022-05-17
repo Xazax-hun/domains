@@ -44,12 +44,12 @@ std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, 
     return {};
 }
 
-std::vector<std::string_view> getListOfAnalyses()
+std::set<std::string_view> getListOfAnalyses()
 {
-    std::vector<std::string_view> results;
+    std::set<std::string_view> results;
     for (const auto& [name, _] : analyses)
     {
-        results.push_back(name);
+        results.insert(name);
     }
     return results;
 }

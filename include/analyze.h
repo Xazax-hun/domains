@@ -4,6 +4,7 @@
 #include "include/cfg.h"
 
 #include <string_view>
+#include <set>
 
 struct AnalysisResult
 {
@@ -12,6 +13,6 @@ struct AnalysisResult
 };
 
 std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, const CFG& cfg);
-std::vector<std::string_view> getListOfAnalyses();
+std::set<std::string_view> getListOfAnalyses();
 
 #endif // ANALYZE_H

@@ -151,6 +151,11 @@ int main(int argc, const char* argv[])
                     fmt::print(stderr, "Analysis name was not provided.");
                     return EXIT_FAILURE;
                 }
+                if (!getListOfAnalyses().contains(argv[i+1]))
+                {
+                    fmt::print(stderr, "Analysis '{}' does not exist.", argv[i+1]);
+                    return EXIT_FAILURE;
+                }
                 config.analysisName = argv[i+1];
                 ++i;
                 continue;
