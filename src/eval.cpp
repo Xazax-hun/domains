@@ -21,7 +21,7 @@ struct StepEval {
     {
         std::uniform_int_distribution<int> genX(*i->topX.value, *i->topX.value + *i->width.value);
         std::uniform_int_distribution<int> genY(*i->topY.value, *i->topY.value + *i->height.value);
-        return Step{ Vec2 (genX(gen), genY(gen)), {}, {}, true};
+        return Step{ Vec2{ genX(gen), genY(gen) }, {}, {}, true};
     }
 
     Step operator()(const Translation* t) const noexcept

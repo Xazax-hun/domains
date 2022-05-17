@@ -47,14 +47,18 @@ bool runFile(std::string_view filePath, Config config)
     CFG cfg = createCfg(*root);
     if (config.dumpCfg)
         fmt::print("{}\n", print(cfg));
+    Annotations annotations;
+    std::vector<Polygon> covered;
     if (config.analysisName)
     {
-        auto annotations = getAnalysisResults(*config.analysisName, cfg);
-        if (!annotations)
+        auto analysisResult = getAnalysisResults(*config.analysisName, cfg);
+        if (!analysisResult)
+        {
+            fmt::print(stderr, "Failed to run analysis '{}'.\n", *config.analysisName);
             return false;
-
-        fmt::print("{}\n", print(*root, *annotations));
-        return true;
+        }
+        annotations = std::move(analysisResult->annotations);
+        covered = std::move(analysisResult->covered);
     }
 
     std::vector<Walk> walks;
@@ -72,7 +76,9 @@ bool runFile(std::string_view filePath, Config config)
         }
     }
     if (config.svg)
-        fmt::print("{}\n", renderRandomWalkSVG(walks, config.dotsOnly));
+        fmt::print("{}\n", renderRandomWalkSVG(walks, covered, config.dotsOnly));
+    else if (config.analysisName)
+        fmt::print("{}\n", print(*root, annotations));
     return true;
 }
 

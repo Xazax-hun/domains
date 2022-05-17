@@ -6,6 +6,8 @@
 #include <string_view>
 #include <limits>
 
+#include "include/utils.h"
+
 constexpr int NEG_INF = std::numeric_limits<int>::min();
 constexpr int INF = std::numeric_limits<int>::max();
 
@@ -27,6 +29,9 @@ concept Domain = requires(T a)
     // * bottom.merge(b) == b
     { a.merge(a) } -> std::same_as<T>;
     { a.toString() } -> std::convertible_to<std::string_view>;
+
+    // For visualization purposes only.
+    { a.covers() } -> std::same_as<std::vector<Polygon>>;
 };
 
 template<typename T>

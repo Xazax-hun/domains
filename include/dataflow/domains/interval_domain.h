@@ -59,6 +59,11 @@ struct IntervalDomain
         };
         return fmt::format("[{}, {}]", minStr, maxStr);
     }
+
+    std::vector<Polygon> covers() const
+    {
+        return {std::vector{Vec2{min, 0}, Vec2{max, 0}}};
+    }
 };
 
 inline bool operator==(IntervalDomain lhs, IntervalDomain rhs)

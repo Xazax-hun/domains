@@ -3,6 +3,7 @@
 
 #include "include/dataflow/domains/domain.h"
 
+#include <algorithm>
 #include <fmt/format.h>
 
 // Product of two domain values, used to represent a point in 2d space.
@@ -46,6 +47,32 @@ struct Vec2Domain
     std::string toString() const
     {
         return fmt::format("{{ x: {}, y: {} }}", x.toString(), y.toString());
+    }
+
+    std::vector<Polygon> covers() const
+    {
+        auto xs = x.covers();
+        auto ys = y.covers();
+
+        assert(xs.size() == ys.size());
+        std::vector<Polygon> polys;
+        for(unsigned i = 0; i < xs.size(); ++i)
+        {
+            polys.emplace_back();
+            bool first = true;
+            for (Vec2 x : xs[i])
+            {
+                auto yCoords = ys[i];
+                if (first)
+                    first = false;
+                else
+                    std::reverse(yCoords.begin(), yCoords.end());
+                for (Vec2 y : yCoords)
+                    polys.back().emplace_back(x.x, y.x);
+            }
+        }
+
+        return polys;
     }
 
     // TODO: This is failing. Is this a gcc bug?

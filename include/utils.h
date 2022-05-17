@@ -3,6 +3,7 @@
 
 #include <iosfwd>
 #include <string_view>
+#include <vector>
 
 class DiagnosticEmitter
 {
@@ -47,5 +48,7 @@ inline Vec2 operator+(Vec2 lhs, Vec2 rhs)
 {
     return lhs += rhs;
 }
+
+using Polygon = std::vector<Vec2>;
 
 #endif // UTILS_H

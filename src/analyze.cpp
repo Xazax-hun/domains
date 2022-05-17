@@ -10,13 +10,21 @@ namespace
 {
 
 template<Domain D, AnalysisFunc<D> getAnalysis>
-Annotations getResults(const CFG& cfg)
+AnalysisResult getResults(const CFG& cfg)
 {
     auto results = getAnalysis(cfg);
-    return annotationsFromAnalysisResults(results, cfg);
+    auto annotations = annotationsFromAnalysisResults(results, cfg);
+    std::vector<Polygon> covered;
+    for (auto state : results)
+    {
+        for (const auto& poly : state.covers())
+            covered.push_back(poly);
+    }
+    
+    return { std::move(annotations), std::move(covered)};
 }
 
-using AnalysisAnnotationsFunc = Annotations(*)(const CFG& cfg);
+using AnalysisAnnotationsFunc = AnalysisResult(*)(const CFG& cfg);
 
 std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
     {"sign", &getResults<Vec2Sign, getSignAnalysis> },
@@ -26,7 +34,7 @@ std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
 
 } // anonymous
 
-std::optional<Annotations> getAnalysisResults(std::string_view analysisName, const CFG& cfg)
+std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, const CFG& cfg)
 {
     if (auto it = analyses.find(analysisName); it != analyses.end())
     {

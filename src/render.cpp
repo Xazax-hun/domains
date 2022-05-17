@@ -1,4 +1,5 @@
 #include "include/render.h"
+#include "include/dataflow/domains/domain.h"
 
 #ifdef HAVE_CAIRO
 
@@ -107,9 +108,35 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
 
 }
 
+int clipWidth(int pos) { return pos == INF ? WIDTH / 2 : (pos == NEG_INF ? -WIDTH / 2 : pos); }
+int clipHeight(int pos) { return pos == INF ? HEIGHT / 2 : (pos == NEG_INF ? -HEIGHT / 2 : pos); }
+
+void renderCoveredArea(cairo_t *cr, const std::vector<Polygon>& inferred)
+{
+    // Set background to grey
+    cairo_set_source_rgb(cr, 0.75, 0.75, 0.75);
+    for (const Polygon& p : inferred)
+    {
+        cairo_new_path(cr);
+        bool first = true;
+        for (Vec2 dot : p)
+        {
+            if (first)
+            {
+                cairo_move_to(cr, clipWidth(dot.x), -clipHeight(dot.y));
+                first = false;
+                continue;
+            }
+            cairo_line_to(cr, clipWidth(dot.x), -clipHeight(dot.y));
+        }
+        cairo_close_path(cr);
+        cairo_fill(cr);
+    }
+}
+
 } // anonymous
 
-std::string renderRandomWalkSVG(std::vector<Walk> walks, bool dotsOnly)
+std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vector<Polygon>& inferred, bool dotsOnly)
 {
     std::stringstream svgContent;
     {
@@ -125,6 +152,10 @@ std::string renderRandomWalkSVG(std::vector<Walk> walks, bool dotsOnly)
         cairo_fill(cr);
         // Put origo on the middle.
         cairo_translate (cr, WIDTH/2, HEIGHT/2);
+
+        // Render the result of the analysis.
+        renderCoveredArea(cr, inferred);
+
         // Draw the axes. 
         cairo_set_source_rgb(cr, 0, 0, 0);
         cairo_new_path(cr);

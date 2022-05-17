@@ -5,6 +5,7 @@
 
 #include <vector>
 
-std::string renderRandomWalkSVG(std::vector<Walk> walks, bool dotsOnly = false);
+std::string renderRandomWalkSVG(const std::vector<Walk>& walks,
+    const std::vector<Polygon>& inferred, bool dotsOnly = false);
 
 #endif // RENDER_H

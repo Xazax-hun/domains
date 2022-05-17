@@ -70,6 +70,26 @@ struct SignDomain
                 return "";
         }
     }
+
+    std::vector<Polygon> covers() const
+    {
+        switch(v)
+        {
+            case Top:
+                return {std::vector{Vec2{NEG_INF, 0}, Vec2{INF, 0}}};
+            case Bottom:
+                return {};
+            case Negative:
+                return {std::vector{Vec2{NEG_INF, 0}, Vec2{0, 0}}};
+            case Zero:
+                return {std::vector{Vec2{0, 0}}};
+            case Positive:
+                return {std::vector{Vec2{0, 0}, Vec2{INF, 0}}};
+            default:
+                assert(false);
+                return {};
+        }
+    }
 };
 
 inline bool operator==(SignDomain lhs, SignDomain rhs)
