@@ -30,18 +30,18 @@ std::optional<const Sequence*> Parser::parse()
 
 std::optional<const Sequence*> Parser::sequence(bool root)
 {
-    std::vector<Node> commands;
-    if (root && peek().type != TokenType::INIT)
+    if (root && !check(TokenType::INIT))
     {
         error(peek(), "'init' expected at the beginning of the program");
         return {};
     }
-    while (auto com = command())
+
+    std::vector<Node> commands;
+    do
     {
-        commands.push_back(*com);
-        if (!match(TokenType::SEMICOLON))
-            break;
-    }
+        BIND(com, command());
+        commands.push_back(com);
+    } while (match(TokenType::SEMICOLON));
 
     auto seq = context.make<Sequence>(std::move(commands));
     return seq;
@@ -108,18 +108,42 @@ std::optional<Node> Parser::command()
         return branch();
     }
 
+    if (isAtEnd() || check(TokenType::RIGHT_BRACE))
+    {
+        error(peek(), "redundant semicolon?");
+    }
+
     return {};
 }
 
 std::optional<const Branch*> Parser::branch()
 {
-    BIND(lhs, sequence());
+    // Exception to allow empty sequence in alternatives.
+    const Sequence* lhs = nullptr;
+    if (!check(TokenType::RIGHT_BRACE))
+    {
+        BIND(lhs_candidate, sequence());
+        lhs = lhs_candidate;
+    }
+    else
+        lhs = context.make<Sequence>(std::vector<Node>{});
+
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
     BIND(kw, consume(TokenType::OR, "number expected"));
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
-    BIND(rhs, sequence());
+
+    const Sequence* rhs = nullptr;
+    if (!check(TokenType::RIGHT_BRACE))
+    {
+        BIND(rhs_candidate, sequence());
+        rhs = rhs_candidate;
+    }
+    else
+        rhs = context.make<Sequence>(std::vector<Node>{});
+
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
+    assert(lhs && rhs);
     if (lhs->nodes.empty() && rhs->nodes.empty())
     {
         error(kw, "at most one alternative can be empty");
@@ -133,14 +157,15 @@ std::optional<const Loop*> Parser::loop()
 {
     Token kw = previous();
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
-    BIND(body, sequence());
-    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
-    if (body->nodes.empty())
+    if (match(TokenType::RIGHT_BRACE))
     {
         error(kw, "the body of 'iter' must not be empty");
         return {};
     }
+
+    BIND(body, sequence());
+    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
     return context.make<Loop>(kw, body);
 }

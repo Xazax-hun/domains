@@ -74,7 +74,7 @@ R"(init(50, 50, 50, 50);
 translation(10, 0);
 iter {
   iter {
-    translation(10, 0);
+    translation(10, 0)
   };
   {
     translation(10, 0)

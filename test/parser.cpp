@@ -103,4 +103,28 @@ TEST(Parser, EmptyLoop)
     EXPECT_EQ(output.str(), "[line 1] Error at 'iter': the body of 'iter' must not be empty\n");
 }
 
+TEST(Parser, RedundantSemicolon)
+{
+    std::stringstream output;
+    std::string_view source = "init(50, 50, 50, 50); iter { translation(0, 0); }";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at '}': redundant semicolon?\n[line 1] Error at '}': end of file expected\n");
+}
+
+TEST(Parser, RedundantSemicolon2)
+{
+    std::stringstream output;
+    std::string_view source = "init(50, 50, 50, 50);";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at end of file: redundant semicolon?\n");
+}
+
+TEST(Parser, FromFuzzing)
+{
+    std::stringstream output;
+    std::string_view source = "init";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at end of file: ( expected\n");
+}
+
 } // anonymous
