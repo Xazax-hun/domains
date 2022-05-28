@@ -10,6 +10,7 @@
 #include "include/parser.h"
 #include "include/render.h"
 #include "include/analyze.h"
+#include "include/utils.h"
 
 using namespace std::literals;
 
@@ -115,6 +116,7 @@ int main(int argc, const char* argv[])
         fmt::print("Available analyses:\n");
         for (const auto& analysis : getListOfAnalyses())
             fmt::print("  {}\n", analysis);
+        fmt::print("Version: {}\n", version);
     };
 
     std::string_view file;
@@ -139,7 +141,7 @@ int main(int argc, const char* argv[])
                 config.dotsOnly = true;
                 continue;
             }
-            if (argv[i] == "--help"sv)
+            if (argv[i] == "--help"sv || argv[i] == "--version"sv)
             {
                 printHelp();
                 return EXIT_SUCCESS;

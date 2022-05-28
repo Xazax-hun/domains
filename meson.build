@@ -11,8 +11,12 @@ if cairo_dep.found()
   add_project_arguments('-DHAVE_CAIRO', language : 'cpp')
 endif
 
+# Embedding version number.
+version_dep = vcs_tag(input: 'src/version.cpp.in',
+                      output: 'version.cpp')
+
 # Libraries
-domains_static_sources = ['src/lexer.cpp', 'src/parser.cpp',
+domains_static_sources = [version_dep, 'src/lexer.cpp', 'src/parser.cpp',
                           'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp',
                           'src/cfg.cpp', 'src/render.cpp', 'src/dataflow/sign_analysis.cpp',
                           'src/dataflow/interval_analysis.cpp', 'src/analyze.cpp']

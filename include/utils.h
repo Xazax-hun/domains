@@ -5,6 +5,7 @@
 #include <string_view>
 #include <vector>
 
+extern std::string_view version;
 class DiagnosticEmitter
 {
 public:
