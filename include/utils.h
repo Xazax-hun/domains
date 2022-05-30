@@ -6,6 +6,7 @@
 #include <vector>
 
 extern std::string_view version;
+
 class DiagnosticEmitter
 {
 public:
@@ -15,7 +16,6 @@ public:
     void error(int line, std::string_view message) const noexcept;
     void report(int line, std::string_view where, std::string_view message) const noexcept;
 
-    std::ostream& getOutput() const { return out; }
 private:
     std::ostream& out;
     std::ostream& err;

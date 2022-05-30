@@ -5,14 +5,14 @@
 
 #include <algorithm>
 #include <random>
-#include <cmath>
+#include <numbers>
 #include <set>
 
 #include <fmt/format.h>
 
 namespace
 {
-double toRad(double deg) noexcept { return deg / 180 * M_PI; }
+double toRad(double deg) noexcept { return deg / 180 * std::numbers::pi_v<double>; }
 
 struct StepEval {
     const Step* in;
@@ -32,7 +32,7 @@ struct StepEval {
     Step operator()(const Rotation* r) const noexcept
     {
         Vec2 origin{*r->x.value, *r->y.value};
-        Vec2 toRotate { in->pos.x, in->pos.y };
+        Vec2 toRotate{ in->pos.x, in->pos.y };
         Vec2 rotated = rotate(toRotate, origin, *r->deg.value);
         return Step {
             rotated,
@@ -76,7 +76,7 @@ std::set<std::pair<int, int>> detectBackEdges(const CFG& cfg, int current, const
     return ret;
 }
 
-unsigned getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
+int getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
                       const std::set<std::pair<int, int>>& backEdges, int loopiness)
 {
     std::vector<int> successors = cfg.blocks[current].succs;
@@ -90,16 +90,14 @@ unsigned getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
     std::uniform_int_distribution<int> shouldTakeBackEdge(1, regularEdgeNum + backEdgeNum * loopiness);
     if (shouldTakeBackEdge(gen) <= regularEdgeNum)
     {
-        unsigned next = std::uniform_int_distribution<int>(0, regularEdgeNum - 1)(gen);
-        assert(next < successors.size());
+        int next = std::uniform_int_distribution<int>(0, regularEdgeNum - 1)(gen);
+        assert(next < static_cast<int>(successors.size()));
         return successors[next];
     }
-    else
-    {
-        unsigned next = std::uniform_int_distribution<int>(regularEdgeNum, regularEdgeNum + backEdgeNum - 1)(gen);
-        assert(next < successors.size());
-        return successors[next];
-    }
+
+    int next = std::uniform_int_distribution<int>(regularEdgeNum, regularEdgeNum + backEdgeNum - 1)(gen);
+    assert(next < static_cast<int>(successors.size()));
+    return successors[next];
 }
 } // anonymous namespace
 

@@ -67,7 +67,7 @@ struct TransferOperation
             return lhs.y < rhs.y;
         });
         return Vec2Interval{ IntervalDomain{ newX.first->x, newX.second->x },
-                             IntervalDomain { newY.first->y, newY.second->y } };
+                             IntervalDomain{ newY.first->y, newY.second->y } };
     }
     
     Vec2Interval preState;

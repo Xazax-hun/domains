@@ -2,7 +2,6 @@
 #define DOMAIN_H
 
 #include <concepts>
-#include <string>
 #include <string_view>
 #include <limits>
 

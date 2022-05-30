@@ -18,7 +18,7 @@ std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg);
 
 
 // TODO: add variants of interval analysis:
-// - Widening
+// - Back-edge only widening
 // - Loop unrolling
 // - Narrowing
 // - ...

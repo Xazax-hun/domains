@@ -43,7 +43,7 @@ std::optional<const Sequence*> Parser::sequence(bool root)
         commands.push_back(com);
     } while (match(TokenType::SEMICOLON));
 
-    auto seq = context.make<Sequence>(std::move(commands));
+    const auto* seq = context.make<Sequence>(std::move(commands));
     return seq;
 }
 
@@ -171,7 +171,7 @@ std::optional<const Loop*> Parser::loop()
 }
 
 
-void Parser::error(Token t, std::string_view message) noexcept
+void Parser::error(Token t, std::string_view message) const noexcept
 {
     if (t.type == TokenType::END_OF_FILE)
     {

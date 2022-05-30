@@ -7,6 +7,7 @@
 
 #include "include/utils.h"
 
+// TODO: Instead of optional fields would a variant work better?
 struct Step {
     Vec2 pos;
     std::optional<Vec2> origin;

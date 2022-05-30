@@ -9,7 +9,7 @@
 #include "include/dataflow/domains/domain.h"
 
 struct IntervalDomain;
-bool operator==(IntervalDomain lhs, IntervalDomain rhs);
+bool operator==(IntervalDomain lhs, IntervalDomain rhs) noexcept;
 
 struct IntervalDomain
 {
@@ -66,19 +66,19 @@ struct IntervalDomain
     }
 };
 
-inline bool operator==(IntervalDomain lhs, IntervalDomain rhs)
+inline bool operator==(IntervalDomain lhs, IntervalDomain rhs) noexcept
 {
     return lhs.min == rhs.min && lhs.max == rhs.max;
 }
 
-inline bool operator<=(IntervalDomain lhs, IntervalDomain rhs)
+inline bool operator<=(IntervalDomain lhs, IntervalDomain rhs) noexcept
 {
     return rhs.min <= lhs.min && rhs.max >= lhs.max;
 }
 
 static_assert(WidenableDomain<IntervalDomain>);
 
-inline IntervalDomain operator-(IntervalDomain o)
+inline IntervalDomain operator-(IntervalDomain o) noexcept
 {
     int minResult = [o] {
         if (o.max == INF)
@@ -93,7 +93,7 @@ inline IntervalDomain operator-(IntervalDomain o)
     return {minResult, maxResult};
 }
 
-inline IntervalDomain operator+(IntervalDomain lhs, IntervalDomain rhs)
+inline IntervalDomain operator+(IntervalDomain lhs, IntervalDomain rhs) noexcept
 {
     int resultMin = [lhs, rhs]{
         assert(lhs.min != INF && rhs.min != INF);

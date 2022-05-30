@@ -24,9 +24,9 @@ AnalysisResult getResults(const CFG& cfg)
     return { std::move(annotations), std::move(covered)};
 }
 
-using AnalysisAnnotationsFunc = AnalysisResult(*)(const CFG& cfg);
+using AnalysisResultsFunc = AnalysisResult(*)(const CFG& cfg);
 
-std::unordered_map<std::string_view, AnalysisAnnotationsFunc> analyses = {
+std::unordered_map<std::string_view, AnalysisResultsFunc> analyses = {
     {"sign", &getResults<Vec2Sign, getSignAnalysis> },
     {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis> },
     {"interval", &getResults<Vec2Interval, getIntervalAnalysis> }

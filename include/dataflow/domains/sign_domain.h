@@ -23,7 +23,7 @@ enum class SignValue
     Positive
 };
 
-inline constexpr SignValue toAbstract(int value)
+inline constexpr SignValue toAbstract(int value) noexcept
 {
     using enum SignValue;
     if (value < 0)
@@ -38,17 +38,17 @@ struct SignDomain
     using enum SignValue;
     SignValue v;
 
-    constexpr SignDomain(SignValue v) : v(v) {}
+    explicit constexpr SignDomain(SignValue v) : v(v) {}
     explicit constexpr SignDomain(int v) : v(toAbstract(v)) {}
 
-    static SignDomain bottom() { return { Bottom }; }
+    static SignDomain bottom() { return SignDomain{ Bottom }; }
     SignDomain merge(SignDomain other) const
     {
         if (v == other.v || other.v == Bottom)
             return *this;
         if (v == Bottom)
             return other;
-        return { Top };
+        return SignDomain{ Top };
     }
 
     std::string_view toString() const
@@ -92,12 +92,12 @@ struct SignDomain
     }
 };
 
-inline bool operator==(SignDomain lhs, SignDomain rhs)
+inline bool operator==(SignDomain lhs, SignDomain rhs) noexcept
 {
     return lhs.v == rhs.v;
 }
 
-inline bool operator<=(SignDomain lhs, SignDomain rhs)
+inline bool operator<=(SignDomain lhs, SignDomain rhs) noexcept
 {
     if (lhs.v == SignValue::Bottom)
         return true;
@@ -110,7 +110,7 @@ inline bool operator<=(SignDomain lhs, SignDomain rhs)
 
 static_assert(Domain<SignDomain>);
 
-inline SignDomain operator-(SignDomain d)
+inline SignDomain operator-(SignDomain d) noexcept
 {
     if (d.v == SignValue::Negative)
         return SignDomain{ SignValue::Positive };
@@ -120,7 +120,7 @@ inline SignDomain operator-(SignDomain d)
     return d;
 }
 
-inline SignDomain operator+(SignDomain lhs, SignDomain rhs)
+inline SignDomain operator+(SignDomain lhs, SignDomain rhs) noexcept
 {
     using enum SignValue;
     static constexpr SignValue AdditionTable[][5] = 
@@ -133,7 +133,7 @@ inline SignDomain operator+(SignDomain lhs, SignDomain rhs)
         /* Positive */ { Top,  Bottom, Top,      Positive, Positive}
     };
 
-    return SignDomain { AdditionTable[static_cast<int>(lhs.v)][static_cast<int>(rhs.v)] };
+    return SignDomain{ AdditionTable[static_cast<int>(lhs.v)][static_cast<int>(rhs.v)] };
 }
 
 #endif // SIGN_DOMAIN_H

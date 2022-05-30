@@ -22,7 +22,7 @@ public:
 
     std::optional<const Sequence*> parse();
 
-    const ASTContext& getContext() const { return context; }
+    const ASTContext& getContext() const noexcept { return context; }
 
 private:
     std::optional<const Sequence*> sequence(bool root = false);
@@ -68,7 +68,7 @@ private:
         return std::nullopt;
     }
 
-    void error(Token t, std::string_view message) noexcept;
+    void error(Token t, std::string_view message) const noexcept;
 
     ASTContext context;
     std::vector<Token> tokens;

@@ -4,7 +4,7 @@
 #ifdef HAVE_CAIRO
 
 #include <sstream>
-#include <cmath>
+#include <numbers>
 
 #include <cairo.h>
 #include <cairo-svg.h> 
@@ -102,7 +102,7 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
     {
         cairo_new_path(cr);
         cairo_set_source_rgb(cr, 0, step.init ? 1 : 0, 0);
-        cairo_arc(cr, step.pos.x, -step.pos.y, RADIUS, 0, 2 * M_PI);
+        cairo_arc(cr, step.pos.x, -step.pos.y, RADIUS, 0, 2 * std::numbers::pi_v<double>);
         cairo_fill(cr);
     }
 
@@ -178,7 +178,7 @@ std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vecto
 
 #else
 
-std::string renderRandomWalkSVG(std::vector<Walk> walks)
+std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vector<Polygon>& inferred, bool dotsOnly)
 {
     return "ERROR: compiled without cairo.";
 }

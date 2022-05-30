@@ -1,7 +1,5 @@
 #include "include/dataflow/analyses/sign_analysis.h"
 
-#include <cmath>
-
 #include "include/dataflow/solver.h"
 
 namespace
