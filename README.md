@@ -1,5 +1,7 @@
 # Domains
 
+Build status: ![Build status](https://github.com/Xazax-hun/domains/actions/workflows/linux.yml/badge.svg)
+
 Toy language to help experiment with numerical domains for abstract interpretation. The language is inspired by the following book:
 
 ```
