@@ -1,35 +1,13 @@
 #include <gtest/gtest.h>
-
+#include "analysis_test_support.h"
 #include "include/dataflow/analyses/sign_analysis.h"
-#include "include/dataflow/solver.h"
-#include "include/parser.h"
-#include "include/cfg.h"
 
 namespace
 {
-struct AnalysisResult
-{
-    CFG cfg;
-    std::vector<Vec2Sign> analysis;
-    Node root;
-    Parser parser; // Owns the nodes.
-};
-
-std::optional<AnalysisResult> analyze(std::string_view str, std::ostream& output)
-{
-    DiagnosticEmitter emitter(output, output);
-    Lexer lexer(std::string(str), emitter);
-    auto tokens = lexer.lexAll();
-    if (tokens.empty())
-        return {};
-    Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
-        return {};
-    auto cfg = createCfg(*root);
-    auto result = getSignAnalysis(cfg);
-    return AnalysisResult{std::move(cfg), std::move(result), *root, std::move(parser)};
-}
+auto signAnalyze = analyzeForTest<Vec2Sign,
+                                  getSignAnalysis,
+                                  signAnalysisToOperationAnnotations,
+                                  signAnalysisToCoveredArea>;
 
 using enum SignValue;
 
@@ -44,7 +22,7 @@ rotation(0, 0, 0))";
 R"(init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
 translation(10, 0) /* { x: Positive, y: Positive } */;
 rotation(0, 0, 0) /* { x: Positive, y: Positive } */)";
-    auto result = analyze(source, output);
+    auto result = signAnalyze(source, output);
     auto anns = signAnalysisToOperationAnnotations(result->cfg, result->analysis);
     std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
@@ -70,7 +48,7 @@ R"(init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
 } or {
   translation(-10, 0) /* { x: Top, y: Positive } */
 })";
-    auto result = analyze(source, output);
+    auto result = signAnalyze(source, output);
     auto anns = signAnalysisToOperationAnnotations(result->cfg, result->analysis);
     std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
@@ -87,7 +65,7 @@ iter {
   translation(0, 0)
 })";
     auto posPos = Vec2Sign{SignDomain{Positive}, SignDomain{Positive}};
-    auto result = analyze(source, output);
+    auto result = signAnalyze(source, output);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     // Start.
