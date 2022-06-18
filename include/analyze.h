@@ -13,6 +13,7 @@ struct AnalysisResult
     std::vector<Polygon> covered;
 };
 
+// Returns an empty optional when no analysis exists under the name specified.
 std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, const CFG& cfg);
 std::set<std::string_view> getListOfAnalyses();
 
