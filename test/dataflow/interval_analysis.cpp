@@ -32,9 +32,9 @@ std::optional<AnalysisResult> analyze(std::string_view str, std::ostream& output
     if (!root)
         return {};
     auto cfg = createCfg(*root);
-    auto result = F(cfg);
-    auto anns = annotationsFromAnalysisResults(result, cfg);
-    return AnalysisResult{std::move(cfg), std::move(result), *root, std::move(anns), std::move(parser)};
+    auto results = F(cfg);
+    auto anns = intervalAnalysisToOperationAnnotations(cfg, results);
+    return AnalysisResult{std::move(cfg), std::move(results), *root, std::move(anns), std::move(parser)};
 }
 
 TEST(IntervalAnalysis, PrimitiveAnalysis)
@@ -44,7 +44,7 @@ TEST(IntervalAnalysis, PrimitiveAnalysis)
 R"(init(50, 50, 50, 50);
 translation(10, 0))";
     std::string_view expected =
-R"(init(50, 50, 50, 50);
+R"(init(50, 50, 50, 50) /* { x: [50, 100], y: [50, 100] } */;
 translation(10, 0) /* { x: [60, 110], y: [50, 100] } */)";
     auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
     std::string annotatedSource = print(result->root, result->anns);
@@ -60,7 +60,7 @@ TEST(IntervalAnalysis, PrimitiveAnalysisRotation)
 R"(init(20, 20, 50, 50);
 rotation(0, 0, 90))";
     std::string_view expected =
-R"(init(20, 20, 50, 50);
+R"(init(20, 20, 50, 50) /* { x: [20, 70], y: [20, 70] } */;
 rotation(0, 0, 90) /* { x: [-70, -20], y: [20, 70] } */)";
     auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
     std::string annotatedSource = print(result->root, result->anns);
@@ -76,7 +76,7 @@ TEST(IntervalAnalysis, PrimitiveAnalysisRotation2)
 R"(init(20, 20, 50, 50);
 rotation(0, 0, 180))";
     std::string_view expected =
-R"(init(20, 20, 50, 50);
+R"(init(20, 20, 50, 50) /* { x: [20, 70], y: [20, 70] } */;
 rotation(0, 0, 180) /* { x: [-70, -20], y: [-70, -20] } */)";
     auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
     std::string annotatedSource = print(result->root, result->anns);
@@ -92,7 +92,7 @@ TEST(IntervalAnalysis, PrimitiveAnalysisRotation3)
 R"(init(20, 20, 50, 50);
 rotation(0, 0, 360))";
     std::string_view expected =
-R"(init(20, 20, 50, 50);
+R"(init(20, 20, 50, 50) /* { x: [20, 70], y: [20, 70] } */;
 rotation(0, 0, 360) /* { x: [20, 70], y: [20, 70] } */)";
     auto result = analyze<getPrimitiveIntervalAnalysis>(source, output);
     std::string annotatedSource = print(result->root, result->anns);
@@ -112,7 +112,7 @@ iter{
 }
 )";
     std::string_view expected =
-R"(init(50, 50, 50, 50);
+R"(init(50, 50, 50, 50) /* { x: [50, 100], y: [50, 100] } */;
 translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
 iter {
   translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
@@ -122,7 +122,6 @@ iter {
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_EQ(expected, annotatedSource);
-
 }
 
 TEST(IntervalAnalysis, WidenSimpleLoopAndRotate)
@@ -136,7 +135,7 @@ iter{
 };
 rotation(0, 0, 90))";
     std::string_view expected =
-R"(init(50, 50, 50, 50);
+R"(init(50, 50, 50, 50) /* { x: [50, 100], y: [50, 100] } */;
 translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
 iter {
   translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
@@ -147,7 +146,6 @@ rotation(0, 0, 90) /* { x: [-inf, inf], y: [-inf, inf] } */)";
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_EQ(expected, annotatedSource);
-
 }
 
 } // anonymous

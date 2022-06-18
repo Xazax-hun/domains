@@ -19,12 +19,24 @@ concept TransferFunction = Domain<Dom> &&
     { f(d, o) } -> std::same_as<Dom>;
 };
 
+template<Domain D>
+using AnnotatorFunc = Annotations (*)(const CFG& cfg, const std::vector<D>& result);
+
 // Calculate the domain values for the end of each
 // basic block using monotonic transfer functions.
 // This function is doing forward analysis.
 //
 // The indices in the returned vector correspond to
 // the IDs of the cfg nodes.
+//
+// While it would be possible to record the analysis state
+// for each operation, it is often not required. Using the
+// transfer functions one can recover the state for all
+// operations and the user of the analysis often only needs
+// the analysis state for a small subset of the operations.
+//
+// See `allAnnotationsFromAnalysisResults` how to recover
+// per-operation analysis states.
 template<Domain D, TransferFunction<D> F>
 std::vector<D> solveMonotoneFramework(const CFG& cfg)
 {
@@ -42,6 +54,10 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
         D postState{ preState };
         for (Operation o : cfg.blocks[currentBlock].operations)
         {
+            // TODO: consider switching the operands for transfer functions and
+            //       introduce currying + caching. I.e., it would be possible
+            //       to partially evaluate the transfer functions, see
+            //       Futamura projections.
             postState = F{}(postState, o);
         }
         // If the state did not change we do not need to
@@ -91,8 +107,10 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
     return postStates;
 }
 
+// Annotate the last operation of each CFG block with the analysis state at the end of the
+// basic block.
 template<Domain D>
-Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const CFG& cfg)
+Annotations blockEndAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
 {
     Annotations anns;
     int i = 0;
@@ -103,6 +121,27 @@ Annotations annotationsFromAnalysisResults(const std::vector<D>& result, const C
             anns.postAnnotations[toNode(block.operations.back())].emplace_back(result[i].toString());
         }
         ++i;
+    }
+    return anns;
+}
+
+// Use the transfer functions to expand post-states to every operation.
+template<Domain D, TransferFunction<D> F>
+Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
+{
+    Annotations anns;
+    for (const auto& block : cfg.blocks)
+    {
+        D preState{ D::bottom() };
+        for (auto pred : block.preds)
+            preState = preState.merge(result[pred]);
+
+        D postOperationState = preState;
+        for (auto op : block.operations)
+        {
+            postOperationState = F{}(postOperationState, op);
+            anns.postAnnotations[toNode(op)].emplace_back(postOperationState.toString());
+        }
     }
     return anns;
 }

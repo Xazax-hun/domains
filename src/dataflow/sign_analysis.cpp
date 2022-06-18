@@ -81,3 +81,9 @@ std::vector<Vec2Sign> getSignAnalysis(const CFG& cfg)
 {
     return solveMonotoneFramework<Vec2Sign, SignTransfer>(cfg);
 }
+
+Annotations signAnalysisToOperationAnnotations(const CFG& cfg,
+                                               const std::vector<Vec2Sign>& results)
+{
+    return allAnnotationsFromAnalysisResults<Vec2Sign, SignTransfer>(cfg, results);
+}

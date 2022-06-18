@@ -9,11 +9,11 @@
 namespace 
 {
 
-template<Domain D, AnalysisFunc<D> getAnalysis>
+template<Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> F>
 AnalysisResult getResults(const CFG& cfg)
 {
     auto results = getAnalysis(cfg);
-    auto annotations = annotationsFromAnalysisResults(results, cfg);
+    auto annotations = F(cfg, results);
     std::vector<Polygon> covered;
     for (auto state : results)
     {
@@ -27,9 +27,9 @@ AnalysisResult getResults(const CFG& cfg)
 using AnalysisResultsFunc = AnalysisResult(*)(const CFG& cfg);
 
 std::unordered_map<std::string_view, AnalysisResultsFunc> analyses = {
-    {"sign", &getResults<Vec2Sign, getSignAnalysis> },
-    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis> },
-    {"interval", &getResults<Vec2Interval, getIntervalAnalysis> }
+    {"sign", &getResults<Vec2Sign, getSignAnalysis, signAnalysisToOperationAnnotations> },
+    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis, intervalAnalysisToOperationAnnotations> },
+    {"interval", &getResults<Vec2Interval, getIntervalAnalysis, intervalAnalysisToOperationAnnotations> }
 };
 
 } // anonymous

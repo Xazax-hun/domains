@@ -41,11 +41,11 @@ R"(init(50, 50, 50, 50);
 translation(10, 0);
 rotation(0, 0, 0))";
     std::string_view expected =
-R"(init(50, 50, 50, 50);
-translation(10, 0);
+R"(init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
+translation(10, 0) /* { x: Positive, y: Positive } */;
 rotation(0, 0, 0) /* { x: Positive, y: Positive } */)";
     auto result = analyze(source, output);
-    auto anns = annotationsFromAnalysisResults(result->analysis, result->cfg);
+    auto anns = signAnalysisToOperationAnnotations(result->cfg, result->analysis);
     std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
@@ -71,7 +71,7 @@ R"(init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
   translation(-10, 0) /* { x: Top, y: Positive } */
 })";
     auto result = analyze(source, output);
-    auto anns = annotationsFromAnalysisResults(result->analysis, result->cfg);
+    auto anns = signAnalysisToOperationAnnotations(result->cfg, result->analysis);
     std::string annotatedSource = print(result->root, anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);

@@ -91,3 +91,9 @@ std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg)
 {
     return solveMonotoneFrameworkWithWidening<Vec2Interval, IntervalTransfer>(cfg);
 }
+
+Annotations intervalAnalysisToOperationAnnotations(const CFG& cfg,
+                                                   const std::vector<Vec2Interval>& results)
+{
+    return allAnnotationsFromAnalysisResults<Vec2Interval, IntervalTransfer>(cfg, results);
+}

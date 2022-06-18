@@ -16,6 +16,8 @@ std::vector<Vec2Interval> getPrimitiveIntervalAnalysis(const CFG& cfg);
 // Always widen during the fixed-point iteration.
 std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg);
 
+Annotations intervalAnalysisToOperationAnnotations(const CFG& cfg,
+                                                   const std::vector<Vec2Interval>& results);
 
 // TODO: add variants of interval analysis:
 // - Back-edge only widening
