@@ -1,15 +1,17 @@
-name: Ubuntu Linux W/O SVG Support
+name: Ubuntu Linux Build
 on:
   push:
     branches: [ main ]
     paths:
       - "**.cpp"
       - "**.h"
+      - "**.yml"
   pull_request:
     branches: [ main ]
     paths:
       - "**.cpp"
       - "**.h"
+      - "**.yml"
 jobs:
   build-and-test:
       runs-on: ubuntu-latest
