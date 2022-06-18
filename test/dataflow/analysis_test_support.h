@@ -31,6 +31,8 @@ std::optional<AnalysisTestResult<D>> analyzeForTest(std::string_view str, std::o
         return {};
     auto cfg = createCfg(*root);
     auto results = getAnalysis(cfg);
+    if (results.empty())
+        return AnalysisTestResult<D>{*root, std::move(cfg), {}, {}, {}, std::move(parser)};
     auto anns = AF(cfg, results);
     auto covered = VF(cfg, results);
     return AnalysisTestResult<D>{*root, std::move(cfg), std::move(results),

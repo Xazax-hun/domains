@@ -13,10 +13,13 @@ template<Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> AF, VisualizerF
 AnalysisResult getResults(const CFG& cfg)
 {
     auto results = getAnalysis(cfg);
+    if (results.empty())
+        return { false, {}, {} };
+
     auto annotations = AF(cfg, results);
     std::vector<Polygon> covered = VF(cfg, results);
     
-    return { std::move(annotations), std::move(covered)};
+    return { true, std::move(annotations), std::move(covered)};
 }
 
 using AnalysisResultsFunc = AnalysisResult(*)(const CFG& cfg);

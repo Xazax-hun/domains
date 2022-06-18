@@ -8,6 +8,7 @@
 
 struct AnalysisResult
 {
+    bool converged = false;
     Annotations annotations;
     std::vector<Polygon> covered;
 };

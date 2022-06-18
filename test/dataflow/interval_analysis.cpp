@@ -79,6 +79,21 @@ rotation(0, 0, 360) /* { x: [20, 70], y: [20, 70] } */)";
     EXPECT_EQ(expected, annotatedSource);
 }
 
+TEST(IntervalAnalysis, PrimitiveAnalysisDoesNotConverge)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+translation(10, 0);
+iter {
+  translation(10, 0)
+})";
+    auto result = primitiveIntervalAnalyze(source, output);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(result->analysis.empty());
+}
+
 TEST(IntervalAnalysis, WidenSimpleLoop)
 {
     std::stringstream output;

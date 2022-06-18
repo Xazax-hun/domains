@@ -31,7 +31,10 @@ using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vecto
 // This function is doing forward analysis.
 //
 // The indices in the returned vector correspond to
-// the IDs of the cfg nodes.
+// the IDs of the cfg nodes. If the analysis did not converge
+// within NodeLimit * cfg.blocks.size(), an empty vector will
+// be returned. NodeLimit of 0 means there is no upper bound
+// on the number of iterations.
 //
 // While it would be possible to record the analysis state
 // for each operation, it is often not required. Using the
@@ -41,14 +44,19 @@ using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vecto
 //
 // See `allAnnotationsFromAnalysisResults` how to recover
 // per-operation analysis states.
-template<Domain D, TransferFunction<D> F>
+template<Domain D, TransferFunction<D> F, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFramework(const CFG& cfg)
 {
+    const size_t limit = NodeLimit * cfg.blocks.size();
+    size_t processedNodes = 0;
     std::vector<D> postStates(cfg.blocks.size(), D::bottom());
     RPOWorklist w{ cfg };
     w.enqueue(0);
     while(!w.empty())
     {
+        if (limit > 0 && processedNodes >= limit)
+            return {};
+
         int currentBlock = w.dequeue();
         D preState{ D::bottom() };
         for (auto pred : cfg.blocks[currentBlock].preds)
@@ -64,6 +72,7 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
             //       Futamura projections.
             postState = F{}(postState, o);
         }
+        ++processedNodes;
         // If the state did not change we do not need to
         // propagate the changes.
         if (postStates[currentBlock] == postState)
@@ -78,15 +87,20 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
 
 // Similar to solveMonotoneFramework, but always invoke the widen
 // operation.
-template<WidenableDomain D, TransferFunction<D> F>
+template<WidenableDomain D, TransferFunction<D> F, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
 {
+    const size_t limit = NodeLimit * cfg.blocks.size();
+    size_t processedNodes = 0;
     std::vector<D> preStates(cfg.blocks.size(), D::bottom());
     std::vector<D> postStates(cfg.blocks.size(), D::bottom());
     RPOWorklist w{ cfg };
     w.enqueue(0);
     while(!w.empty())
     {
+        if (limit > 0 && processedNodes >= limit)
+            return {};
+
         int currentBlock = w.dequeue();
         D newPreState{ D::bottom() };
         for (auto pred : cfg.blocks[currentBlock].preds)
@@ -99,6 +113,7 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
         {
             postState = F{}(postState, o);
         }
+        ++processedNodes;
         // If the state did not change we do not need to
         // propagate the changes.
         if (postStates[currentBlock] == postState)

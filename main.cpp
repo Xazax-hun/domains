@@ -58,6 +58,11 @@ bool runFile(std::string_view filePath, Config config)
             fmt::print(stderr, "Failed to run analysis '{}'.\n", *config.analysisName);
             return false;
         }
+        if (!analysisResult->converged)
+        {
+            fmt::print(stderr, "Analysis '{}' did not converge in the iteration limit.\n", *config.analysisName);
+            return false;
+        }
         annotations = std::move(analysisResult->annotations);
         covered = std::move(analysisResult->covered);
     }
