@@ -19,6 +19,9 @@ std::vector<Vec2Interval> getIntervalAnalysis(const CFG& cfg);
 Annotations intervalAnalysisToOperationAnnotations(const CFG& cfg,
                                                    const std::vector<Vec2Interval>& results);
 
+std::vector<Polygon> intervalAnalysisToCoveredArea(const CFG& cfg,
+                                                   const std::vector<Vec2Interval>& results);
+
 // TODO: add variants of interval analysis:
 // - Back-edge only widening
 // - Loop unrolling

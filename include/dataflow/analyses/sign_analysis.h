@@ -14,4 +14,7 @@ std::vector<Vec2Sign> getSignAnalysis(const CFG& cfg);
 Annotations signAnalysisToOperationAnnotations(const CFG& cfg,
                                                const std::vector<Vec2Sign>& results);
 
+std::vector<Polygon> signAnalysisToCoveredArea(const CFG& cfg,
+                                               const std::vector<Vec2Sign>& results);
+
 #endif // SIN_ANALYSIS_H

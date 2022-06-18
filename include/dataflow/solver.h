@@ -22,6 +22,10 @@ concept TransferFunction = Domain<Dom> &&
 template<Domain D>
 using AnnotatorFunc = Annotations (*)(const CFG& cfg, const std::vector<D>& result);
 
+// TODO: covered area should be represented as a set of polygons instead of a vector.
+template<Domain D>
+using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vector<D>& result);
+
 // Calculate the domain values for the end of each
 // basic block using monotonic transfer functions.
 // This function is doing forward analysis.
@@ -144,6 +148,27 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
         }
     }
     return anns;
+}
+
+template<Domain D, TransferFunction<D> F>
+std::vector<Polygon> coveredAreaFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
+{
+    std::vector<Polygon> covered;
+    for (const auto& block : cfg.blocks)
+    {
+        D preState{ D::bottom() };
+        for (auto pred : block.preds)
+            preState = preState.merge(result[pred]);
+
+        D postOperationState = preState;
+        for (auto op : block.operations)
+        {
+            postOperationState = F{}(postOperationState, op);
+            for (const auto& poly : postOperationState.covers())
+                covered.push_back(poly);
+        }
+    }
+    return covered;
 }
 
 #endif // SOLVER_H

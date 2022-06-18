@@ -30,6 +30,7 @@ concept Domain = requires(T a)
     { a.toString() } -> std::convertible_to<std::string_view>;
 
     // For visualization purposes only.
+    // TODO: figure out how to visualize congruence domains.
     { a.covers() } -> std::same_as<std::vector<Polygon>>;
 };
 
@@ -43,5 +44,7 @@ concept WidenableDomain = Domain<T> &&
     // * b.widen(a) == b if a <= b
     { a.widen(a) } -> std::same_as<T>; 
 };
+
+// TODO: add helper tools to generate tests about the semantic requirements.
 
 #endif // SOLVER_H

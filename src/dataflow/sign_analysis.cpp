@@ -87,3 +87,9 @@ Annotations signAnalysisToOperationAnnotations(const CFG& cfg,
 {
     return allAnnotationsFromAnalysisResults<Vec2Sign, SignTransfer>(cfg, results);
 }
+
+std::vector<Polygon> signAnalysisToCoveredArea(const CFG& cfg,
+                                               const std::vector<Vec2Sign>& results)
+{
+    return coveredAreaFromAnalysisResults<Vec2Sign, SignTransfer>(cfg, results);
+}

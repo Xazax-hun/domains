@@ -9,17 +9,12 @@
 namespace 
 {
 
-template<Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> F>
+template<Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> AF, VisualizerFunc<D> VF>
 AnalysisResult getResults(const CFG& cfg)
 {
     auto results = getAnalysis(cfg);
-    auto annotations = F(cfg, results);
-    std::vector<Polygon> covered;
-    for (auto state : results)
-    {
-        for (const auto& poly : state.covers())
-            covered.push_back(poly);
-    }
+    auto annotations = AF(cfg, results);
+    std::vector<Polygon> covered = VF(cfg, results);
     
     return { std::move(annotations), std::move(covered)};
 }
@@ -27,9 +22,24 @@ AnalysisResult getResults(const CFG& cfg)
 using AnalysisResultsFunc = AnalysisResult(*)(const CFG& cfg);
 
 std::unordered_map<std::string_view, AnalysisResultsFunc> analyses = {
-    {"sign", &getResults<Vec2Sign, getSignAnalysis, signAnalysisToOperationAnnotations> },
-    {"primitive-interval", &getResults<Vec2Interval, getPrimitiveIntervalAnalysis, intervalAnalysisToOperationAnnotations> },
-    {"interval", &getResults<Vec2Interval, getIntervalAnalysis, intervalAnalysisToOperationAnnotations> }
+    {
+        "sign", &getResults<Vec2Sign,
+                            getSignAnalysis,
+                            signAnalysisToOperationAnnotations,
+                            signAnalysisToCoveredArea>
+    },
+    {
+        "primitive-interval", &getResults<Vec2Interval,
+                                          getPrimitiveIntervalAnalysis,
+                                          intervalAnalysisToOperationAnnotations,
+                                          intervalAnalysisToCoveredArea>
+    },
+    {
+        "interval", &getResults<Vec2Interval,
+                                getIntervalAnalysis,
+                                intervalAnalysisToOperationAnnotations,
+                                intervalAnalysisToCoveredArea>
+    }
 };
 
 } // anonymous

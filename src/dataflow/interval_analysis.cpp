@@ -97,3 +97,9 @@ Annotations intervalAnalysisToOperationAnnotations(const CFG& cfg,
 {
     return allAnnotationsFromAnalysisResults<Vec2Interval, IntervalTransfer>(cfg, results);
 }
+
+std::vector<Polygon> intervalAnalysisToCoveredArea(const CFG& cfg,
+                                                   const std::vector<Vec2Interval>& results)
+{
+    return coveredAreaFromAnalysisResults<Vec2Interval, IntervalTransfer>(cfg, results);
+}
