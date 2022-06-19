@@ -3,12 +3,31 @@
 
 #include "include/ast.h"
 #include <queue>
+#include <ranges>
+#include <sstream>
 
+// Elements of a basic block, cannot represent control flow.
 using Operation = std::variant<const Init*, const Translation*, const Rotation*>;
+
 inline Node toNode(Operation op) noexcept
 {
     return std::visit([](const auto* node) noexcept -> Node { return node; }, op);
 }
+
+template<typename T>
+concept CfgBlockConcept = requires(T a)
+{
+    { a.operations() } -> std::ranges::range;
+    { a.successors() } -> std::ranges::range;
+    { a.predecessors() } -> std::ranges::range;
+};
+
+template<typename T>
+concept CfgConcept = requires(T a)
+{
+    { a.blocks() } -> std::ranges::range;
+    { *a.blocks().begin() } -> CfgBlockConcept;
+};
 
 class BasicBlock
 {
@@ -24,9 +43,12 @@ private:
     friend class CFG;
 };
 
+static_assert(CfgBlockConcept<BasicBlock>);
+
 class CFG
 {
 public:
+    // The first block is the start block. The last block is the end block.
     const std::vector<BasicBlock>& blocks() const { return basicBlocks; }
     static CFG createCfg(Node root) noexcept;
 
@@ -39,6 +61,51 @@ private:
 
     friend class CFGTest;
 };
+
+static_assert(CfgConcept<CFG>);
+
+class ReverseBasicBlock
+{
+public:
+    ReverseBasicBlock(const BasicBlock& bb, int blockNum)
+        : bb(bb), blockNum(blockNum) {}
+
+    auto operations() const noexcept { return std::views::reverse(bb.operations()); }
+    auto successors() const noexcept {
+        return bb.predecessors() | std::views::transform([this](int idx) {
+                   return blockNum - 1 - idx;
+               });
+    }
+    auto predecessors() const noexcept {
+        return bb.successors() | std::views::transform([this](int idx) {
+                   return blockNum - 1 - idx;
+               });
+    }
+
+private:
+    const BasicBlock& bb;
+    int blockNum;
+};
+
+static_assert(CfgBlockConcept<ReverseBasicBlock>);
+
+class ReverseCFG
+{
+public:
+    ReverseCFG(const CFG& cfg) : cfg(cfg) {}
+
+    auto blocks() const {
+        return std::views::reverse(cfg.blocks()) |
+               std::views::transform([this](const BasicBlock& bb) {
+                  return ReverseBasicBlock(bb, cfg.blocks().size());
+               });
+    }
+
+private:
+    const CFG& cfg;
+};
+
+static_assert(CfgConcept<ReverseCFG>);
 
 class RPOCompare
 {
@@ -71,6 +138,32 @@ private:
     std::vector<bool> queued;
 };
 
-std::string print(const CFG& cfg) noexcept;
+template<CfgConcept CFG>
+std::string print(const CFG& cfg) noexcept
+{
+    std::stringstream out;
+    out << "digraph CFG {\n";
+    int counter = 0;
+    for (const auto& block : cfg.blocks())
+    {
+        out << "  Node_" << counter << R"([label=")";
+        for (auto op : block.operations())
+            out << print(toNode(op)) << R"(\n)";
+
+        out << R"("])" << "\n";
+        ++counter;
+    }
+    out << "\n";
+    counter = 0;
+    for (const auto& block : cfg.blocks())
+    {
+        for (auto next : block.successors())
+            out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
+
+        ++counter;
+    }
+    out << "}\n";
+    return std::move(out).str();
+}
 
 #endif // ANALYSIS_H

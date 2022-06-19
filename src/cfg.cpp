@@ -1,7 +1,6 @@
 #include "include/cfg.h"
 
 #include <algorithm>
-#include <sstream>
 #include <stack>
 #include <cassert>
 
@@ -89,34 +88,6 @@ int CFG::newBlock()
     basicBlocks.emplace_back();
     return basicBlocks.size() - 1;
 }
-
-std::string print(const CFG& cfg) noexcept
-{
-    std::stringstream out;
-    out << "digraph CFG {\n";
-    int counter = 0;
-    for (const auto& block : cfg.blocks())
-    {
-        out << "  Node_" << counter << R"([label=")";
-        for (auto op : block.operations())
-            out << print(toNode(op)) << R"(\n)";
-
-        out << R"("])" << "\n";
-        ++counter;
-    }
-    out << "\n";
-    counter = 0;
-    for (const auto& block : cfg.blocks())
-    {
-        for (auto next : block.successors())
-            out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
-
-        ++counter;
-    }
-    out << "}\n";
-    return std::move(out).str();
-}
-
 
 RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
 {

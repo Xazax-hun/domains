@@ -3,21 +3,12 @@
 #include "include/parser.h"
 #include "include/cfg.h"
 
-class CFGTest
-{
-public:
-    static CFG createTestForRpoOrder();
-    static CFG createTestForRpoOrderMirrored();
-    static CFG createTestForRpoRpoOrder_WithBackEdges();
-    static CFG createTestForRpoRpoOrder_WithBackEdges_2();
-};
-
 namespace
 {
 
 struct ParseResult
 {
-    CFG root;
+    CFG cfg;
     Parser parser; // Owns the nodes.
 };
 
@@ -71,7 +62,46 @@ R"(digraph CFG {
     auto result = parseToCFG(source, output);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result.has_value());
-    auto prettyPrintedCfg = print(result->root);
+    auto prettyPrintedCfg = print(result->cfg);
+    EXPECT_EQ(prettyPrintedCfg, expected);
+}
+
+TEST(Cfg, BasicReverseCfg)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+translation(10, 0);
+iter {
+  {
+    translation(10, 0)
+  } or {
+    rotation(0, 0, 90)
+  }
+})";
+    std::string_view expected =
+R"(digraph CFG {
+  Node_0[label=""]
+  Node_1[label=""]
+  Node_2[label="rotation(0, 0, 90)\n"]
+  Node_3[label="translation(10, 0)\n"]
+  Node_4[label=""]
+  Node_5[label="translation(10, 0)\ninit(50, 50, 50, 50)\n"]
+
+  Node_0 -> Node_1
+  Node_1 -> Node_3
+  Node_1 -> Node_2
+  Node_2 -> Node_4
+  Node_3 -> Node_4
+  Node_4 -> Node_5
+  Node_4 -> Node_1
+}
+)";
+    auto result = parseToCFG(source, output);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result.has_value());
+    ReverseCFG reverseResult{result->cfg};
+    auto prettyPrintedCfg = print(reverseResult);
     EXPECT_EQ(prettyPrintedCfg, expected);
 }
 
@@ -135,11 +165,20 @@ R"(digraph CFG {
     auto result = parseToCFG(source, output);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result.has_value());
-    auto prettyPrintedCfg = print(result->root);
+    auto prettyPrintedCfg = print(result->cfg);
     EXPECT_EQ(prettyPrintedCfg, expected);
 }
 
 } // anonymous
+
+class CFGTest
+{
+public:
+    static CFG createTestForRpoOrder();
+    static CFG createTestForRpoOrderMirrored();
+    static CFG createTestForRpoRpoOrder_WithBackEdges();
+    static CFG createTestForRpoRpoOrder_WithBackEdges_2();
+};
 
 CFG CFGTest::createTestForRpoOrder()
 {
