@@ -14,9 +14,9 @@ using AnalysisFunc = std::vector<D>(*)(const CFG&);
 template<typename T, typename Dom>
 concept TransferFunction = Domain<Dom> && 
     std::is_default_constructible_v<T> &&
-    requires(T f, Dom d, Operation o)
+    requires(T f, Operation op, Dom d)
 {
-    { f(d, o) } -> std::same_as<Dom>;
+    { f(op, d) } -> std::same_as<Dom>;
 };
 
 template<Domain D>
@@ -64,13 +64,12 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
             preState = preState.merge(postStates[pred]);
         }
         D postState{ preState };
-        for (Operation o : cfg.blocks[currentBlock].operations)
+        for (Operation op : cfg.blocks[currentBlock].operations)
         {
-            // TODO: consider switching the operands for transfer functions and
-            //       introduce currying + caching. I.e., it would be possible
-            //       to partially evaluate the transfer functions, see
-            //       Futamura projections.
-            postState = F{}(postState, o);
+            // TODO: consider currying for transfer functions for caching.
+            //       I.e., it would be possible to partially evaluate the
+            //       transfer functions, see Futamura projections.
+            postState = F{}(op, postState);
         }
         ++processedNodes;
         // If the state did not change we do not need to
@@ -109,9 +108,9 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
         }
         preStates[currentBlock] = preStates[currentBlock].widen(newPreState);
         D postState{ preStates[currentBlock] };
-        for (Operation o : cfg.blocks[currentBlock].operations)
+        for (Operation op : cfg.blocks[currentBlock].operations)
         {
-            postState = F{}(postState, o);
+            postState = F{}(op, postState);
         }
         ++processedNodes;
         // If the state did not change we do not need to
@@ -158,7 +157,7 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
         D postOperationState = preState;
         for (auto op : block.operations)
         {
-            postOperationState = F{}(postOperationState, op);
+            postOperationState = F{}(op, postOperationState);
             anns.postAnnotations[toNode(op)].emplace_back(postOperationState.toString());
         }
     }
@@ -178,7 +177,7 @@ std::vector<Polygon> coveredAreaFromAnalysisResults(const CFG& cfg, const std::v
         D postOperationState = preState;
         for (auto op : block.operations)
         {
-            postOperationState = F{}(postOperationState, op);
+            postOperationState = F{}(op, postOperationState);
             for (const auto& poly : postOperationState.covers())
                 covered.push_back(poly);
         }

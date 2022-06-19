@@ -75,9 +75,9 @@ struct TransferOperation
 
 struct IntervalTransfer
 {
-    Vec2Interval operator()(Vec2Interval preState, Operation o) const
+    Vec2Interval operator()(Operation op, Vec2Interval preState) const
     {
-        return std::visit(TransferOperation{preState}, o);
+        return std::visit(TransferOperation{preState}, op);
     }
 };
 } // anonymous
