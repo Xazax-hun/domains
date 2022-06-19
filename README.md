@@ -1,4 +1,4 @@
-# Domains ![Build status](https://github.com/Xazax-hun/domains/actions/workflows/linux.yml/badge.svg)
+# Domains ![Build status](https://github.com/Xazax-hun/domains/actions/workflows/linux.yml/badge.svg) ![Build status](https://github.com/Xazax-hun/domains/actions/workflows/linuxNoSVG.yml/badge.svg)
 
 Toy language to help experiment with numerical domains for abstract interpretation. The language is inspired by the following book:
 
