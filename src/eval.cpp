@@ -65,7 +65,7 @@ std::set<std::pair<int, int>> detectBackEdges(const CFG& cfg, int current, const
         return {};
 
     std::set<std::pair<int, int>> ret;
-    for(auto succ : cfg.blocks[current].succs)
+    for(auto succ : cfg.blocks()[current].successors())
     {
         // In every walk, in order to take the back edge of a loop,
         // we first need to enter the loop. Thus, if the target of the
@@ -79,7 +79,7 @@ std::set<std::pair<int, int>> detectBackEdges(const CFG& cfg, int current, const
 int getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
                       const std::set<std::pair<int, int>>& backEdges, int loopiness)
 {
-    std::vector<int> successors = cfg.blocks[current].succs;
+    std::vector<int> successors = cfg.blocks()[current].successors();
     auto it = std::partition(successors.begin(), successors.end(),
         [&backEdges, current](int succ) {
             return !backEdges.contains(std::make_pair(current, succ));
@@ -104,7 +104,7 @@ int getNextBlock(std::mt19937& gen, const CFG& cfg, int current,
 Walk createRandomWalk(const CFG& cfg, int loopiness)
 {
     Walk w;
-    if (!std::holds_alternative<const Init*>(cfg.blocks.at(0).operations.at(0)))
+    if (!std::holds_alternative<const Init*>(cfg.blocks().at(0).operations().at(0)))
         return w; // TODO: add error message.
 
     std::random_device rd;
@@ -118,14 +118,14 @@ Walk createRandomWalk(const CFG& cfg, int loopiness)
     int current = 0;
     do 
     {
-        for (Operation o : cfg.blocks[current].operations)
+        for (Operation o : cfg.blocks()[current].operations())
         {
             if (w.empty())
                w.push_back(std::visit(StepEval{nullptr, gen}, o));
             else
                w.push_back(std::visit(StepEval{&w.back(), gen}, o));
         }
-        if (cfg.blocks[current].succs.empty())
+        if (cfg.blocks()[current].successors().empty())
             break;
         backEdges.merge(detectBackEdges(cfg, current, visited));
         visited.insert(current);

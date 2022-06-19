@@ -47,9 +47,9 @@ using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vecto
 template<Domain D, TransferFunction<D> F, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFramework(const CFG& cfg)
 {
-    const size_t limit = NodeLimit * cfg.blocks.size();
+    const size_t limit = NodeLimit * cfg.blocks().size();
     size_t processedNodes = 0;
-    std::vector<D> postStates(cfg.blocks.size(), D::bottom());
+    std::vector<D> postStates(cfg.blocks().size(), D::bottom());
     F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
@@ -60,13 +60,13 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
 
         int currentBlock = w.dequeue();
         D preState{ D::bottom() };
-        for (auto pred : cfg.blocks[currentBlock].preds)
+        for (auto pred : cfg.blocks()[currentBlock].predecessors())
             preState = preState.merge(postStates[pred]);
 
         D postState{ preState };
         // TODO: support per-block transfer functions. E.g., for bitvector
         //       style analyses.
-        for (Operation op : cfg.blocks[currentBlock].operations)
+        for (Operation op : cfg.blocks()[currentBlock].operations())
         {
             // TODO: consider currying for transfer functions for caching.
             //       I.e., it would be possible to partially evaluate the
@@ -91,10 +91,10 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
 template<WidenableDomain D, TransferFunction<D> F, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
 {
-    const size_t limit = NodeLimit * cfg.blocks.size();
+    const size_t limit = NodeLimit * cfg.blocks().size();
     size_t processedNodes = 0;
-    std::vector<D> preStates(cfg.blocks.size(), D::bottom());
-    std::vector<D> postStates(cfg.blocks.size(), D::bottom());
+    std::vector<D> preStates(cfg.blocks().size(), D::bottom());
+    std::vector<D> postStates(cfg.blocks().size(), D::bottom());
     F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
@@ -105,12 +105,12 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
 
         int currentBlock = w.dequeue();
         D newPreState{ D::bottom() };
-        for (auto pred : cfg.blocks[currentBlock].preds)
+        for (auto pred : cfg.blocks()[currentBlock].predecessors())
             newPreState = newPreState.merge(postStates[pred]);
 
         preStates[currentBlock] = preStates[currentBlock].widen(newPreState);
         D postState{ preStates[currentBlock] };
-        for (Operation op : cfg.blocks[currentBlock].operations)
+        for (Operation op : cfg.blocks()[currentBlock].operations())
             postState = transfer(op, postState);
 
         ++processedNodes;
@@ -133,10 +133,10 @@ Annotations blockEndAnnotationsFromAnalysisResults(const CFG& cfg, const std::ve
 {
     Annotations anns;
     int i = 0;
-    for (const auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks())
     {
-        if (!block.operations.empty())
-            anns.postAnnotations[toNode(block.operations.back())].emplace_back(result[i].toString());
+        if (!block.operations().empty())
+            anns.postAnnotations[toNode(block.operations().back())].emplace_back(result[i].toString());
         ++i;
     }
     return anns;
@@ -148,14 +148,14 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
 {
     Annotations anns;
     F transfer{};
-    for (const auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks())
     {
         D preState{ D::bottom() };
-        for (auto pred : block.preds)
+        for (auto pred : block.predecessors())
             preState = preState.merge(result[pred]);
 
         D postOperationState = preState;
-        for (auto op : block.operations)
+        for (auto op : block.operations())
         {
             postOperationState = transfer(op, postOperationState);
             anns.postAnnotations[toNode(op)].emplace_back(postOperationState.toString());
@@ -169,14 +169,14 @@ std::vector<Polygon> coveredAreaFromAnalysisResults(const CFG& cfg, const std::v
 {
     std::vector<Polygon> covered;
     F transfer{};
-    for (const auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks())
     {
         D preState{ D::bottom() };
-        for (auto pred : block.preds)
+        for (auto pred : block.predecessors())
             preState = preState.merge(result[pred]);
 
         D postOperationState = preState;
-        for (auto op : block.operations)
+        for (auto op : block.operations())
         {
             postOperationState = transfer(op, postOperationState);
             for (const auto& poly : postOperationState.covers())

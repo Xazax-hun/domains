@@ -3,6 +3,15 @@
 #include "include/parser.h"
 #include "include/cfg.h"
 
+class CFGTest
+{
+public:
+    static CFG createTestForRpoOrder();
+    static CFG createTestForRpoOrderMirrored();
+    static CFG createTestForRpoRpoOrder_WithBackEdges();
+    static CFG createTestForRpoRpoOrder_WithBackEdges_2();
+};
+
 namespace
 {
 
@@ -23,7 +32,7 @@ std::optional<ParseResult> parseToCFG(std::string_view str, std::ostream& output
     auto root = parser.parse();
     if (!root)
         return {};
-    auto cfg = createCfg(*root);
+    auto cfg = CFG::createCfg(*root);
     return ParseResult{std::move(cfg), std::move(parser)};
 }
 
@@ -130,7 +139,9 @@ R"(digraph CFG {
     EXPECT_EQ(prettyPrintedCfg, expected);
 }
 
-TEST(Cfg, RpoOrder)
+} // anonymous
+
+CFG CFGTest::createTestForRpoOrder()
 {
     //     0
     //    / \  no multiline comment 
@@ -140,12 +151,18 @@ TEST(Cfg, RpoOrder)
     //    \ / 
     //     4
     CFG cfg;
-    cfg.blocks.resize(5);
+    cfg.basicBlocks.resize(5);
     cfg.addEdge(0, 1)
        .addEdge(0, 2)
        .addEdge(1, 4)
        .addEdge(2, 3)
        .addEdge(3, 4);
+    return cfg;
+}
+
+TEST(Cfg, RpoOrder)
+{
+    CFG cfg = CFGTest::createTestForRpoOrder();
 
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
@@ -155,7 +172,7 @@ TEST(Cfg, RpoOrder)
     EXPECT_EQ(compare.getRpoPosition(4), 4);
 }
 
-TEST(Cfg, RpoOrder_Mirrored)
+CFG CFGTest::createTestForRpoOrderMirrored()
 {
     //     0
     //    / \  no multiline comment 
@@ -165,12 +182,18 @@ TEST(Cfg, RpoOrder_Mirrored)
     //    \ / 
     //     4
     CFG cfg;
-    cfg.blocks.resize(5);
+    cfg.basicBlocks.resize(5);
     cfg.addEdge(0, 2)
        .addEdge(0, 1)
        .addEdge(1, 4)
        .addEdge(2, 3)
        .addEdge(3, 4);
+    return cfg;
+}
+
+TEST(Cfg, RpoOrder_Mirrored)
+{
+    CFG cfg = CFGTest::createTestForRpoOrderMirrored();
 
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
@@ -180,7 +203,7 @@ TEST(Cfg, RpoOrder_Mirrored)
     EXPECT_EQ(compare.getRpoPosition(4), 4);
 }
 
-TEST(Cfg, RpoOrder_WithBackEdges)
+CFG CFGTest::createTestForRpoRpoOrder_WithBackEdges()
 {
     //      0  <----
     //     / \   | |
@@ -190,7 +213,7 @@ TEST(Cfg, RpoOrder_WithBackEdges)
     //     \ / 
     //      4
     CFG cfg;
-    cfg.blocks.resize(5);
+    cfg.basicBlocks.resize(5);
     cfg.addEdge(0, 1)
        .addEdge(0, 2)
        .addEdge(1, 4)
@@ -198,7 +221,12 @@ TEST(Cfg, RpoOrder_WithBackEdges)
        .addEdge(2, 0)
        .addEdge(3, 4)
        .addEdge(3, 0);
+    return cfg;
+}
 
+TEST(Cfg, RpoOrder_WithBackEdges)
+{
+    CFG cfg = CFGTest::createTestForRpoRpoOrder_WithBackEdges();
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
     EXPECT_EQ(compare.getRpoPosition(1), 1);
@@ -207,7 +235,7 @@ TEST(Cfg, RpoOrder_WithBackEdges)
     EXPECT_EQ(compare.getRpoPosition(4), 4);
 }
 
-TEST(Cfg, RpoOrder_WithBackEdges_2)
+CFG CFGTest::createTestForRpoRpoOrder_WithBackEdges_2()
 {
     //      0  <----
     //     / \   | |
@@ -217,7 +245,7 @@ TEST(Cfg, RpoOrder_WithBackEdges_2)
     // |   \ / 
     // |----4
     CFG cfg;
-    cfg.blocks.resize(5);
+    cfg.basicBlocks.resize(5);
     cfg.addEdge(0, 1)
        .addEdge(0, 2)
        .addEdge(1, 4)
@@ -226,7 +254,12 @@ TEST(Cfg, RpoOrder_WithBackEdges_2)
        .addEdge(3, 4)
        .addEdge(3, 0)
        .addEdge(4, 1);
+    return cfg;
+}
 
+TEST(Cfg, RpoOrder_WithBackEdges_2)
+{
+    CFG cfg = CFGTest::createTestForRpoRpoOrder_WithBackEdges_2();
     // TODO: is this actually the order we want?
     //       would we want to visit 1 earlier?
     RPOCompare compare(cfg);
@@ -241,5 +274,3 @@ TEST(Cfg, RpoOrder_WithBackEdges_2)
 //  * No unreachable nodes
 //  * All next indices are valid
 //  ...
-
-} // anonymous

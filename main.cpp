@@ -45,7 +45,7 @@ bool runFile(std::string_view filePath, Config config)
     auto root = parser.parse();
     if (!root)
         return false;
-    CFG cfg = createCfg(*root);
+    CFG cfg = CFG::createCfg(*root);
     if (config.dumpCfg)
         fmt::print("{}\n", print(cfg));
     Annotations annotations;

@@ -5,97 +5,89 @@
 #include <stack>
 #include <cassert>
 
-Node toNode(Operation op) noexcept
-{
-    return std::visit([](const auto* node) noexcept -> Node { return node; }, op);
-}
-
-namespace
-{
-int addAstNode(CFG& cfg, int currentBlock, Node currentNode)
+int CFG::addAstNode(int currentBlock, Node currentNode)
 {
     struct
     {
         int currentBlock;
         CFG& cfg;
 
-        int newBlock() noexcept
-        {
-            cfg.blocks.emplace_back();
-            return cfg.blocks.size() - 1;
-        }
-
         int operator()(const Init* i) noexcept
         {
-            cfg.blocks[currentBlock].operations.emplace_back(i);
+            cfg.basicBlocks[currentBlock].ops.emplace_back(i);
             return currentBlock;
         }
         int operator()(const Translation* t) noexcept
         {
-            cfg.blocks[currentBlock].operations.emplace_back(t);
+            cfg.basicBlocks[currentBlock].ops.emplace_back(t);
             return currentBlock;
         }
         int operator()(const Rotation* r) noexcept
         {
-            cfg.blocks[currentBlock].operations.emplace_back(r);
+            cfg.basicBlocks[currentBlock].ops.emplace_back(r);
             return currentBlock;
         }
         int operator()(const Sequence* s) noexcept
         {
             for (auto node : s->nodes)
             {
-                currentBlock = addAstNode(cfg, currentBlock, node);
+                currentBlock = cfg.addAstNode(currentBlock, node);
             }
             return currentBlock;
         }
         int operator()(const Branch* b) noexcept
         {
-            int lhsBlock = newBlock();
-            int rhsBlock = newBlock();
+            int lhsBlock = cfg.newBlock();
+            int rhsBlock = cfg.newBlock();
             int branchPred = currentBlock;
-            int lhsAfter = addAstNode(cfg, lhsBlock, b->lhs);
-            int rhsAfter = addAstNode(cfg, rhsBlock, b->rhs);
+            int lhsAfter = cfg.addAstNode(lhsBlock, b->lhs);
+            int rhsAfter = cfg.addAstNode(rhsBlock, b->rhs);
             cfg.addEdge(branchPred, lhsBlock);
             cfg.addEdge(branchPred, rhsBlock);
             // TODO: can we do something smarter to avoid empty nodes with e.g., nested ors?
-            int afterBranch = newBlock();
+            int afterBranch = cfg.newBlock();
             cfg.addEdge(lhsAfter, afterBranch);
             cfg.addEdge(rhsAfter, afterBranch);
             return afterBranch;
         }
         int operator()(const Loop* l) noexcept
         {
-            int bodyBegin = newBlock();
+            int bodyBegin = cfg.newBlock();
             cfg.addEdge(currentBlock, bodyBegin);
-            int bodyEnd = addAstNode(cfg, bodyBegin, l->body);
-            int afterBody = newBlock();
+            int bodyEnd = cfg.addAstNode(bodyBegin, l->body);
+            int afterBody = cfg.newBlock();
             cfg.addEdge(bodyEnd, bodyBegin);
             cfg.addEdge(bodyEnd, afterBody);
             return afterBody;
         }
 
-    } processNode(currentBlock, cfg);
+    } processNode(currentBlock, *this);
     
     return std::visit(processNode, currentNode);
 }
-} // anonymous namespace
 
-CFG createCfg(Node root) noexcept
+CFG CFG::createCfg(Node root) noexcept
 {
     CFG cfg;
     // Add start block.
-    cfg.blocks.emplace_back();
+    cfg.basicBlocks.emplace_back();
 
-    addAstNode(cfg, 0, root);
+    cfg.addAstNode(0, root);
     return cfg;
 }
 
 CFG& CFG::addEdge(int from, int to)
 {
-    blocks[from].succs.push_back(to);
-    blocks[to].preds.push_back(from);
+    basicBlocks[from].succs.push_back(to);
+    basicBlocks[to].preds.push_back(from);
     // TODO: add assertion that succs/preds has no duplicates.
     return *this;
+}
+
+int CFG::newBlock()
+{
+    basicBlocks.emplace_back();
+    return basicBlocks.size() - 1;
 }
 
 std::string print(const CFG& cfg) noexcept
@@ -103,10 +95,10 @@ std::string print(const CFG& cfg) noexcept
     std::stringstream out;
     out << "digraph CFG {\n";
     int counter = 0;
-    for (const auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks())
     {
         out << "  Node_" << counter << R"([label=")";
-        for (auto op : block.operations)
+        for (auto op : block.operations())
             out << print(toNode(op)) << R"(\n)";
 
         out << R"("])" << "\n";
@@ -114,9 +106,9 @@ std::string print(const CFG& cfg) noexcept
     }
     out << "\n";
     counter = 0;
-    for (const auto& block : cfg.blocks)
+    for (const auto& block : cfg.blocks())
     {
-        for (auto next : block.succs)
+        for (auto next : block.successors())
             out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
 
         ++counter;
@@ -126,12 +118,12 @@ std::string print(const CFG& cfg) noexcept
 }
 
 
-RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
+RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
 {
     std::vector<int> visitOrder;
-    visitOrder.reserve(cfg.blocks.size());
+    visitOrder.reserve(cfg.blocks().size());
     std::stack<int, std::vector<int>> stack;
-    std::vector<bool> visited(cfg.blocks.size());
+    std::vector<bool> visited(cfg.blocks().size());
     std::stack<int, std::vector<int>> pending;
     stack.push(0);
     while(!stack.empty())
@@ -139,7 +131,7 @@ RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
         int current = stack.top();
         visited[current] = true;
         pending.push(-1);
-        for(auto succ : cfg.blocks[current].succs)
+        for(auto succ : cfg.blocks()[current].successors())
         {
             if (!visited[succ])
                 pending.push(succ);
@@ -161,7 +153,7 @@ RPOCompare::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks.size())
 }
 
 RPOWorklist::RPOWorklist(const CFG& cfg)
-  : cfg(cfg), comparator(cfg), worklist(comparator), queued(cfg.blocks.size(), false) {}
+  : cfg(cfg), comparator(cfg), worklist(comparator), queued(cfg.blocks().size(), false) {}
 
 void RPOWorklist::enqueue(int node) noexcept
 {
@@ -174,7 +166,7 @@ void RPOWorklist::enqueue(int node) noexcept
 
 void RPOWorklist::enqueueSuccessors(int node) noexcept
 {
-    for (int succ : cfg.blocks[node].succs)
+    for (int succ : cfg.blocks()[node].successors())
         enqueue(succ);
 }
 

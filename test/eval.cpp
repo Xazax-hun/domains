@@ -24,7 +24,7 @@ std::optional<ParseResult> getWalk(std::string_view str, std::ostream& output)
     auto root = parser.parse();
     if (!root)
         return {};
-    auto cfg = createCfg(*root);
+    auto cfg = CFG::createCfg(*root);
     auto w = createRandomWalk(cfg);
     return ParseResult{std::move(w), std::move(parser)};
 }

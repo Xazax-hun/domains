@@ -29,7 +29,7 @@ std::optional<AnalysisTestResult<D>> analyzeForTest(std::string_view str, std::o
     auto root = parser.parse();
     if (!root)
         return {};
-    auto cfg = createCfg(*root);
+    auto cfg = CFG::createCfg(*root);
     auto results = getAnalysis(cfg);
     if (results.empty())
         return AnalysisTestResult<D>{*root, std::move(cfg), {}, {}, {}, std::move(parser)};

@@ -5,22 +5,40 @@
 #include <queue>
 
 using Operation = std::variant<const Init*, const Translation*, const Rotation*>;
-Node toNode(Operation op) noexcept;
-
-struct BasicBlock
+inline Node toNode(Operation op) noexcept
 {
-    std::vector<Operation> operations;
+    return std::visit([](const auto* node) noexcept -> Node { return node; }, op);
+}
+
+class BasicBlock
+{
+public:
+    const std::vector<Operation>& operations() const noexcept { return ops; }
+    const std::vector<int>& successors() const noexcept { return succs; }
+    const std::vector<int>& predecessors() const noexcept { return preds; }
+
+private:
+    std::vector<Operation> ops;
     std::vector<int> succs;
     std::vector<int> preds;
+    friend class CFG;
 };
 
-struct CFG
+class CFG
 {
-    std::vector<BasicBlock> blocks;
-    CFG& addEdge(int from, int to);
-};
+public:
+    const std::vector<BasicBlock>& blocks() const { return basicBlocks; }
+    static CFG createCfg(Node root) noexcept;
 
-CFG createCfg(Node root) noexcept;
+private:
+    CFG() = default;
+    std::vector<BasicBlock> basicBlocks;
+    CFG& addEdge(int from, int to);
+    int newBlock();
+    int addAstNode(int currentBlock, Node currentNode);
+
+    friend class CFGTest;
+};
 
 class RPOCompare
 {
