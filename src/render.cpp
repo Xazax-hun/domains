@@ -178,7 +178,9 @@ std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vecto
 
 #else
 
-std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vector<Polygon>& inferred, bool dotsOnly)
+std::string renderRandomWalkSVG(const std::vector<Walk>& /*walks*/,
+                                const std::vector<Polygon>& /*inferred*/,
+                                bool /*dotsOnly*/)
 {
     return "ERROR: compiled without cairo.";
 }

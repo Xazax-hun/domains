@@ -4,6 +4,7 @@
 #include "include/eval.h"
 
 #include <vector>
+#include <string>
 
 std::string renderRandomWalkSVG(const std::vector<Walk>& walks,
     const std::vector<Polygon>& inferred, bool dotsOnly = false);

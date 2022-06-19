@@ -1,4 +1,4 @@
-name: Ubuntu Linux Build
+name: Ubuntu Linux NoSVG Build
 on:
   push:
     branches: [ main ]
@@ -25,7 +25,9 @@ jobs:
         - name: install meson
           run: pip install meson ninja
         - name: install dependencies
-          run: sudo apt install -y libgtest-dev libfmt-dev libcairo2-dev
+          run: sudo apt install -y libgtest-dev libfmt-dev
+        - name: uninstall unwanted packages
+          run: sudo apt remove -y libcairo2-dev
         - name: configure
           run: meson setup builddir/
           env:
