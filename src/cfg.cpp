@@ -107,10 +107,8 @@ std::string print(const CFG& cfg) noexcept
     {
         out << "  Node_" << counter << R"([label=")";
         for (auto op : block.operations)
-        {
-            out << print(toNode(op));
-            out << R"(\n)";
-        }
+            out << print(toNode(op)) << R"(\n)";
+
         out << R"("])" << "\n";
         ++counter;
     }
@@ -119,9 +117,8 @@ std::string print(const CFG& cfg) noexcept
     for (const auto& block : cfg.blocks)
     {
         for (auto next : block.succs)
-        {
             out << "  Node_" << counter << " -> " << "Node_" << next << "\n";
-        }
+
         ++counter;
     }
     out << "}\n";

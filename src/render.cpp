@@ -167,9 +167,8 @@ std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vecto
 
         ColorPicker picker;
         for (const auto& walk : walks)
-        {
             renderRandomPath(cr, walk, picker.next(), dotsOnly);
-        }
+
         // Surface needs to be destroyed here.
     }
 

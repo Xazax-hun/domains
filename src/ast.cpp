@@ -81,9 +81,8 @@ namespace
                 {
                     out << " /*";
                     for (const auto& annotation : it->second)
-                    {
                         out << " " << annotation;
-                    }
+
                     out << " */";
                 }
             }

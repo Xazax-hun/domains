@@ -57,9 +57,8 @@ struct TransferOperation
                         Vec2{preState.x.max, preState.y.max} };
         Vec2 origin{*r->x.value, *r->y.value};
         for (auto& toRotate : corners)
-        {
             toRotate = rotate(toRotate, origin, *r->deg.value);
-        }
+
         auto newX = std::minmax_element(std::begin(corners), std::end(corners), [](Vec2 lhs, Vec2 rhs) {
             return lhs.x < rhs.x;
         });

@@ -100,18 +100,12 @@ std::optional<Node> Parser::command()
         return context.make<Rotation>(kw, x, y, deg);
     }
     if (match(TokenType::ITER))
-    {
         return loop();
-    }
     if (match(TokenType::LEFT_BRACE))
-    {
         return branch();
-    }
 
     if (isAtEnd() || check(TokenType::RIGHT_BRACE))
-    {
         error(peek(), "redundant semicolon?");
-    }
 
     return {};
 }
@@ -174,11 +168,7 @@ std::optional<const Loop*> Parser::loop()
 void Parser::error(Token t, std::string_view message) const noexcept
 {
     if (t.type == TokenType::END_OF_FILE)
-    {
         diag.report(t.line, "at end of file", message);
-    }
     else
-    {
         diag.report(t.line, fmt::format("at '{}'", print(t)), message);
-    }
 }

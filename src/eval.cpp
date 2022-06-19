@@ -105,10 +105,8 @@ Walk createRandomWalk(const CFG& cfg, int loopiness)
 {
     Walk w;
     if (!std::holds_alternative<const Init*>(cfg.blocks.at(0).operations.at(0)))
-    {
-        // TODO: add error message.
-        return w;
-    }
+        return w; // TODO: add error message.
+
     std::random_device rd;
     std::mt19937 gen(rd());
 

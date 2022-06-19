@@ -61,10 +61,11 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
         int currentBlock = w.dequeue();
         D preState{ D::bottom() };
         for (auto pred : cfg.blocks[currentBlock].preds)
-        {
             preState = preState.merge(postStates[pred]);
-        }
+
         D postState{ preState };
+        // TODO: support per-block transfer functions. E.g., for bitvector
+        //       style analyses.
         for (Operation op : cfg.blocks[currentBlock].operations)
         {
             // TODO: consider currying for transfer functions for caching.
@@ -105,15 +106,13 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
         int currentBlock = w.dequeue();
         D newPreState{ D::bottom() };
         for (auto pred : cfg.blocks[currentBlock].preds)
-        {
             newPreState = newPreState.merge(postStates[pred]);
-        }
+
         preStates[currentBlock] = preStates[currentBlock].widen(newPreState);
         D postState{ preStates[currentBlock] };
         for (Operation op : cfg.blocks[currentBlock].operations)
-        {
             postState = transfer(op, postState);
-        }
+
         ++processedNodes;
         // If the state did not change we do not need to
         // propagate the changes.
@@ -137,9 +136,7 @@ Annotations blockEndAnnotationsFromAnalysisResults(const CFG& cfg, const std::ve
     for (const auto& block : cfg.blocks)
     {
         if (!block.operations.empty())
-        {
             anns.postAnnotations[toNode(block.operations.back())].emplace_back(result[i].toString());
-        }
         ++i;
     }
     return anns;
