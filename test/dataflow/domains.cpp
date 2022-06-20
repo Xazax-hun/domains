@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 
+#include <string>
+
 #include "include/dataflow/domains/sign_domain.h"
 #include "include/dataflow/domains/interval_domain.h"
 #include "include/dataflow/domains/vec2_domain.h"
+#include "include/dataflow/domains/powerset_domain.h"
 
 namespace
 {
@@ -26,6 +29,13 @@ TEST(Domains, SignDomain)
     EXPECT_EQ(negative.merge(top), top);
     EXPECT_EQ(bottom.merge(negative), negative);
     EXPECT_EQ(negative.merge(bottom), negative);
+
+
+    EXPECT_EQ(negative.toString(), "Negative");
+    EXPECT_EQ(positive.toString(), "Positive");
+    EXPECT_EQ(zero.toString(), "Zero");
+    EXPECT_EQ(top.toString(), "Top");
+    EXPECT_EQ(bottom.toString(), "Bottom");
 }
 
 TEST(Domains, IntervalDomain)
@@ -86,6 +96,14 @@ TEST(Domains, IntervalDomain)
         EXPECT_EQ(smallRangeA + smallRangeB, addExpected2);
         EXPECT_EQ(smallRangeB + smallRangeA, addExpected2);
     }
+
+    // Printing
+    {
+        EXPECT_EQ(singleton.toString(), "[5, 5]");
+        EXPECT_EQ(smallRangeA.toString(), "[0, 10]");
+        EXPECT_EQ(top.toString(), "[-inf, inf]");
+        EXPECT_EQ(bottom.toString(), "[inf, -inf]");
+    }
 }
 
 TEST(Domains, Vec2SignsDomain)
@@ -113,6 +131,8 @@ TEST(Domains, Vec2SignsDomain)
     EXPECT_EQ(posNeg.merge(topTop), topTop);
     EXPECT_EQ(posNeg.merge(bottom), posNeg);
     EXPECT_EQ(bottom.merge(posNeg), posNeg);
+
+    EXPECT_EQ(posNeg.toString(), "{ x: Positive, y: Negative }");
 }
 
 TEST(Domains, Vec2IntervalDomain)
@@ -124,6 +144,30 @@ TEST(Domains, Vec2IntervalDomain)
     Vec2Interval range{IntervalDomain{0, 10}, IntervalDomain{0, 10}};
 
     EXPECT_EQ(singleton.widen(range), Vec2Interval::top());
+}
+
+TEST(Domains, PowersetDomain)
+{
+    using StringSetDomain = PowersetDomain<std::string>;
+    static_assert(Domain<StringSetDomain>);
+
+    StringSetDomain bottom = StringSetDomain::bottom();
+    StringSetDomain a{"a"};
+    StringSetDomain b{"b"};
+    StringSetDomain ab{"a", "b"};
+
+    EXPECT_EQ(bottom, bottom);
+    EXPECT_TRUE(bottom <= a);
+    EXPECT_TRUE(bottom <= b);
+    EXPECT_TRUE(a <= ab);
+    EXPECT_TRUE(b <= ab);
+    EXPECT_EQ(a.merge(b), ab);
+    EXPECT_EQ(b.merge(a), ab);
+    EXPECT_EQ(b.merge(b), b);
+    EXPECT_EQ(bottom.merge(b), b);
+
+    EXPECT_EQ(ab.toString(), "{a, b}");
+    EXPECT_EQ(bottom.toString(), "{}");
 }
 
 } // anonymous

@@ -48,12 +48,16 @@ struct IntervalDomain
         std::string minStr{ [this]() -> std::string {
                 if (min == NEG_INF)
                     return "-inf";
+                if (min == INF)
+                    return "inf";
                 return std::to_string(min);
             }()
         };
         std::string maxStr{ [this]() -> std::string {
                 if (max == INF)
                     return "inf";
+                if (max == NEG_INF)
+                    return "-inf";
                 return std::to_string(max);
             }()
         };
