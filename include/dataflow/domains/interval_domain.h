@@ -45,23 +45,14 @@ struct IntervalDomain
 
     std::string toString() const
     {
-        std::string minStr{ [this]() -> std::string {
-                if (min == NEG_INF)
+        const auto toStr = [](int num) -> std::string {
+                if (num == NEG_INF)
                     return "-inf";
-                if (min == INF)
+                if (num == INF)
                     return "inf";
-                return std::to_string(min);
-            }()
-        };
-        std::string maxStr{ [this]() -> std::string {
-                if (max == INF)
-                    return "inf";
-                if (max == NEG_INF)
-                    return "-inf";
-                return std::to_string(max);
-            }()
-        };
-        return fmt::format("[{}, {}]", minStr, maxStr);
+                return std::to_string(num);
+            };
+        return fmt::format("[{}, {}]", toStr(min), toStr(max));
     }
 
     std::vector<Polygon> covers() const
