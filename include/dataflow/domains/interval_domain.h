@@ -73,6 +73,7 @@ inline bool operator<=(IntervalDomain lhs, IntervalDomain rhs) noexcept
 
 static_assert(WidenableDomain<IntervalDomain>);
 
+// TODO: should these handle bottom?
 inline IntervalDomain operator-(IntervalDomain o) noexcept
 {
     int minResult = [o] {

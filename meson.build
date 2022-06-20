@@ -33,10 +33,10 @@ executable('domains', interpreter_sources,
 
 # Tests + test dependencies.
 gtest_dep = dependency('gtest')
-unittest_sources = ['test/main.cpp', 'test/lexer.cpp', 'test/parser.cpp',
-                    'test/cfg.cpp', 'test/eval.cpp', 'test/dataflow/domains.cpp',
-                    'test/dataflow/sign_analysis.cpp', 'test/dataflow/interval_analysis.cpp',
-                    'test/dataflow/reachable_op_analysis.cpp']
+unittest_sources = ['unittest/main.cpp', 'unittest/lexer.cpp', 'unittest/parser.cpp',
+                    'unittest/cfg.cpp', 'unittest/eval.cpp', 'unittest/dataflow/domains.cpp',
+                    'unittest/dataflow/sign_analysis.cpp', 'unittest/dataflow/interval_analysis.cpp',
+                    'unittest/dataflow/reachable_op_analysis.cpp']
 tests = executable('unittest', unittest_sources,
                    d_unittest: true,
                    install: false,
