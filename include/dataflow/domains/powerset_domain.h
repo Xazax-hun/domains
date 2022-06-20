@@ -3,8 +3,9 @@
 
 #include <fmt/format.h>
 
-#include <set>
+#include <algorithm>
 #include <initializer_list>
+#include <set>
 
 #include "include/dataflow/domains/domain.h"
 
@@ -15,9 +16,11 @@ struct PowersetDomain
     explicit PowersetDomain(std::initializer_list<Element> e) : data{e} {}
     static PowersetDomain bottom() { return {}; }
 
-    void insert(const Element& element)
+    PowersetDomain insert(const Element& element) const
     {
-        data.insert(element);
+        PowersetDomain result{*this};
+        result.data.insert(element);
+        return result;
     }
 
     bool operator==(const PowersetDomain& other) const

@@ -50,6 +50,7 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
     const size_t limit = NodeLimit * cfg.blocks().size();
     size_t processedNodes = 0;
     std::vector<D> postStates(cfg.blocks().size(), D::bottom());
+    std::vector<bool> visited(cfg.blocks().size(), false);
     F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
@@ -74,11 +75,14 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
             postState = transfer(op, postState);
         }
         ++processedNodes;
-        // If the state did not change we do not need to
-        // propagate the changes.
-        if (postStates[currentBlock] == postState)
+        // If the state did not change we do not need to propagate the changes.
+        // If the first time we visit a node the transfer function produces bottom,
+        // we do not want to terminate the analysis prematurely. Not every analysis
+        // uses bottom to represent dead code.
+        if (visited[currentBlock] && postStates[currentBlock] == postState)
             continue;
-
+        
+        visited[currentBlock] = true;
         postStates[currentBlock] = postState;
         w.enqueueSuccessors(currentBlock);
     }
@@ -95,6 +99,7 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
     size_t processedNodes = 0;
     std::vector<D> preStates(cfg.blocks().size(), D::bottom());
     std::vector<D> postStates(cfg.blocks().size(), D::bottom());
+    std::vector<bool> visited(cfg.blocks().size(), false);
     F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
@@ -116,9 +121,10 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
         ++processedNodes;
         // If the state did not change we do not need to
         // propagate the changes.
-        if (postStates[currentBlock] == postState)
+        if (visited[currentBlock] && postStates[currentBlock] == postState)
             continue;
 
+        visited[currentBlock] = true;
         postStates[currentBlock] = postState;
         w.enqueueSuccessors(currentBlock);
     }
@@ -158,7 +164,10 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
         for (auto op : block.operations())
         {
             postOperationState = transfer(op, postOperationState);
-            anns.postAnnotations[toNode(op)].emplace_back(postOperationState.toString());
+            if constexpr (std::is_same_v<CFG, ReverseCFG>)
+                anns.preAnnotations[toNode(op)].emplace_back(postOperationState.toString());
+            else
+                anns.postAnnotations[toNode(op)].emplace_back(postOperationState.toString());
         }
     }
     return anns;

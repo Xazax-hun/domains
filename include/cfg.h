@@ -76,12 +76,12 @@ public:
 
     auto operations() const noexcept { return std::views::reverse(bb.operations()); }
     auto successors() const noexcept {
-        return bb.predecessors() | std::views::transform([this](int idx) {
+        return bb.predecessors() | std::views::transform([blockNum = blockNum](int idx) {
                    return blockNum - 1 - idx;
                });
     }
     auto predecessors() const noexcept {
-        return bb.successors() | std::views::transform([this](int idx) {
+        return bb.successors() | std::views::transform([blockNum = blockNum](int idx) {
                    return blockNum - 1 - idx;
                });
     }
@@ -100,8 +100,8 @@ public:
 
     auto blocks() const {
         return std::views::reverse(cfg.blocks()) |
-               std::views::transform([this](const BasicBlock& bb) {
-                  return ReverseBasicBlock(bb, cfg.blocks().size());
+               std::views::transform([size = cfg.blocks().size()](const BasicBlock& bb) {
+                  return ReverseBasicBlock(bb, size);
                });
     }
 

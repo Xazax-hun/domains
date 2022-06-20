@@ -3,6 +3,7 @@
 #include "include/dataflow/domains/domain.h"
 #include "include/dataflow/analyses/sign_analysis.h"
 #include "include/dataflow/analyses/interval_analysis.h"
+#include "include/dataflow/analyses/reachable_operations_analysis.h"
 
 #include <unordered_map>
 
@@ -44,10 +45,23 @@ std::unordered_map<std::string_view, AnalysisResultsFunc<CFG>> forwardAnalyses =
                                 getIntervalAnalysis,
                                 intervalAnalysisToOperationAnnotations,
                                 intervalAnalysisToCoveredArea>
+    },
+    {
+        "past-operations", &getResults<CFG, StringSetDomain,
+                                getPastOperationsAnalysis,
+                                pastOperationsAnalysisToOperationAnnotations,
+                                pastOperationsAnalysisToCoveredArea>
     }
 };
 
-std::unordered_map<std::string_view, AnalysisResultsFunc<ReverseCFG>> backwardAnalyses = {};
+std::unordered_map<std::string_view, AnalysisResultsFunc<ReverseCFG>> backwardAnalyses = {
+    {
+        "future-operations", &getResults<ReverseCFG, StringSetDomain,
+                                getFutureOperationsAnalysis,
+                                futureOperationsAnalysisToOperationAnnotations,
+                                futureOperationsAnalysisToCoveredArea>
+    }
+};
 
 } // anonymous
 

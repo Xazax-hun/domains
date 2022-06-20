@@ -19,7 +19,9 @@ version_dep = vcs_tag(input: 'src/version.cpp.in',
 domains_static_sources = [version_dep, 'src/lexer.cpp', 'src/parser.cpp',
                           'src/ast.cpp', 'src/utils.cpp', 'src/eval.cpp',
                           'src/cfg.cpp', 'src/render.cpp', 'src/dataflow/sign_analysis.cpp',
-                          'src/dataflow/interval_analysis.cpp', 'src/analyze.cpp']
+                          'src/dataflow/interval_analysis.cpp',
+                          'src/dataflow/reachable_operations_analysis.cpp',
+                          'src/analyze.cpp']
 domains_static_lib = static_library('libslox', domains_static_sources,
                                      dependencies: [fmt_dep, cairo_dep])
 
@@ -33,7 +35,8 @@ executable('domains', interpreter_sources,
 gtest_dep = dependency('gtest')
 unittest_sources = ['test/main.cpp', 'test/lexer.cpp', 'test/parser.cpp',
                     'test/cfg.cpp', 'test/eval.cpp', 'test/dataflow/domains.cpp',
-                    'test/dataflow/sign_analysis.cpp', 'test/dataflow/interval_analysis.cpp']
+                    'test/dataflow/sign_analysis.cpp', 'test/dataflow/interval_analysis.cpp',
+                    'test/dataflow/reachable_op_analysis.cpp']
 tests = executable('unittest', unittest_sources,
                    d_unittest: true,
                    install: false,

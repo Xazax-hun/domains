@@ -19,6 +19,7 @@ namespace
 struct Config
 {
     bool dumpCfg = false;
+    bool dumpReverseCfg = false;
     bool svg = false;
     bool dotsOnly = false;
     int iterations = 1;
@@ -48,6 +49,8 @@ bool runFile(std::string_view filePath, Config config)
     CFG cfg = CFG::createCfg(*root);
     if (config.dumpCfg)
         fmt::print("{}\n", print(cfg));
+    if (config.dumpReverseCfg)
+        fmt::print("{}\n", print(ReverseCFG(cfg)));
     Annotations annotations;
     std::vector<Polygon> covered;
     if (config.analysisName)
@@ -112,6 +115,7 @@ int main(int argc, const char* argv[])
         fmt::print("Usage: {} script [options]\n", argv[0]);
         fmt::print("Options:\n");
         fmt::print("  --cfg-dump\n");
+        fmt::print("  --reverse-cfg-dump\n");
         fmt::print("  --svg\n");
         fmt::print("  --dots-only\n");
         fmt::print("  --executions NUMBER\n");
@@ -134,6 +138,11 @@ int main(int argc, const char* argv[])
             if (argv[i] == "--cfg-dump"sv)
             {
                 config.dumpCfg = true;
+                continue;
+            }
+            if (argv[i] == "--reverse-cfg-dump"sv)
+            {
+                config.dumpReverseCfg = true;
                 continue;
             }
             if (argv[i] == "--svg"sv)
