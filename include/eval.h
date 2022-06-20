@@ -6,18 +6,15 @@
 #include <vector>
 
 #include "include/utils.h"
+#include "include/cfg.h"
 
 // TODO: Instead of optional fields would a variant work better?
 struct Step {
     Vec2 pos;
-    std::optional<Vec2> origin;
-    std::optional<int> deg;
-    bool init = false;
+    Operation op;
 };
 
 using Walk = std::vector<Step>;
-
-class CFG;
 
 // Loopiness specifies the weight of choosing back edges.
 // Loopiness == 1 means that back edges are as likely to
@@ -26,5 +23,7 @@ class CFG;
 Walk createRandomWalk(const CFG& cfg, int loopiness = 1);
 
 Vec2 rotate(Vec2 toRotate, Vec2 origin, int degree);
+
+Annotations annotateWithWalks(const std::vector<Walk>& walks);
 
 #endif // EVAL_H

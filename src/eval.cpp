@@ -7,6 +7,7 @@
 #include <random>
 #include <numbers>
 #include <set>
+#include <unordered_map>
 
 #include <fmt/format.h>
 
@@ -21,12 +22,12 @@ struct StepEval {
     {
         std::uniform_int_distribution<int> genX(*i->topX.value, *i->topX.value + *i->width.value);
         std::uniform_int_distribution<int> genY(*i->topY.value, *i->topY.value + *i->height.value);
-        return Step{ Vec2{ genX(gen), genY(gen) }, {}, {}, true};
+        return Step{ Vec2{ genX(gen), genY(gen) }, i};
     }
 
     Step operator()(const Translation* t) const noexcept
     {
-        return Step{ in->pos + Vec2{ *t->x.value, *t->y.value }, {}, {}, false };
+        return Step{ in->pos + Vec2{ *t->x.value, *t->y.value }, t };
     }
 
     Step operator()(const Rotation* r) const noexcept
@@ -34,12 +35,7 @@ struct StepEval {
         Vec2 origin{*r->x.value, *r->y.value};
         Vec2 toRotate{ in->pos.x, in->pos.y };
         Vec2 rotated = rotate(toRotate, origin, *r->deg.value);
-        return Step {
-            rotated,
-            origin,
-            *r->deg.value,
-            false
-        };
+        return Step{ rotated, r };
     }
 };
 } // anonymous namespace
@@ -120,10 +116,12 @@ Walk createRandomWalk(const CFG& cfg, int loopiness)
     {
         for (Operation o : cfg.blocks()[current].operations())
         {
-            if (w.empty())
-               w.push_back(std::visit(StepEval{nullptr, gen}, o));
-            else
-               w.push_back(std::visit(StepEval{&w.back(), gen}, o));
+            Step step = [&] {
+                if (w.empty())
+                    return std::visit(StepEval{nullptr, gen}, o);
+                return std::visit(StepEval{&w.back(), gen}, o);
+            }();
+            w.push_back(step);
         }
         if (cfg.blocks()[current].successors().empty())
             break;
@@ -133,4 +131,34 @@ Walk createRandomWalk(const CFG& cfg, int loopiness)
     } while (true);
 
     return w;
+}
+
+Annotations annotateWithWalks(const std::vector<Walk>& walks)
+{
+    std::unordered_map<Operation, std::vector<Vec2>> collectedSteps;
+
+    for (const auto& walk : walks)
+        for (auto step : walk)
+            collectedSteps[step.op].push_back(step.pos);
+
+    auto printSet = [](const std::vector<Vec2>& positions) {
+        std::string result{"{"};
+
+        for (const auto& p : positions)
+            result += fmt::format("{{x: {}, y: {}}}, ", p.x, p.y);
+
+        if (result.size() > 1)
+        {
+            result.pop_back();
+            result.pop_back();
+        }
+        result += "}";
+        return result;
+    };
+
+    Annotations anns;
+    for (const auto& [op, positions] : collectedSteps)
+        anns.postAnnotations[toNode(op)].push_back(printSet(positions));
+
+    return anns;
 }

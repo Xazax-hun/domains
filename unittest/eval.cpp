@@ -10,6 +10,7 @@ namespace
 struct ParseResult
 {
     Walk w;
+    Node root;
     Parser parser; // Owns the nodes.
 };
 
@@ -26,7 +27,7 @@ std::optional<ParseResult> getWalk(std::string_view str, std::ostream& output)
         return {};
     auto cfg = CFG::createCfg(*root);
     auto w = createRandomWalk(cfg);
-    return ParseResult{std::move(w), std::move(parser)};
+    return ParseResult{std::move(w), *root, std::move(parser)};
 }
 
 constexpr double threshold = 1e-10;
@@ -64,11 +65,17 @@ rotation(0, 0, 90))";
     EXPECT_TRUE(veryClose(result->w[0].pos, expected[0]));
     EXPECT_TRUE(veryClose(result->w[1].pos, expected[1]));
     EXPECT_TRUE(veryClose(result->w[2].pos, expected[2]));
-    EXPECT_TRUE(result->w[0].init);
-    EXPECT_FALSE(result->w[1].origin);
-    EXPECT_FALSE(result->w[1].deg);
-    EXPECT_TRUE(result->w[2].origin);
-    EXPECT_TRUE(result->w[2].deg);
+    EXPECT_TRUE(std::holds_alternative<const Init*>(result->w[0].op));
+    EXPECT_TRUE(std::holds_alternative<const Translation*>(result->w[1].op));
+    EXPECT_TRUE(std::holds_alternative<const Rotation*>(result->w[2].op));
+
+    std::string_view expectedSourceText =
+R"(init(50, 0, 0, 0) /* {{x: 50, y: 0}} */;
+translation(10, 0) /* {{x: 60, y: 0}} */;
+rotation(0, 0, 90) /* {{x: 0, y: 60}} */)";
+    Annotations annotations = annotateWithWalks(std::vector<Walk>{result->w});
+    std::string annotated = print(result->root, annotations);
+    EXPECT_EQ(expectedSourceText, annotated);
 }
 
 TEST(Eval, IterTest)
@@ -82,11 +89,10 @@ iter { translation(10, 0) })";
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_TRUE(!result->w.empty());
-    EXPECT_TRUE(result->w[0].init);
+    EXPECT_TRUE(std::holds_alternative<const Init*>(result->w[0].op));
     for (unsigned i = 1; i < result->w.size(); ++i)
     {
-        EXPECT_FALSE(result->w[i].origin);
-        EXPECT_FALSE(result->w[i].deg);
+        EXPECT_TRUE(std::holds_alternative<const Translation*>(result->w[i].op));
         EXPECT_TRUE(veryClose(result->w[i - 1].pos.x + 10, result->w[i].pos.x));
     }
 }
@@ -102,9 +108,8 @@ R"(init(50, 0, 0, 0);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_TRUE(result->w.size() == 2);
-    EXPECT_TRUE(result->w[0].init);
-    EXPECT_FALSE(result->w[1].origin);
-    EXPECT_FALSE(result->w[1].deg);
+    EXPECT_TRUE(std::holds_alternative<const Init*>(result->w[0].op));
+    EXPECT_TRUE(std::holds_alternative<const Translation*>(result->w[1].op));
     EXPECT_TRUE(veryClose(distSquared(result->w[0].pos, result->w[1].pos), 10*10));
 }
 

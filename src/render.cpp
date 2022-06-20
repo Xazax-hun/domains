@@ -79,14 +79,15 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
         for (unsigned i = 1; i < w.size(); ++i)
         {
             cairo_new_path(cr);
-            if (w[i].origin)
+            if (auto r = std::get_if<const Rotation*>(&w[i].op))
             {
-                int xdiff = w[i].origin->x - w[i].pos.x;
-                int ydiff = w[i].origin->y - w[i].pos.y;
+                auto rotation = *r;
+                int xdiff = *rotation->x.value - w[i].pos.x;
+                int ydiff = *rotation->y.value - w[i].pos.y;
                 double dist = sqrt(xdiff * xdiff + ydiff * ydiff);
                 double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
                 double degCur = atan2(-w[i].pos.y, w[i].pos.x);
-                cairo_arc(cr, w[i].origin->x, -w[i].origin->y, dist, degCur, degPrev);
+                cairo_arc(cr, *rotation->x.value, -*rotation->y.value, dist, degCur, degPrev);
                 cairo_stroke(cr);
             }
             else
@@ -101,7 +102,7 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
     for (auto step : w)
     {
         cairo_new_path(cr);
-        cairo_set_source_rgb(cr, 0, step.init ? 1 : 0, 0);
+        cairo_set_source_rgb(cr, 0, std::holds_alternative<const Init*>(step.op) ? 1 : 0, 0);
         cairo_arc(cr, step.pos.x, -step.pos.y, RADIUS, 0, 2 * std::numbers::pi_v<double>);
         cairo_fill(cr);
     }

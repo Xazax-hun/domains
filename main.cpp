@@ -22,6 +22,7 @@ struct Config
     bool dumpReverseCfg = false;
     bool svg = false;
     bool dotsOnly = false;
+    bool annotateTrace = false;
     int iterations = 1;
     int loopiness = 1;
     std::optional<std::string> analysisName;
@@ -84,6 +85,8 @@ bool runFile(std::string_view filePath, Config config)
                 fmt::print("{{ x: {}, y: {} }}\n", step.pos.x, step.pos.y);
         }
     }
+    if (config.annotateTrace)
+        fmt::print("{}\n", print(*root, annotateWithWalks(walks)));
     if (config.svg)
         fmt::print("{}\n", renderRandomWalkSVG(walks, covered, config.dotsOnly));
     else if (config.analysisName)
@@ -121,7 +124,9 @@ int main(int argc, const char* argv[])
         fmt::print("  --executions NUMBER\n");
         fmt::print("  --loopiness NUMBER\n");
         fmt::print("  --analyze ANALYSIS_NAME\n");
+        fmt::print("  --annotate-with-trace\n");
         fmt::print("  --help\n");
+        fmt::print("  --version\n");
         fmt::print("Available analyses:\n");
         for (const auto& analysis : getListOfAnalyses())
             fmt::print("  {}\n", analysis);
@@ -153,6 +158,11 @@ int main(int argc, const char* argv[])
             if (argv[i] == "--dots-only"sv)
             {
                 config.dotsOnly = true;
+                continue;
+            }
+            if (argv[i] == "--annotate-with-trace"sv)
+            {
+                config.annotateTrace = true;
                 continue;
             }
             if (argv[i] == "--help"sv || argv[i] == "--version"sv)
