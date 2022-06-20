@@ -17,7 +17,8 @@ struct AnalysisTestResult
     Parser parser; // Owns the nodes.
 };
 
-template <Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> AF, VisualizerFunc<D> VF>
+template <CfgConcept CFG, Domain D, AnalysisFunc<D, CFG> getAnalysis,
+          AnnotatorFunc<D, CFG> AF, VisualizerFunc<D, CFG> VF>
 std::optional<AnalysisTestResult<D>> analyzeForTest(std::string_view str, std::ostream& output)
 {
     DiagnosticEmitter emitter(output, output);

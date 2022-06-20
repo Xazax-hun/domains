@@ -5,12 +5,12 @@
 
 namespace
 {
-auto primitiveIntervalAnalyze = analyzeForTest<Vec2Interval,
+auto primitiveIntervalAnalyze = analyzeForTest<CFG, Vec2Interval,
                                               getPrimitiveIntervalAnalysis,
                                               intervalAnalysisToOperationAnnotations,
                                               intervalAnalysisToCoveredArea>;
 
-auto intervalAnalyze = analyzeForTest<Vec2Interval,
+auto intervalAnalyze = analyzeForTest<CFG, Vec2Interval,
                                       getIntervalAnalysis,
                                       intervalAnalysisToOperationAnnotations,
                                       intervalAnalysisToCoveredArea>;

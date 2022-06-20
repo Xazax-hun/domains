@@ -9,7 +9,8 @@
 namespace 
 {
 
-template<Domain D, AnalysisFunc<D> getAnalysis, AnnotatorFunc<D> AF, VisualizerFunc<D> VF>
+template<CfgConcept CFG, Domain D, AnalysisFunc<D, CFG> getAnalysis,
+         AnnotatorFunc<D, CFG> AF, VisualizerFunc<D, CFG> VF>
 AnalysisResult getResults(const CFG& cfg)
 {
     auto results = getAnalysis(cfg);
@@ -22,35 +23,44 @@ AnalysisResult getResults(const CFG& cfg)
     return { true, std::move(annotations), std::move(covered)};
 }
 
+template <CfgConcept CFG>
 using AnalysisResultsFunc = AnalysisResult(*)(const CFG& cfg);
 
-std::unordered_map<std::string_view, AnalysisResultsFunc> analyses = {
+std::unordered_map<std::string_view, AnalysisResultsFunc<CFG>> forwardAnalyses = {
     {
-        "sign", &getResults<Vec2Sign,
+        "sign", &getResults<CFG, Vec2Sign,
                             getSignAnalysis,
                             signAnalysisToOperationAnnotations,
                             signAnalysisToCoveredArea>
     },
     {
-        "primitive-interval", &getResults<Vec2Interval,
+        "primitive-interval", &getResults<CFG, Vec2Interval,
                                           getPrimitiveIntervalAnalysis,
                                           intervalAnalysisToOperationAnnotations,
                                           intervalAnalysisToCoveredArea>
     },
     {
-        "interval", &getResults<Vec2Interval,
+        "interval", &getResults<CFG, Vec2Interval,
                                 getIntervalAnalysis,
                                 intervalAnalysisToOperationAnnotations,
                                 intervalAnalysisToCoveredArea>
     }
 };
 
+std::unordered_map<std::string_view, AnalysisResultsFunc<ReverseCFG>> backwardAnalyses = {};
+
 } // anonymous
 
 std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, const CFG& cfg)
 {
-    if (auto it = analyses.find(analysisName); it != analyses.end())
+    if (auto it = forwardAnalyses.find(analysisName); it != forwardAnalyses.end())
         return it->second(cfg);
+
+    if (auto it = backwardAnalyses.find(analysisName); it != backwardAnalyses.end())
+    {
+        ReverseCFG revCfg(cfg);
+        return it->second(revCfg);
+    }
 
     return {};
 }
@@ -58,7 +68,10 @@ std::optional<AnalysisResult> getAnalysisResults(std::string_view analysisName, 
 std::set<std::string_view> getListOfAnalyses()
 {
     std::set<std::string_view> results;
-    for (const auto& [name, _] : analyses)
+    for (const auto& [name, _] : forwardAnalyses)
+        results.insert(name);
+
+    for (const auto& [name, _] : backwardAnalyses)
         results.insert(name);
 
     return results;

@@ -2,9 +2,13 @@
 #define ANALYSIS_H
 
 #include "include/ast.h"
+
+#include <algorithm>
+#include <cassert>
 #include <queue>
 #include <ranges>
 #include <sstream>
+#include <stack>
 
 // Elements of a basic block, cannot represent control flow.
 using Operation = std::variant<const Init*, const Translation*, const Rotation*>;
@@ -107,6 +111,7 @@ private:
 
 static_assert(CfgConcept<ReverseCFG>);
 
+template<CfgConcept CFG>
 class RPOCompare
 {
 public:
@@ -122,6 +127,7 @@ private:
     std::vector<int> rpoOrder;
 };
 
+template<CfgConcept CFG>
 class RPOWorklist
 {
 public:
@@ -131,9 +137,9 @@ public:
     int dequeue() noexcept;
     bool empty() const noexcept { return worklist.empty(); }
 private:
-    using Worklist = std::priority_queue<int, std::vector<int>, RPOCompare>;
+    using Worklist = std::priority_queue<int, std::vector<int>, RPOCompare<CFG>>;
     const CFG& cfg;
-    RPOCompare comparator; // Must be declared before the worklist.
+    RPOCompare<CFG> comparator; // Must be declared before the worklist.
     Worklist worklist;
     std::vector<bool> queued;
 };
@@ -164,6 +170,72 @@ std::string print(const CFG& cfg) noexcept
     }
     out << "}\n";
     return std::move(out).str();
+}
+
+template<CfgConcept CFG>
+RPOCompare<CFG>::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
+{
+    std::vector<int> visitOrder;
+    visitOrder.reserve(cfg.blocks().size());
+    std::stack<int, std::vector<int>> stack;
+    std::vector<bool> visited(cfg.blocks().size());
+    std::stack<int, std::vector<int>> pending;
+    stack.push(0);
+    while(!stack.empty())
+    {
+        int current = stack.top();
+        visited[current] = true;
+        pending.push(-1);
+        for(auto succ : cfg.blocks()[current].successors())
+        {
+            if (!visited[succ])
+                pending.push(succ);
+        }
+        int next = pending.top();
+        pending.pop();
+        if (next == -1)
+        {
+            stack.pop();
+            visitOrder.push_back(current);
+            continue;
+        }
+        stack.push(next);
+    }
+    std::reverse(visitOrder.begin(), visitOrder.end());
+    int counter = 0;
+    for (int node : visitOrder)
+        rpoOrder[node] = counter++;
+}
+
+template<CfgConcept CFG>
+RPOWorklist<CFG>::RPOWorklist(const CFG& cfg)
+  : cfg(cfg), comparator(cfg), worklist(comparator), queued(cfg.blocks().size(), false) {}
+
+template<CfgConcept CFG>
+void RPOWorklist<CFG>::enqueue(int node) noexcept
+{
+    if (queued[node])
+        return;
+
+    queued[node] = true;
+    worklist.push(node);
+}
+
+template<CfgConcept CFG>
+void RPOWorklist<CFG>::enqueueSuccessors(int node) noexcept
+{
+    for (int succ : cfg.blocks()[node].successors())
+        enqueue(succ);
+}
+
+template<CfgConcept CFG>
+int RPOWorklist<CFG>::dequeue() noexcept
+{
+    assert(!worklist.empty());
+    int node = worklist.top();
+    worklist.pop();
+    queued[node] = false;
+    return node;
 }
 
 #endif // ANALYSIS_H

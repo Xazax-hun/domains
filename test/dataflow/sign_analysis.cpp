@@ -4,7 +4,7 @@
 
 namespace
 {
-auto signAnalyze = analyzeForTest<Vec2Sign,
+auto signAnalyze = analyzeForTest<CFG, Vec2Sign,
                                   getSignAnalysis,
                                   signAnalysisToOperationAnnotations,
                                   signAnalysisToCoveredArea>;

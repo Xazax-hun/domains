@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-template<Domain D>
+template<Domain D, CfgConcept CFG>
 using AnalysisFunc = std::vector<D>(*)(const CFG&);
 
 template<typename T, typename Dom>
@@ -19,11 +19,11 @@ concept TransferFunction = Domain<Dom> &&
     { f(op, d) } -> std::same_as<Dom>;
 };
 
-template<Domain D>
+template<Domain D, CfgConcept CFG>
 using AnnotatorFunc = Annotations (*)(const CFG& cfg, const std::vector<D>& result);
 
 // TODO: covered area should be represented as a set of polygons instead of a vector.
-template<Domain D>
+template<Domain D, CfgConcept CFG>
 using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vector<D>& result);
 
 // Calculate the domain values for the end of each
@@ -44,7 +44,7 @@ using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vecto
 //
 // See `allAnnotationsFromAnalysisResults` how to recover
 // per-operation analysis states.
-template<Domain D, TransferFunction<D> F, unsigned NodeLimit = 10>
+template<Domain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFramework(const CFG& cfg)
 {
     const size_t limit = NodeLimit * cfg.blocks().size();
@@ -88,7 +88,7 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
 
 // Similar to solveMonotoneFramework, but always invoke the widen
 // operation.
-template<WidenableDomain D, TransferFunction<D> F, unsigned NodeLimit = 10>
+template<WidenableDomain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
 std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
 {
     const size_t limit = NodeLimit * cfg.blocks().size();
@@ -128,7 +128,7 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
 
 // Annotate the last operation of each CFG block with the analysis state at the end of the
 // basic block.
-template<Domain D>
+template<Domain D, CfgConcept CFG>
 Annotations blockEndAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
 {
     Annotations anns;
@@ -143,7 +143,7 @@ Annotations blockEndAnnotationsFromAnalysisResults(const CFG& cfg, const std::ve
 }
 
 // Use the transfer functions to expand post-states to every operation.
-template<Domain D, TransferFunction<D> F>
+template<Domain D, TransferFunction<D> F, CfgConcept CFG>
 Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
 {
     Annotations anns;
@@ -164,7 +164,7 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
     return anns;
 }
 
-template<Domain D, TransferFunction<D> F>
+template<Domain D, TransferFunction<D> F, CfgConcept CFG>
 std::vector<Polygon> coveredAreaFromAnalysisResults(const CFG& cfg, const std::vector<D>& result)
 {
     std::vector<Polygon> covered;
