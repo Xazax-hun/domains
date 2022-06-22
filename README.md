@@ -84,8 +84,14 @@ The gray area represents the regions  of the 2D space that the analysis deduced 
 
 # Dependencies
 
+## Build
+
 * Meson
 * C++20 compatible compiler
 * fmt
-* gtest
 * cairo (optional for svg output)
+
+## Test
+
+* gtest
+* turnt

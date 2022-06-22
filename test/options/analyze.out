@@ -1,0 +1,9 @@
+init(50, 50, 50, 50) /* { x: Positive, y: Positive } */;
+iter {
+  {
+    translation(10, 0) /* { x: Positive, y: Positive } */
+  } or {
+    translation(0, 10) /* { x: Positive, y: Positive } */
+  }
+};
+rotation(0, 0, 180) /* { x: Negative, y: Negative } */

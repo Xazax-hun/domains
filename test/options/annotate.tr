@@ -1,0 +1,5 @@
+// CMD: {args} {filename} --annotate-with-trace
+init(50, 50, 0, 0);
+translation(10, 0);
+rotation(0, 0, 90);
+translation(0, 10)

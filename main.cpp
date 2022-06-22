@@ -77,7 +77,8 @@ bool runFile(std::string_view filePath, Config config)
         walks.push_back(createRandomWalk(cfg, config.loopiness));
         if (walks.back().empty())
             return false;
-        if (!config.svg)
+        if (!config.svg && !config.analysisName && !config.dumpCfg &&
+            !config.dumpReverseCfg)
         {
             if (config.iterations > 1)
                 fmt::print("{}. execution:\n", i + 1);

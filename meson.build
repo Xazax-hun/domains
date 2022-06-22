@@ -27,9 +27,9 @@ domains_static_lib = static_library('libslox', domains_static_sources,
 
 # Executables
 interpreter_sources = ['main.cpp']
-executable('domains', interpreter_sources,
-           link_with: domains_static_lib,
-           dependencies: fmt_dep)
+driver = executable('domains', interpreter_sources,
+                    link_with: domains_static_lib,
+                    dependencies: fmt_dep)
 
 # Tests + test dependencies.
 gtest_dep = dependency('gtest')
@@ -43,3 +43,15 @@ tests = executable('unittest', unittest_sources,
                    link_with: domains_static_lib,
                    dependencies: gtest_dep)
 test('unittests', tests)
+
+dir_base = meson.current_source_dir()
+cmd_option_tests = [dir_base / 'test/options/exec.tr',
+                    dir_base / 'test/options/multiple_exec.tr',
+                    dir_base / 'test/options/annotate.tr',
+                    dir_base / 'test/options/multiple_annotate.tr',
+                    dir_base / 'test/options/cfg-dump.tr',
+                    dir_base / 'test/options/reverse-cfg-dump.tr',
+                    dir_base / 'test/options/analyze.tr',
+                   ]
+turnt = find_program('turnt')
+test('option tests', turnt, args: cmd_option_tests + ['--diff', '--args', driver.full_path()])

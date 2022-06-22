@@ -23,7 +23,7 @@ jobs:
         - name: setup compiler
           run: sudo apt install -y gcc-11 g++-11
         - name: install meson
-          run: pip install meson ninja
+          run: pip install meson ninja turnt
         - name: install dependencies
           run: sudo apt install -y libgtest-dev libfmt-dev libcairo2-dev
         - name: configure
