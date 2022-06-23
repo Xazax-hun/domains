@@ -301,6 +301,10 @@ TEST(Cfg, RpoOrder_WithBackEdges_2)
     CFG cfg = CFGTest::createTestForRpoRpoOrder_WithBackEdges_2();
     // TODO: is this actually the order we want?
     //       would we want to visit 1 earlier?
+    //       It turns out while visiting 1 earlier would be nice,
+    //       this control flow rarely happens in the real world.
+    //       In most real world loops back edges will go to a loop header
+    //       header that dominates all the nodes in the loop.
     RPOCompare compare(cfg);
     EXPECT_EQ(compare.getRpoPosition(0), 0);
     EXPECT_EQ(compare.getRpoPosition(2), 1);
