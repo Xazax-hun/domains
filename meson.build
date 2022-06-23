@@ -32,26 +32,30 @@ driver = executable('domains', interpreter_sources,
                     dependencies: fmt_dep)
 
 # Tests + test dependencies.
-gtest_dep = dependency('gtest')
-unittest_sources = ['unittest/main.cpp', 'unittest/lexer.cpp', 'unittest/parser.cpp',
-                    'unittest/cfg.cpp', 'unittest/eval.cpp', 'unittest/dataflow/domains.cpp',
-                    'unittest/dataflow/sign_analysis.cpp', 'unittest/dataflow/interval_analysis.cpp',
-                    'unittest/dataflow/reachable_op_analysis.cpp']
-tests = executable('unittest', unittest_sources,
-                   d_unittest: true,
-                   install: false,
-                   link_with: domains_static_lib,
-                   dependencies: gtest_dep)
-test('unittests', tests)
+gtest_dep = dependency('gtest', required: false)
+if (gtest_dep.found())
+  unittest_sources = ['unittest/main.cpp', 'unittest/lexer.cpp', 'unittest/parser.cpp',
+                      'unittest/cfg.cpp', 'unittest/eval.cpp', 'unittest/dataflow/domains.cpp',
+                      'unittest/dataflow/sign_analysis.cpp', 'unittest/dataflow/interval_analysis.cpp',
+                      'unittest/dataflow/reachable_op_analysis.cpp']
+  tests = executable('unittest', unittest_sources,
+                    d_unittest: true,
+                    install: false,
+                    link_with: domains_static_lib,
+                    dependencies: gtest_dep)
+  test('unittests', tests)
+endif
 
-dir_base = meson.current_source_dir()
-cmd_option_tests = [dir_base / 'test/options/exec.tr',
-                    dir_base / 'test/options/multiple_exec.tr',
-                    dir_base / 'test/options/annotate.tr',
-                    dir_base / 'test/options/multiple_annotate.tr',
-                    dir_base / 'test/options/cfg-dump.tr',
-                    dir_base / 'test/options/reverse-cfg-dump.tr',
-                    dir_base / 'test/options/analyze.tr',
-                   ]
-turnt = find_program('turnt')
-test('option tests', turnt, args: cmd_option_tests + ['--diff', '--args', driver.full_path()])
+turnt = find_program('turnt',  required: false)
+if (turnt.found())
+  dir_base = meson.current_source_dir()
+  cmd_option_tests = [dir_base / 'test/options/exec.tr',
+                      dir_base / 'test/options/multiple_exec.tr',
+                      dir_base / 'test/options/annotate.tr',
+                      dir_base / 'test/options/multiple_annotate.tr',
+                      dir_base / 'test/options/cfg-dump.tr',
+                      dir_base / 'test/options/reverse-cfg-dump.tr',
+                      dir_base / 'test/options/analyze.tr',
+                    ]
+  test('option tests', turnt, args: cmd_option_tests + ['--diff', '--args', driver.full_path()])
+endif
