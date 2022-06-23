@@ -141,4 +141,34 @@ rotation(0, 0, 90) /* { x: [-inf, inf], y: [-inf, inf] } */)";
     EXPECT_EQ(expected, annotatedSource);
 }
 
+TEST(IntervalAnalysis, WidenLoopWithBranchAndRotate)
+{
+    std::stringstream output;
+    std::string_view source =
+R"(init(50, 50, 50, 50);
+iter {
+  {
+    translation(10, 0)
+  } or {
+    translation(0, 10)
+  }
+};
+rotation(0, 0, 180))";
+    std::string_view expected =
+R"(init(50, 50, 50, 50) /* { x: [50, 100], y: [50, 100] } */;
+iter {
+  {
+    translation(10, 0) /* { x: [60, inf], y: [50, inf] } */
+  } or {
+    translation(0, 10) /* { x: [50, inf], y: [60, inf] } */
+  }
+};
+rotation(0, 0, 180) /* { x: [-inf, inf], y: [-inf, inf] } */)";
+    auto result = intervalAnalyze(source, output);
+    std::string annotatedSource = print(result->root, result->anns);
+    EXPECT_TRUE(output.str().empty());
+    EXPECT_TRUE(result);
+    EXPECT_EQ(expected, annotatedSource);
+}
+
 } // anonymous

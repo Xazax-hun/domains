@@ -119,7 +119,8 @@ public:
 
     bool operator()(int lhsBlockId, int rhsBlockId) const
     {
-        return rpoOrder[lhsBlockId] < rpoOrder[rhsBlockId];
+        // std::priority_queue is a max-heap by default.
+        return rpoOrder[lhsBlockId] > rpoOrder[rhsBlockId];
     }
 
     int getRpoPosition(int node) const { return rpoOrder[node]; }
@@ -178,28 +179,38 @@ RPOCompare<CFG>::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
     std::vector<int> visitOrder;
     visitOrder.reserve(cfg.blocks().size());
     std::stack<int, std::vector<int>> stack;
-    std::vector<bool> visited(cfg.blocks().size());
+    std::vector<bool> visited(cfg.blocks().size(), false);
     std::stack<int, std::vector<int>> pending;
     stack.push(0);
     while(!stack.empty())
     {
         int current = stack.top();
-        visited[current] = true;
-        pending.push(-1);
-        for(auto succ : cfg.blocks()[current].successors())
+        if (!visited[current])
         {
-            if (!visited[succ])
-                pending.push(succ);
+            visited[current] = true;
+            pending.push(-1);
+            for(auto succ : cfg.blocks()[current].successors())
+            {
+                if (!visited[succ])
+                    pending.push(succ);
+            }
         }
-        int next = pending.top();
-        pending.pop();
-        if (next == -1)
+        while (true)
         {
-            stack.pop();
-            visitOrder.push_back(current);
-            continue;
+            int next = pending.top();
+            pending.pop();
+            if (next == -1)
+            {
+                stack.pop();
+                visitOrder.push_back(current);
+                break;
+            }
+            if (!visited[next])
+            {
+                stack.push(next);
+                break;
+            }
         }
-        stack.push(next);
     }
     std::reverse(visitOrder.begin(), visitOrder.end());
     int counter = 0;
