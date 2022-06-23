@@ -133,7 +133,7 @@ translation(10, 0) /* { x: [60, 110], y: [50, 100] } */;
 iter {
   translation(10, 0) /* { x: [70, inf], y: [50, 100] } */
 };
-rotation(0, 0, 90) /* { x: [-inf, inf], y: [-inf, inf] } */)";
+rotation(0, 0, 90) /* { x: [-100, -50], y: [70, inf] } */)";
     auto result = intervalAnalyze(source, output);
     std::string annotatedSource = print(result->root, result->anns);
     EXPECT_TRUE(output.str().empty());
@@ -163,7 +163,7 @@ iter {
     translation(0, 10) /* { x: [50, inf], y: [60, inf] } */
   }
 };
-rotation(0, 0, 180) /* { x: [-inf, inf], y: [-inf, inf] } */)";
+rotation(0, 0, 180) /* { x: [-inf, -50], y: [-inf, -50] } */)";
     auto result = intervalAnalyze(source, output);
     std::string annotatedSource = print(result->root, result->anns);
     EXPECT_TRUE(output.str().empty());

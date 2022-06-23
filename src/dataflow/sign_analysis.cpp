@@ -48,11 +48,12 @@ struct TransferOperation
 
     Vec2Sign operator()(const Rotation* r) const
     {
+        int deg = *r->deg.value;
+        if (deg % 360 == 0)
+            return preState;
+
         if (*r->x.value == 0 && *r->y.value == 0)
         {
-            int deg = *r->deg.value;
-            if (deg % 360 == 0)
-                return preState;
             if (deg % 360 == 270)
                 return Vec2Sign{preState.y, -preState.x};
             if (deg % 180 == 0)

@@ -26,8 +26,37 @@ struct TransferOperation
 
     Vec2Interval operator()(const Rotation* r) const
     {
-        // TODO: In some cases we could give tighter bounds
-        //       for these.
+        int degree = *r->deg.value;
+        // Rotation by the multiple of 360 degrees will not change the state.
+        if (degree % 360 == 0)
+            return preState;
+
+        // When the rotation is the multiple of 90 degrees, we can easily handle
+        // the rotation and it will not interfere with the infinite bounds.
+        // First translate the state so the rotation's center is at the origo.
+        // Then do the rotation as if inf and -inf were just regular numbers.
+        // Then undo the translation.
+        Vec2 origin{*r->x.value, *r->y.value};
+        Vec2Interval toRotate{preState.x + IntervalDomain{-origin.x},
+                              preState.y + IntervalDomain{-origin.y}};
+        if (degree % 360 == 270)
+        {
+            return Vec2Interval{toRotate.y + IntervalDomain{origin.x},
+                                -toRotate.x + IntervalDomain{origin.y}};
+        }
+        if (degree % 180 == 0)
+        {
+            return Vec2Interval{-toRotate.x + IntervalDomain{origin.x},
+                                -toRotate.y + IntervalDomain{origin.y}};
+        }
+        if (degree % 360 == 90)
+        {
+            return Vec2Interval{-toRotate.y + IntervalDomain{origin.x},
+                                toRotate.x + IntervalDomain{origin.y}};
+        }
+
+        // TODO: when only some of the bounds are infinite, we might be able to
+        //       preserve some information.
         if (preState.x.max == INF ||
             preState.x.min == NEG_INF ||
             preState.y.max == INF ||
@@ -55,9 +84,8 @@ struct TransferOperation
                         Vec2{preState.x.min, preState.y.max},
                         Vec2{preState.x.max, preState.y.min},
                         Vec2{preState.x.max, preState.y.max} };
-        Vec2 origin{*r->x.value, *r->y.value};
         for (auto& toRotate : corners)
-            toRotate = rotate(toRotate, origin, *r->deg.value);
+            toRotate = rotate(toRotate, origin, degree);
 
         auto newX = std::minmax_element(std::begin(corners), std::end(corners), [](Vec2 lhs, Vec2 rhs) {
             return lhs.x < rhs.x;
