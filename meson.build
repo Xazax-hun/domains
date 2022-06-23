@@ -1,5 +1,5 @@
 project('domains', 'cpp',
-        version : '0.0.2',
+        version : '0.0.3',
         default_options : ['cpp_std=c++20', 'warning_level=3'])
 
 # Dependencies
