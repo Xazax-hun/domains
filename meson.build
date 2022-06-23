@@ -57,5 +57,7 @@ if (turnt.found())
                       dir_base / 'test/options/reverse-cfg-dump.tr',
                       dir_base / 'test/options/analyze.tr',
                     ]
-  test('option tests', turnt, args: cmd_option_tests + ['--diff', '--args', driver.full_path()])
+  test('option tests', turnt,
+       args: cmd_option_tests + ['--diff', '--args', driver.full_path()],
+       depends: driver)
 endif
