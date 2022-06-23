@@ -6,12 +6,14 @@ on:
       - "**.cpp"
       - "**.h"
       - "**.yml"
+      - "meson.build"
   pull_request:
     branches: [ main ]
     paths:
       - "**.cpp"
       - "**.h"
       - "**.yml"
+      - "meson.build"
 jobs:
   build-and-test:
       runs-on: ubuntu-latest
