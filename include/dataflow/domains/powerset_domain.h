@@ -13,7 +13,7 @@ template<typename Element>
 struct PowersetDomain
 {
     PowersetDomain() = default;
-    explicit PowersetDomain(std::initializer_list<Element> e) : data{e} {}
+    PowersetDomain(std::initializer_list<Element> e) : data{e} {}
     static PowersetDomain bottom() { return {}; }
 
     PowersetDomain insert(const Element& element) const

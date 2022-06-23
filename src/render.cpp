@@ -20,7 +20,7 @@ constexpr int HEIGHT = 500;
 
 cairo_status_t stringstream_writer(void *closure, const unsigned char *data, unsigned int length)
 {
-    static_cast<std::stringstream*>(closure)->write((const char*)data, length);
+    static_cast<std::stringstream*>(closure)->write(reinterpret_cast<const char*>(data), length);
     return CAIRO_STATUS_SUCCESS;
 }
 
@@ -79,9 +79,9 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
         for (unsigned i = 1; i < w.size(); ++i)
         {
             cairo_new_path(cr);
-            if (auto r = std::get_if<const Rotation*>(&w[i].op))
+            if (const auto* r = std::get_if<const Rotation*>(&w[i].op))
             {
-                auto rotation = *r;
+                const auto* rotation = *r;
                 int xdiff = *rotation->x.value - w[i].pos.x;
                 int ydiff = *rotation->y.value - w[i].pos.y;
                 double dist = sqrt(xdiff * xdiff + ydiff * ydiff);

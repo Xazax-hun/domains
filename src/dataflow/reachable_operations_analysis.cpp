@@ -21,12 +21,12 @@ struct TransferOperation
         return preState.insert("Rotation");
     }
 
-    StringSetDomain preState;
+    const StringSetDomain& preState;
 };
 
 struct ReachableOperationsTransfer
 {
-    StringSetDomain operator()(Operation op, StringSetDomain preState) const
+    StringSetDomain operator()(Operation op, const StringSetDomain& preState) const
     {
         return std::visit(TransferOperation{preState}, op);
     }
