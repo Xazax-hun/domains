@@ -76,7 +76,6 @@ std::optional<Token> Lexer::lex() noexcept
             }
             if (match('*'))
             {
-                bool closed = false;
                 // Skip to end of comment. TODO: make this nestable?
                 do
                 {
@@ -94,12 +93,10 @@ std::optional<Token> Lexer::lex() noexcept
                     if (peek() == '/')
                     {
                         advance();
-                        closed = true;
                         break;
                     }
                 } while (true);
-                if (closed)
-                    break;
+                break;
             }
             diag.error(line, fmt::format("Unexpected token: '{}'.", source.substr(start, current - start)));
             hasError = true;
