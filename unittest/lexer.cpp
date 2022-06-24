@@ -75,7 +75,7 @@ TEST(Lexer, TestComments)
 TEST(Lexer, TestMultiLineComments)
 {
     std::stringstream output;
-    auto tokenList = lexString("/* foo */ 0 /* the rest is */  /* ignored\n\n so is this\n  // and this */", output);
+    auto tokenList = lexString("/* foo */ 0 /* the rest * is */  /* ignored\n\n so is this\n  // and this */", output);
     TokenType tokenTypes[] = {NUMBER, END_OF_FILE};
     EXPECT_TRUE(std::equal(tokenList.begin(), tokenList.end(), std::begin(tokenTypes), std::end(tokenTypes),
                 [](const Token& t, TokenType type) { return t.type == type; }));
