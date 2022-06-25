@@ -70,8 +70,8 @@ std::optional<Token> Lexer::lex() noexcept
             if (match('/'))
             {
                 // Skip to end of line for comment.
-                while (peek() != '\n' && !isAtEnd())
-                    advance();
+                while (advance() != '\n' && !isAtEnd())
+                    ;
                 break;
             }
             if (match('*'))
@@ -79,8 +79,8 @@ std::optional<Token> Lexer::lex() noexcept
                 // Skip to end of comment. TODO: make this nestable?
                 do
                 {
-                    while (peek() != '*' && !isAtEnd())
-                        advance();
+                    while (advance() != '*' && !isAtEnd())
+                        ;
 
                     if (isAtEnd())
                     {
@@ -89,12 +89,8 @@ std::optional<Token> Lexer::lex() noexcept
                         return std::nullopt;
                     }
 
-                    advance();
-                    if (peek() == '/')
-                    {
-                        advance();
+                    if (advance() == '/')
                         break;
-                    }
                 } while (true);
                 break;
             }
@@ -132,7 +128,11 @@ std::optional<Token> Lexer::lexNumber() noexcept
     while (isdigit(peek()))
         advance();
 
-    int value = atoi(source.substr(start, current - start).c_str());
+    auto num = source.substr(start, current - start);
+    char *end;
+    int value = strtol(num.c_str(), &end, 10);
+    if (end == num.c_str())
+        return {};
 
     return Token(NUMBER, line, value);
 }

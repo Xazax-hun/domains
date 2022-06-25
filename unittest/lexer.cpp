@@ -84,11 +84,19 @@ TEST(Lexer, TestMultiLineComments)
 }
 
 TEST(Lexer, ErrorMessages)
-{
-    std::stringstream output;
-    auto maybeTokens = lexString("|", output);
-    EXPECT_TRUE(maybeTokens.empty());
-    EXPECT_EQ("[line 1] Error : Unexpected token: '|'.\n", output.str());
+{ 
+    {
+        std::stringstream output;
+        auto maybeTokens = lexString("|", output);
+        EXPECT_TRUE(maybeTokens.empty());
+        EXPECT_EQ("[line 1] Error : Unexpected token: '|'.\n", output.str());
+    }
+    {
+        std::stringstream output;
+        auto maybeTokens = lexString("-iter", output);
+        EXPECT_TRUE(maybeTokens.empty());
+        EXPECT_EQ("[line 1] Error : Expected number after '-'.\n", output.str());
+    }
 }
 
 
