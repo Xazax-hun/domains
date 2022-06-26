@@ -114,26 +114,26 @@ std::optional<const Branch*> Parser::branch()
 {
     // Exception to allow empty sequence in alternatives.
     const Sequence* lhs = nullptr;
-    if (!check(TokenType::RIGHT_BRACE))
+    if (check(TokenType::RIGHT_BRACE))
+        lhs = context.make<Sequence>(std::vector<Node>{});
+    else
     {
         BIND(lhs_candidate, sequence());
         lhs = lhs_candidate;
     }
-    else
-        lhs = context.make<Sequence>(std::vector<Node>{});
 
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
     BIND(kw, consume(TokenType::OR, "or expected"));
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
 
     const Sequence* rhs = nullptr;
-    if (!check(TokenType::RIGHT_BRACE))
+    if (check(TokenType::RIGHT_BRACE))
+        rhs = context.make<Sequence>(std::vector<Node>{});
+    else
     {
         BIND(rhs_candidate, sequence());
         rhs = rhs_candidate;
     }
-    else
-        rhs = context.make<Sequence>(std::vector<Node>{});
 
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
 
