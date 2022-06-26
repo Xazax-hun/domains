@@ -123,7 +123,7 @@ std::optional<const Branch*> Parser::branch()
         lhs = context.make<Sequence>(std::vector<Node>{});
 
     MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
-    BIND(kw, consume(TokenType::OR, "number expected"));
+    BIND(kw, consume(TokenType::OR, "or expected"));
     MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
 
     const Sequence* rhs = nullptr;

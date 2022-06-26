@@ -95,6 +95,14 @@ TEST(Parser, EmptyOr)
     EXPECT_EQ(output.str(), "[line 1] Error at 'or': at most one alternative can be empty\n");
 }
 
+TEST(Parser, TypoInOr)
+{
+    std::stringstream output;
+    std::string_view source = "init(50, 50, 50, 50); {} 10 { translation(0, 0) }";
+    auto result = parseString(source, output);
+    EXPECT_EQ(output.str(), "[line 1] Error at '10': or expected\n[line 1] Error at '10': end of file expected\n");
+}
+
 TEST(Parser, EmptyLoop)
 {
     std::stringstream output;
