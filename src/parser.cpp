@@ -22,7 +22,7 @@ std::optional<const Sequence*> Parser::parse()
     auto result = sequence(true);
     if (!isAtEnd())
     {
-        error(peek(), "end of file expected");
+        error(peek(), "end of file expected.");
         return {};
     }
     return result;
@@ -32,7 +32,7 @@ std::optional<const Sequence*> Parser::sequence(bool root)
 {
     if (root && !check(TokenType::INIT))
     {
-        error(peek(), "'init' expected at the beginning of the program");
+        error(peek(), "'init' expected at the beginning of the program.");
         return {};
     }
 
@@ -52,24 +52,24 @@ std::optional<Node> Parser::command()
     if (match(TokenType::INIT))
     {
         Token kw = previous();
-        MUST_SUCCEED(consume(TokenType::LEFT_PAREN, "( expected"));
-        BIND(topX, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(topY, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(width, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(height, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN, ") expected"));
+        MUST_SUCCEED(consume(TokenType::LEFT_PAREN));
+        BIND(topX, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(topY, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(width, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(height, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN));
 
         if (*width.value < 0)
         {
-            error(kw, "the width of the initial area cannot be negative");
+            error(kw, "the width of the initial area cannot be negative.");
             return {};
         }
         if (*height.value < 0)
         {
-            error(kw, "the height of the initial area cannot be negative");
+            error(kw, "the height of the initial area cannot be negative.");
             return {};
         }
 
@@ -78,24 +78,24 @@ std::optional<Node> Parser::command()
     if (match(TokenType::TRANSLATION))
     {
         Token kw = previous();
-        MUST_SUCCEED(consume(TokenType::LEFT_PAREN, "( expected"));
-        BIND(x, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(y, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN, ") expected"));
+        MUST_SUCCEED(consume(TokenType::LEFT_PAREN));
+        BIND(x, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(y, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN));
 
         return context.make<Translation>(kw, x, y);
     }
     if (match(TokenType::ROTATION))
     {
         Token kw = previous();
-        MUST_SUCCEED(consume(TokenType::LEFT_PAREN, "( expected"));
-        BIND(x, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(y, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::COMMA, ", expected"))
-        BIND(deg, consume(TokenType::NUMBER, "number expected"));
-        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN, ") expected"));
+        MUST_SUCCEED(consume(TokenType::LEFT_PAREN));
+        BIND(x, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(y, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::COMMA))
+        BIND(deg, consume(TokenType::NUMBER, "a number expected."));
+        MUST_SUCCEED(consume(TokenType::RIGHT_PAREN));
 
         return context.make<Rotation>(kw, x, y, deg);
     }
@@ -122,9 +122,9 @@ std::optional<const Branch*> Parser::branch()
         lhs = lhs_candidate;
     }
 
-    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
-    BIND(kw, consume(TokenType::OR, "or expected"));
-    MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
+    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE));
+    BIND(kw, consume(TokenType::OR));
+    MUST_SUCCEED(consume(TokenType::LEFT_BRACE));
 
     const Sequence* rhs = nullptr;
     if (check(TokenType::RIGHT_BRACE))
@@ -135,12 +135,12 @@ std::optional<const Branch*> Parser::branch()
         rhs = rhs_candidate;
     }
 
-    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
+    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE));
 
     assert(lhs && rhs);
     if (lhs->nodes.empty() && rhs->nodes.empty())
     {
-        error(kw, "at most one alternative can be empty");
+        error(kw, "at most one alternative can be empty.");
         return {};
     }
 
@@ -150,16 +150,16 @@ std::optional<const Branch*> Parser::branch()
 std::optional<const Loop*> Parser::loop()
 {
     Token kw = previous();
-    MUST_SUCCEED(consume(TokenType::LEFT_BRACE, "{ expected"));
+    MUST_SUCCEED(consume(TokenType::LEFT_BRACE));
 
     if (match(TokenType::RIGHT_BRACE))
     {
-        error(kw, "the body of 'iter' must not be empty");
+        error(kw, "the body of 'iter' must not be empty.");
         return {};
     }
 
     BIND(body, sequence());
-    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE, "} expected"));
+    MUST_SUCCEED(consume(TokenType::RIGHT_BRACE));
 
     return context.make<Loop>(kw, body);
 }

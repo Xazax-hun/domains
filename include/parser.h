@@ -4,6 +4,8 @@
 #include <vector>
 #include <optional>
 
+#include "fmt/format.h"
+
 #include "include/lexer.h"
 #include "include/ast.h"
 #include "include/utils.h"
@@ -20,6 +22,7 @@ public:
     Parser(std::vector<Token> tokens,
            const DiagnosticEmitter& diag) noexcept : tokens(std::move(tokens)), diag(diag) {}
 
+    // TODO: return a (node, context) pair.
     std::optional<const Sequence*> parse();
 
 private:
@@ -57,12 +60,15 @@ private:
         return previous();
     }
 
-    std::optional<Token> consume(TokenType type, std::string_view message) noexcept
+    std::optional<Token> consume(TokenType type, std::string_view message = "") noexcept
     {
         if (check(type))
             return advance();
 
-        error(peek(), message);
+        error(peek(),
+              message.empty() ?
+                fmt::format("'{}' expected.", tokenTypeToSourceName(type)) :
+                message);
         return std::nullopt;
     }
 
