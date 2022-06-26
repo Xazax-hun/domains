@@ -157,10 +157,10 @@ std::string print(const CFG& cfg) noexcept
         for (auto op : block.operations())
             out << print(toNode(op)) << R"(\n)";
 
-        out << R"("])" << "\n";
+        out << "\"]\n";
         ++counter;
     }
-    out << "\n";
+    out << '\n';
     counter = 0;
     for (const auto& block : cfg.blocks())
     {
