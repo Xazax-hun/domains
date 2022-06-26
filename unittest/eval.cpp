@@ -10,8 +10,7 @@ namespace
 struct ParseResult
 {
     Walk w;
-    Node root;
-    Parser parser; // Owns the nodes.
+    ASTContext ctxt; // Owns the nodes.
 };
 
 std::optional<ParseResult> getWalk(std::string_view str, std::ostream& output)
@@ -22,12 +21,12 @@ std::optional<ParseResult> getWalk(std::string_view str, std::ostream& output)
     if (tokens.empty())
         return {};
     Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
+    auto ctxt = parser.parse();
+    if (!ctxt)
         return {};
-    auto cfg = CFG::createCfg(*root);
+    auto cfg = CFG::createCfg(ctxt->getRoot());
     auto w = createRandomWalk(cfg);
-    return ParseResult{std::move(w), *root, std::move(parser)};
+    return ParseResult{std::move(w), std::move(*ctxt)};
 }
 
 constexpr double threshold = 1e-10;
@@ -74,7 +73,7 @@ R"(init(50, 0, 0, 0) /* {{x: 50, y: 0}} */;
 translation(10, 0) /* {{x: 60, y: 0}} */;
 rotation(0, 0, 90) /* {{x: 0, y: 60}} */)";
     Annotations annotations = annotateWithWalks(std::vector<Walk>{result->w});
-    std::string annotated = print(result->root, annotations);
+    std::string annotated = print(result->ctxt.getRoot(), annotations);
     EXPECT_EQ(expectedSourceText, annotated);
 }
 

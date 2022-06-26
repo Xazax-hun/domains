@@ -9,12 +9,11 @@
 template<Domain D>
 struct AnalysisTestResult
 {
-    Node root;
+    ASTContext context;
     CFG cfg;
     std::vector<D> analysis;
     Annotations anns;
     std::vector<Polygon> covered;
-    Parser parser; // Owns the nodes.
 };
 
 template <CfgConcept Cfg, Domain D, AnalysisFunc<D, Cfg> getAnalysis,
@@ -27,17 +26,17 @@ std::optional<AnalysisTestResult<D>> analyzeForTest(std::string_view str, std::o
     if (tokens.empty())
         return {};
     Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
+    auto ctxt = parser.parse();
+    if (!ctxt)
         return {};
-    auto cfg = CFG::createCfg(*root);
+    auto cfg = CFG::createCfg(ctxt->getRoot());
     auto results = getAnalysis(cfg);
     if (results.empty())
-        return AnalysisTestResult<D>{*root, std::move(cfg), {}, {}, {}, std::move(parser)};
+        return AnalysisTestResult<D>{std::move(*ctxt), std::move(cfg), {}, {}, {}};
     auto anns = AF(cfg, results);
     auto covered = VF(cfg, results);
-    return AnalysisTestResult<D>{*root, std::move(cfg), std::move(results),
-                                 std::move(anns), std::move(covered), std::move(parser)};
+    return AnalysisTestResult<D>{std::move(*ctxt), std::move(cfg), std::move(results),
+                                 std::move(anns), std::move(covered)};
 }
 
 #endif

@@ -9,7 +9,7 @@ namespace
 struct ParseResult
 {
     CFG cfg;
-    Parser parser; // Owns the nodes.
+    ASTContext context;
 };
 
 std::optional<ParseResult> parseToCFG(std::string_view str, std::ostream& output)
@@ -20,11 +20,11 @@ std::optional<ParseResult> parseToCFG(std::string_view str, std::ostream& output
     if (tokens.empty())
         return {};
     Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
+    auto ctxt = parser.parse();
+    if (!ctxt)
         return {};
-    auto cfg = CFG::createCfg(*root);
-    return ParseResult{std::move(cfg), std::move(parser)};
+    auto cfg = CFG::createCfg(ctxt->getRoot());
+    return ParseResult{std::move(cfg), std::move(*ctxt)};
 }
 
 

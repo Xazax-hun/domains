@@ -73,6 +73,12 @@ public:
         return ret;
     }
 
+    const Sequence* getRoot() const {
+        Node root = nodes.back();
+        assert(std::holds_alternative<const Sequence*>(root));
+        return std::get<const Sequence*>(root);
+    }
+
     ~ASTContext()
     {
         for (auto node : nodes)

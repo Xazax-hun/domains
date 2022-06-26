@@ -17,15 +17,15 @@
   if (!y) return std::nullopt; 
 
 
-std::optional<const Sequence*> Parser::parse()
+std::optional<ASTContext> Parser::parse()
 {
-    auto result = sequence(true);
+    MUST_SUCCEED(sequence(true));
     if (!isAtEnd())
     {
         error(peek(), "end of file expected.");
         return {};
     }
-    return result;
+    return std::move(context);
 }
 
 std::optional<const Sequence*> Parser::sequence(bool root)

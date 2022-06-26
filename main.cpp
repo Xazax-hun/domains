@@ -44,10 +44,10 @@ bool runFile(std::string_view filePath, Config config)
     if (tokens.empty())
         return false;
     Parser parser(tokens, emitter);
-    auto root = parser.parse();
-    if (!root)
+    auto context = parser.parse();
+    if (!context)
         return false;
-    CFG cfg = CFG::createCfg(*root);
+    CFG cfg = CFG::createCfg(context->getRoot());
     if (config.dumpCfg)
         fmt::print("{}\n", print(cfg));
     if (config.dumpReverseCfg)
@@ -87,11 +87,11 @@ bool runFile(std::string_view filePath, Config config)
         }
     }
     if (config.annotateTrace)
-        fmt::print("{}\n", print(*root, annotateWithWalks(walks)));
+        fmt::print("{}\n", print(context->getRoot(), annotateWithWalks(walks)));
     if (config.svg)
         fmt::print("{}\n", renderRandomWalkSVG(walks, covered, config.dotsOnly));
     else if (config.analysisName)
-        fmt::print("{}\n", print(*root, annotations));
+        fmt::print("{}\n", print(context->getRoot(), annotations));
     return true;
 }
 

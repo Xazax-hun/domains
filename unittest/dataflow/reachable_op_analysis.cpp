@@ -32,7 +32,7 @@ iter {
   rotation(0, 0, 90) /* {Init, Rotation, Translation} */
 })";
     auto result = pastOpsAnalyze(source, output);
-    std::string annotatedSource = print(result->root, result->anns);
+    std::string annotatedSource = print(result->context.getRoot(), result->anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_EQ(expected, annotatedSource);
@@ -58,7 +58,7 @@ R"(/* {Init, Rotation, Translation} */ init(50, 50, 50, 50);
   /* {Rotation} */ rotation(0, 0, 90)
 })";
     auto result = futureOpsAnalyze(source, output);
-    std::string annotatedSource = print(result->root, result->anns);
+    std::string annotatedSource = print(result->context.getRoot(), result->anns);
     EXPECT_TRUE(output.str().empty());
     EXPECT_TRUE(result);
     EXPECT_EQ(expected, annotatedSource);
