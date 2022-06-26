@@ -99,5 +99,3 @@ void print(int indent, Node n, std::ostream& output, const Annotations& anns) no
     std::visit(nodePrinter, n);
     renderPostAnnotations(output, n, anns);
 }
-
-

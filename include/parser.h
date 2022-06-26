@@ -22,8 +22,6 @@ public:
 
     std::optional<const Sequence*> parse();
 
-    const ASTContext& getContext() const noexcept { return context; }
-
 private:
     std::optional<const Sequence*> sequence(bool root = false);
     std::optional<const Branch*> branch();
