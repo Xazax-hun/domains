@@ -125,8 +125,8 @@ Walk createRandomWalk(const CFG& cfg, int loopiness)
         }
         if (cfg.blocks()[current].successors().empty())
             break;
-        visited.insert(current);
         backEdges.merge(detectBackEdges(cfg, current, visited));
+        visited.insert(current);
         current = getNextBlock(gen, cfg, current, backEdges, loopiness);
     } while (true);
 
