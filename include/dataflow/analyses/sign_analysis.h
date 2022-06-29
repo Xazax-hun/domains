@@ -9,6 +9,11 @@
 
 using Vec2Sign = Vec2Domain<SignDomain>;
 
+struct SignTransfer
+{
+    Vec2Sign operator()(Operation op, Vec2Sign preState) const;
+};
+
 std::vector<Vec2Sign> getSignAnalysis(const CFG& cfg);
 
 Annotations signAnalysisToOperationAnnotations(const CFG& cfg,

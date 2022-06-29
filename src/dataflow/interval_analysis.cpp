@@ -100,14 +100,12 @@ struct TransferOperation
     Vec2Interval preState;
 };
 
-struct IntervalTransfer
-{
-    Vec2Interval operator()(Operation op, Vec2Interval preState) const
-    {
-        return std::visit(TransferOperation{preState}, op);
-    }
-};
 } // anonymous
+
+Vec2Interval IntervalTransfer::operator()(Operation op, Vec2Interval preState) const
+{
+    return std::visit(TransferOperation{preState}, op);
+}
 
 std::vector<Vec2Interval> getPrimitiveIntervalAnalysis(const CFG& cfg)
 {

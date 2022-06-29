@@ -67,16 +67,12 @@ struct TransferOperation
     Vec2Sign preState;
 };
 
-struct SignTransfer
-{
-    Vec2Sign operator()(Operation op, Vec2Sign preState) const
-    {
-        return std::visit(TransferOperation{preState}, op);
-    }
-};
-
 } // anonymous
 
+Vec2Sign SignTransfer::operator()(Operation op, Vec2Sign preState) const
+{
+    return std::visit(TransferOperation{preState}, op);
+}
 
 std::vector<Vec2Sign> getSignAnalysis(const CFG& cfg)
 {

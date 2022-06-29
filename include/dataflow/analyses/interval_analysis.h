@@ -9,6 +9,11 @@
 
 using Vec2Interval = Vec2Domain<IntervalDomain>;
 
+struct IntervalTransfer
+{
+    Vec2Interval operator()(Operation op, Vec2Interval preState) const;
+};
+
 // This is a deliberately inefficient/primitive implementation. It has hard time
 // dealing with loops and kept for exposition only.
 std::vector<Vec2Interval> getPrimitiveIntervalAnalysis(const CFG& cfg);

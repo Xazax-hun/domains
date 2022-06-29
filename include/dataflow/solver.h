@@ -4,20 +4,11 @@
 #include <vector>
 
 #include "include/dataflow/domains/domain.h"
+#include "include/dataflow/transfer.h"
 #include "include/cfg.h"
-
-#include <type_traits>
 
 template<Domain D, CfgConcept CFG>
 using AnalysisFunc = std::vector<D>(*)(const CFG&);
-
-template<typename T, typename Dom>
-concept TransferFunction = Domain<Dom> && 
-    std::is_default_constructible_v<T> &&
-    requires(T f, Operation op, Dom d)
-{
-    { f(op, d) } -> std::same_as<Dom>;
-};
 
 template<Domain D, CfgConcept CFG>
 using AnnotatorFunc = Annotations (*)(const CFG& cfg, const std::vector<D>& result);
@@ -45,13 +36,12 @@ using VisualizerFunc = std::vector<Polygon> (*)(const CFG& cfg, const std::vecto
 // See `allAnnotationsFromAnalysisResults` how to recover
 // per-operation analysis states.
 template<Domain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
-std::vector<D> solveMonotoneFramework(const CFG& cfg)
+std::vector<D> solveMonotoneFramework(const CFG& cfg, F transfer)
 {
     const size_t limit = NodeLimit * cfg.blocks().size();
     size_t processedNodes = 0;
     std::vector<D> postStates(cfg.blocks().size(), D::bottom());
     std::vector<bool> visited(cfg.blocks().size(), false);
-    F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
     while(!w.empty())
@@ -90,17 +80,22 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg)
     return postStates;
 }
 
+template<Domain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
+std::vector<D> solveMonotoneFramework(const CFG& cfg)
+{
+    return solveMonotoneFramework<D, F, CFG, NodeLimit>(cfg, F{});
+}
+
 // Similar to solveMonotoneFramework, but always invoke the widen
 // operation.
 template<WidenableDomain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
-std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
+std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg, F transfer)
 {
     const size_t limit = NodeLimit * cfg.blocks().size();
     size_t processedNodes = 0;
     std::vector<D> preStates(cfg.blocks().size(), D::bottom());
     std::vector<D> postStates(cfg.blocks().size(), D::bottom());
     std::vector<bool> visited(cfg.blocks().size(), false);
-    F transfer{};
     RPOWorklist w{ cfg };
     w.enqueue(0);
     while(!w.empty())
@@ -130,6 +125,12 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
     }
 
     return postStates;
+}
+
+template<WidenableDomain D, TransferFunction<D> F, CfgConcept CFG, unsigned NodeLimit = 10>
+std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg)
+{
+    return solveMonotoneFrameworkWithWidening<D, F, CFG, NodeLimit>(cfg, F{});
 }
 
 // Annotate the last operation of each CFG block with the analysis state at the end of the

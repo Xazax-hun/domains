@@ -9,6 +9,11 @@
 
 using StringSetDomain = PowersetDomain<std::string>;
 
+struct ReachableOperationsTransfer
+{
+    StringSetDomain operator()(Operation op, const StringSetDomain& preState) const;
+};
+
 std::vector<StringSetDomain> getPastOperationsAnalysis(const CFG& cfg);
 std::vector<StringSetDomain> getFutureOperationsAnalysis(const ReverseCFG& cfg);
 

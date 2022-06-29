@@ -23,15 +23,12 @@ struct TransferOperation
 
     const StringSetDomain& preState;
 };
-
-struct ReachableOperationsTransfer
-{
-    StringSetDomain operator()(Operation op, const StringSetDomain& preState) const
-    {
-        return std::visit(TransferOperation{preState}, op);
-    }
-};
 } // anonymous namespace
+
+StringSetDomain ReachableOperationsTransfer::operator()(Operation op, const StringSetDomain& preState) const
+{
+    return std::visit(TransferOperation{preState}, op);
+}
 
 std::vector<StringSetDomain> getPastOperationsAnalysis(const CFG& cfg)
 {
