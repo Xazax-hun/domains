@@ -66,7 +66,7 @@ std::set<std::pair<int, int>> detectBackEdges(const CFG& cfg, int current, const
         // In every walk, in order to take the back edge of a loop,
         // we first need to enter the loop. Thus, if the target of the
         // edge is already visited, we see a back edge.
-        if (visited.contains(succ))
+        if (visited.contains(succ) || succ == current)
             ret.insert(std::make_pair(current, succ));
     }
     return ret;
