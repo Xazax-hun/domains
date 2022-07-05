@@ -88,14 +88,13 @@ void renderRandomPath(cairo_t *cr, const Walk& w, RGB color, bool dotsOnly)
                 double degPrev = atan2(-w[i-1].pos.y, w[i-1].pos.x);
                 double degCur = atan2(-w[i].pos.y, w[i].pos.x);
                 cairo_arc(cr, *rotation->x.value, -*rotation->y.value, dist, degCur, degPrev);
-                cairo_stroke(cr);
             }
             else
             {
                 cairo_move_to(cr, w[i - 1].pos.x, -w[i - 1].pos.y);
                 cairo_line_to(cr, w[i].pos.x, -w[i].pos.y);
-                cairo_stroke(cr);
             }
+            cairo_stroke(cr);
         }
     }
     // Draw the dots
@@ -161,9 +160,9 @@ std::string renderRandomWalkSVG(const std::vector<Walk>& walks, const std::vecto
         cairo_set_source_rgb(cr, 0, 0, 0);
         cairo_new_path(cr);
         cairo_move_to(cr, 0, -HEIGHT/2);
-        cairo_line_to(cr, 0, HEIGHT);
+        cairo_line_to(cr, 0, HEIGHT/2);
         cairo_move_to(cr, -WIDTH/2, 0);
-        cairo_line_to(cr, WIDTH, 0);
+        cairo_line_to(cr, WIDTH/2, 0);
         cairo_stroke(cr);
 
         ColorPicker picker;
