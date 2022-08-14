@@ -177,8 +177,7 @@ template<CfgConcept CFG>
 RPOCompare<CFG>::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
 {
     enum class Color { White, Gray, Black };
-    std::vector<int> visitOrder;
-    visitOrder.reserve(cfg.blocks().size());
+    int counter = 0;
     std::stack<int, std::vector<int>> stack;
     std::vector<Color> state(cfg.blocks().size(), Color::White);
     stack.push(0);
@@ -201,16 +200,15 @@ RPOCompare<CFG>::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
             }
             case Color::Gray:
                 state[current] = Color::Black;
-                visitOrder.push_back(current);
+                rpoOrder[current] = counter++;
                 break;
             case Color::Black:
                 break;
         }
     }
-    std::reverse(visitOrder.begin(), visitOrder.end());
-    int counter = 0;
-    for (int node : visitOrder)
-        rpoOrder[node] = counter++;
+    const auto maxPos = counter - 1;
+    for (unsigned node = 0; node < rpoOrder.size(); ++node)
+        rpoOrder[node] = maxPos - rpoOrder[node];
 }
 
 template<CfgConcept CFG>
