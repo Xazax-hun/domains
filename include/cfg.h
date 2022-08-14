@@ -176,40 +176,35 @@ std::string print(const CFG& cfg) noexcept
 template<CfgConcept CFG>
 RPOCompare<CFG>::RPOCompare(const CFG& cfg)  : rpoOrder(cfg.blocks().size())
 {
+    enum class Color { White, Gray, Black };
     std::vector<int> visitOrder;
     visitOrder.reserve(cfg.blocks().size());
     std::stack<int, std::vector<int>> stack;
-    std::vector<bool> visited(cfg.blocks().size(), false);
-    std::stack<int, std::vector<int>> pending;
+    std::vector<Color> state(cfg.blocks().size(), Color::White);
     stack.push(0);
     while(!stack.empty())
     {
         int current = stack.top();
-        if (!visited[current])
+        stack.pop();
+        switch(state[current])
         {
-            visited[current] = true;
-            pending.push(-1);
-            for(auto succ : cfg.blocks()[current].successors())
+            case Color::White:
             {
-                if (!visited[succ])
-                    pending.push(succ);
+                state[current] = Color::Gray;
+                stack.push(current);
+                for(auto succ : cfg.blocks()[current].successors())
+                {
+                    if (state[succ] == Color::White)
+                        stack.push(succ);
+                }
+                break;
             }
-        }
-        while (true)
-        {
-            int next = pending.top();
-            pending.pop();
-            if (next == -1)
-            {
-                stack.pop();
+            case Color::Gray:
+                state[current] = Color::Black;
                 visitOrder.push_back(current);
                 break;
-            }
-            if (!visited[next])
-            {
-                stack.push(next);
+            case Color::Black:
                 break;
-            }
         }
     }
     std::reverse(visitOrder.begin(), visitOrder.end());
