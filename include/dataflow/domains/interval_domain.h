@@ -21,7 +21,7 @@ struct IntervalDomain
     static IntervalDomain bottom() { return {INF, NEG_INF}; }
     static IntervalDomain top() { return {NEG_INF, INF}; }
 
-    IntervalDomain merge(IntervalDomain other) const
+    IntervalDomain join(IntervalDomain other) const
     {
         return {std::min(min, other.min), std::max(max, other.max)};
     }

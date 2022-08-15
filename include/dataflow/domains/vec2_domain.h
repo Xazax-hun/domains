@@ -34,9 +34,9 @@ struct Vec2Domain
         return Vec2Domain{D::top(), D::top()};
     }
 
-    Vec2Domain merge(const Vec2Domain& other) const
+    Vec2Domain join(const Vec2Domain& other) const
     {
-        return Vec2Domain{x.merge(other.x), y.merge(other.y)};
+        return Vec2Domain{x.join(other.x), y.join(other.y)};
     }
 
     Vec2Domain widen(const Vec2Domain transferredState) const requires WidenableDomain<D>

@@ -20,13 +20,13 @@ concept Domain = requires(T a)
     // Required to be the smallest element according to the order above.
     { T::bottom() } -> std::same_as<T>;
     // Requirements:
-    // * a.merge(a) == a
-    // * a.merge(b) == b.merge(a)
-    // * a.merge(b) >= a
-    // * a.merge(b) >= b
-    // * top.merge(b) == top
-    // * bottom.merge(b) == b
-    { a.merge(a) } -> std::same_as<T>;
+    // * a.join(a) == a
+    // * a.join(b) == b.join(a)
+    // * a.join(b) >= a
+    // * a.join(b) >= b
+    // * top.join(b) == top
+    // * bottom.join(b) == b
+    { a.join(a) } -> std::same_as<T>;
     { a.toString() } -> std::convertible_to<std::string_view>;
 
     // For visualization purposes only.

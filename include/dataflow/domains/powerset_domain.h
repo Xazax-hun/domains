@@ -34,7 +34,7 @@ struct PowersetDomain
                              data.begin(), data.end());
     }
 
-    PowersetDomain merge(PowersetDomain other) const
+    PowersetDomain join(PowersetDomain other) const
     {
         other.data.insert(data.begin(), data.end());
         return other;

@@ -22,13 +22,13 @@ TEST(Domains, SignDomain)
     EXPECT_EQ(positive, positive);
     EXPECT_TRUE(bottom <= negative);
     EXPECT_TRUE(zero <= top);
-    EXPECT_EQ(zero.merge(zero), zero);
-    EXPECT_EQ(negative.merge(positive), top);
-    EXPECT_EQ(positive.merge(negative), top);
-    EXPECT_EQ(top.merge(negative), top);
-    EXPECT_EQ(negative.merge(top), top);
-    EXPECT_EQ(bottom.merge(negative), negative);
-    EXPECT_EQ(negative.merge(bottom), negative);
+    EXPECT_EQ(zero.join(zero), zero);
+    EXPECT_EQ(negative.join(positive), top);
+    EXPECT_EQ(positive.join(negative), top);
+    EXPECT_EQ(top.join(negative), top);
+    EXPECT_EQ(negative.join(top), top);
+    EXPECT_EQ(bottom.join(negative), negative);
+    EXPECT_EQ(negative.join(bottom), negative);
 
 
     EXPECT_EQ(negative.toString(), "Negative");
@@ -62,13 +62,13 @@ TEST(Domains, IntervalDomain)
 
     // Merging
     {
-        EXPECT_EQ(bottom.merge(singleton), singleton);
-        EXPECT_EQ(bottom.merge(smallRangeA), smallRangeA);
-        EXPECT_EQ(smallRangeA.merge(bottom), smallRangeA);
+        EXPECT_EQ(bottom.join(singleton), singleton);
+        EXPECT_EQ(bottom.join(smallRangeA), smallRangeA);
+        EXPECT_EQ(smallRangeA.join(bottom), smallRangeA);
         IntervalDomain mergedSmallsExpected{0, 20};
-        EXPECT_EQ(smallRangeA.merge(smallRangeB), mergedSmallsExpected);
-        EXPECT_EQ(largeRange.merge(top), top);
-        EXPECT_EQ(top.merge(largeRange), top);
+        EXPECT_EQ(smallRangeA.join(smallRangeB), mergedSmallsExpected);
+        EXPECT_EQ(largeRange.join(top), top);
+        EXPECT_EQ(top.join(largeRange), top);
     }
 
     // Widening
@@ -123,14 +123,14 @@ TEST(Domains, Vec2SignsDomain)
     EXPECT_TRUE(posPos <= posTop);
     EXPECT_FALSE(posPos <= posNeg);
     EXPECT_TRUE(posPos <= topTop);
-    EXPECT_EQ(posNeg.merge(posPos), posTop);
-    EXPECT_EQ(posPos.merge(posNeg), posTop);
-    EXPECT_EQ(negPos.merge(posPos), topPos);
-    EXPECT_EQ(posPos.merge(negPos), topPos);
-    EXPECT_EQ(topTop.merge(posNeg), topTop);
-    EXPECT_EQ(posNeg.merge(topTop), topTop);
-    EXPECT_EQ(posNeg.merge(bottom), posNeg);
-    EXPECT_EQ(bottom.merge(posNeg), posNeg);
+    EXPECT_EQ(posNeg.join(posPos), posTop);
+    EXPECT_EQ(posPos.join(posNeg), posTop);
+    EXPECT_EQ(negPos.join(posPos), topPos);
+    EXPECT_EQ(posPos.join(negPos), topPos);
+    EXPECT_EQ(topTop.join(posNeg), topTop);
+    EXPECT_EQ(posNeg.join(topTop), topTop);
+    EXPECT_EQ(posNeg.join(bottom), posNeg);
+    EXPECT_EQ(bottom.join(posNeg), posNeg);
 
     EXPECT_EQ(posNeg.toString(), "{ x: Positive, y: Negative }");
 }
@@ -161,10 +161,10 @@ TEST(Domains, PowersetDomain)
     EXPECT_TRUE(bottom <= b);
     EXPECT_TRUE(a <= ab);
     EXPECT_TRUE(b <= ab);
-    EXPECT_EQ(a.merge(b), ab);
-    EXPECT_EQ(b.merge(a), ab);
-    EXPECT_EQ(b.merge(b), b);
-    EXPECT_EQ(bottom.merge(b), b);
+    EXPECT_EQ(a.join(b), ab);
+    EXPECT_EQ(b.join(a), ab);
+    EXPECT_EQ(b.join(b), b);
+    EXPECT_EQ(bottom.join(b), b);
 
     EXPECT_EQ(ab.toString(), "{a, b}");
     EXPECT_EQ(bottom.toString(), "{}");

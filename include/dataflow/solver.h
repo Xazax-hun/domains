@@ -52,7 +52,7 @@ std::vector<D> solveMonotoneFramework(const CFG& cfg, F transfer)
         int currentBlock = w.dequeue();
         D preState{ D::bottom() };
         for (auto pred : cfg.blocks()[currentBlock].predecessors())
-            preState = preState.merge(postStates[pred]);
+            preState = preState.join(postStates[pred]);
 
         D postState{ preState };
         // TODO: support per-block transfer functions. E.g., for bitvector
@@ -106,7 +106,7 @@ std::vector<D> solveMonotoneFrameworkWithWidening(const CFG& cfg, F transfer)
         int currentBlock = w.dequeue();
         D newPreState{ D::bottom() };
         for (auto pred : cfg.blocks()[currentBlock].predecessors())
-            newPreState = newPreState.merge(postStates[pred]);
+            newPreState = newPreState.join(postStates[pred]);
 
         preStates[currentBlock] = preStates[currentBlock].widen(newPreState);
         D postState{ preStates[currentBlock] };
@@ -159,7 +159,7 @@ Annotations allAnnotationsFromAnalysisResults(const CFG& cfg, const std::vector<
     {
         D preState{ D::bottom() };
         for (auto pred : block.predecessors())
-            preState = preState.merge(result[pred]);
+            preState = preState.join(result[pred]);
 
         D postOperationState = preState;
         for (auto op : block.operations())
@@ -183,7 +183,7 @@ std::vector<Polygon> coveredAreaFromAnalysisResults(const CFG& cfg, const std::v
     {
         D preState{ D::bottom() };
         for (auto pred : block.predecessors())
-            preState = preState.merge(result[pred]);
+            preState = preState.join(result[pred]);
 
         D postOperationState = preState;
         for (auto op : block.operations())

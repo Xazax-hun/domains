@@ -42,7 +42,7 @@ struct SignDomain
     explicit constexpr SignDomain(int v) : v(toAbstract(v)) {}
 
     static SignDomain bottom() { return SignDomain{ Bottom }; }
-    SignDomain merge(SignDomain other) const
+    SignDomain join(SignDomain other) const
     {
         if (v == other.v || other.v == Bottom)
             return *this;
