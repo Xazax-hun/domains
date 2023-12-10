@@ -10,6 +10,8 @@ The goal is to build a framework that helps experimenting with numerical domains
 infer which regions in the 2D space are reachable by the programs written in the graphical language.
 To get basic syntax highlight for the language install `utils/ide/trlang/trlang.vsix` extension to VS code.
 
+This project is discontinued, a more advanced version written in Rust is available [here](https://github.com/Xazax-hun/domains-oxide).
+
 # Running the interpreter
 
 Consider the following example program from the book:
